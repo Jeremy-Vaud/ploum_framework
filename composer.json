@@ -1,0 +1,19 @@
+{
+    "name": "jeremy/ploum_framework",
+    "description": "",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "class/",
+            "Model\\": "model/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jeremy Vaud"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.7"
+    }
+}

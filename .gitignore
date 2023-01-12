@@ -1,0 +1,7 @@
+/vendor
+/node_modules
+/tmp
+/files
+.DS_Store
+.parcel-cache
+/dist

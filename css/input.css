@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Langar&family=Niramit:wght@300;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: theme(fontFamily.niramit);
+        font-weight: 300;
+        font-size: 17px;
+        color: theme(colors.aubergine);
+        background-color: theme(colors.beige);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: theme(fontFamily.langar);
+    }
+
+    h1, h2 {
+        font-size: 64px;
+    }
+
+    h3 {
+        font-size: 36px;
+    }
+
+    h4, h5{
+        font-size: 21px;
+    }
+}
+
+@layer components {
+
+}
+
+@media screen(sm) {
+    h5 {
+        font-size: 40px;
+    }
+}
+
+@media screen(lg) {
+    
+    h1, h2 {
+        font-size: 165px;
+    }
+
+    h3 {
+        font-size: 96px;
+    }
+
+    h4 {
+        font-size: 40px;
+    }
+
+}
