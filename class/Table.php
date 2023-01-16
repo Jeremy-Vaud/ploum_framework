@@ -13,6 +13,7 @@ abstract class Table extends Debug {
     protected $fields = [];
     protected $files = [];
     protected $foreignKeys = [];
+    protected $adminPannel = null;
 
     /**
      * Retourne la valeur d'un champ de la table
@@ -529,4 +530,7 @@ abstract class Table extends Debug {
         return $data;
     }
     
+    public function getForAdminPannel() {
+        return $this->adminPannel;
+    }
 }

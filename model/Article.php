@@ -20,5 +20,24 @@ class Article extends \App\Table {
         $this->foreignKeys = [
             "Model\Tag" => []
         ];
+        $this->adminPannel = [
+            "title" => "Articles",
+            "icon" => "faNewspaper",
+            "order" => 2,
+            "fields" => [
+                "nom" => [
+                    "titre" => "text",
+                    "table" => ["colums","insert","update"]
+                ],
+                "texte" => [
+                    "date" => "text",
+                    "table" => ["colums","insert","update"]
+                ],
+                "url" => [
+                    "type" => "url",
+                    "table" => ["colums","insert","update"]
+                ],
+            ],
+        ];
     }
 }

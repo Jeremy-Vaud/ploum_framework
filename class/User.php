@@ -22,6 +22,33 @@ class User extends Table {
             "password" => new Field(["type" => "password", "length" => 16, "minLength" => 4]),
             "admin" => new Field(["type" => "bool", "value" => 0]),
         ];
+        $this->adminPannel = [
+            "title" => "Utilisateurs",
+            "icon" => "faUsers",
+            "order" => 1,
+            "fields" => [
+                "nom" => [
+                    "type" => "text",
+                    "table" => ["colums","insert","update"]
+                ],
+                "prenom" => [
+                    "type" => "text",
+                    "table" => ["colums","insert","update"]
+                ],
+                "email" => [
+                    "type" => "email",
+                    "table" => ["colums","insert","update"]
+                ],
+                "password" => [
+                    "type" => "password",
+                    "table" => ["insert"]
+                ],
+                "admin" => [
+                    "type" => "checkbox",
+                    "table" => ["colums","insert","update"]
+                ],
+            ],
+        ];
     }
     
     /**

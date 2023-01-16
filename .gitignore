@@ -5,3 +5,5 @@
 .DS_Store
 .parcel-cache
 /dist
+/admin
+/adminSrc/data.json
