@@ -5,7 +5,6 @@ import TableRow from "./TableRow"
 import ModalInsert from "./ModalInsert"
 import TableSearch from "./TableSearch"
 import Loading from "./Loading"
-import { urlApi } from "../settings"
 
 export default function Table(props) {
     const [data, setData] = useState([])
@@ -122,7 +121,7 @@ export default function Table(props) {
 
     useEffect(() => {
         setLoading("")
-        fetch(urlApi + '?table=' + props.table + '&id=all')
+        fetch("../api.php" + '?table=' + props.table + '&id=all')
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {
@@ -146,7 +145,7 @@ export default function Table(props) {
 
     function loadSelect(table,name,key) {
         setLoading("")
-        fetch(urlApi + '?table=' + table + '&id=all')
+        fetch("../api.php" + '?table=' + table + '&id=all')
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {
@@ -185,7 +184,7 @@ export default function Table(props) {
     return (
         <>
             <div className="flex justify-between items-center mb-4">
-                <ModalInsert form={props.form} table={props.table} insert={insert} logOut={props.logOut} dataSelect={dataSelect}/>
+                <ModalInsert form={props.form} table={props.table} key={uuidv4()} insert={insert} logOut={props.logOut} dataSelect={dataSelect}/>
                 <TableSearch search={search} />
             </div>
             <table className="w-full">

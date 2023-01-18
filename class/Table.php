@@ -531,6 +531,7 @@ abstract class Table extends Debug {
     }
     
     public function getForAdminPannel() {
+        $this->adminPannel["className"] = get_called_class();
         return $this->adminPannel;
     }
 }

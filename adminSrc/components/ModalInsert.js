@@ -7,7 +7,7 @@ import FormImage from "./FormImage"
 import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
-import { urlApi } from "../settings"
+
 
 
 
@@ -67,7 +67,7 @@ export default function ModalInsert(props) {
         formData.append("table", props.table)
         formData.append("action", "insert")
         setLoading("")
-        fetch(urlApi, {
+        fetch("../api.php", {
             method: 'POST',
             body: formData
         })

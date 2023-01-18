@@ -17,8 +17,8 @@ class Tag extends \App\Table {
             "order" => 3,
             "fields" => [
                 "nom" => [
-                    "titre" => "text",
-                    "table" => ["colums","insert","update"]
+                    "type" => "text",
+                    "table" => ["columns","insert","update"]
                 ],
             ],
         ];

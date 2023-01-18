@@ -1,7 +1,6 @@
 import { useState } from "react"
 import trash from "../icons/trash-can-solid.svg"
 import Loading from "./Loading"
-import { urlApi } from "../settings"
 
 export default function ModalDelete(props) {
     const [visiblity, setVisibility] = useState("hidden")
@@ -21,7 +20,7 @@ export default function ModalDelete(props) {
         formData.append("id", props.id)
         formData.append("action", "delete")
         setLoading("")
-        fetch(urlApi, {
+        fetch("../api.php", {
             method: 'POST',
             body: formData
         })

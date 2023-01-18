@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { urlSite } from '../settings'
 
 export default function FormImage(props) {
     const id = uuidv4()
@@ -9,7 +8,7 @@ export default function FormImage(props) {
 
     useEffect(() => {
         if (props.value !== "") {
-            setSrc(urlSite + props.value)
+            setSrc("../"+props.value)
             setHasFile(true)
         }
     }, [])

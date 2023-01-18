@@ -8,7 +8,6 @@ import FormImage from "./FormImage"
 import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
-import { urlApi } from "../settings"
 
 export default function ModalUpdate(props) {
     const [visibility, setVisibility] = useState("hidden")
@@ -68,7 +67,7 @@ export default function ModalUpdate(props) {
                 formData.append(input.name, "0")
             }
         })
-        fetch(urlApi, {
+        fetch("../api.php", {
             method: 'POST',
             body: formData
         })

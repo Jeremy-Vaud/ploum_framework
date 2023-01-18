@@ -29,15 +29,15 @@ class User extends Table {
             "fields" => [
                 "nom" => [
                     "type" => "text",
-                    "table" => ["colums","insert","update"]
+                    "table" => ["columns","insert","update"]
                 ],
                 "prenom" => [
                     "type" => "text",
-                    "table" => ["colums","insert","update"]
+                    "table" => ["columns","insert","update"]
                 ],
                 "email" => [
                     "type" => "email",
-                    "table" => ["colums","insert","update"]
+                    "table" => ["columns","insert","update"]
                 ],
                 "password" => [
                     "type" => "password",
@@ -45,7 +45,7 @@ class User extends Table {
                 ],
                 "admin" => [
                     "type" => "checkbox",
-                    "table" => ["colums","insert","update"]
+                    "table" => ["columns","insert","update"]
                 ],
             ],
         ];

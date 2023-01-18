@@ -1,20 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-
-
+import { v4 as uuidv4 } from 'uuid'
 import Navbar from './components/Navbar'
 import PageLogin from './pages/PageLogin'
 import NotFound from './pages/NotFound'
 import PageHome from './pages/PageHome'
 import PageTable from './pages/pageTable'
-
 import data from './data.json'
-//import PageUsers from './pages/PageUsers'
-
-// Pages spécifique à ploum studio
-//import PageProjects from './pages/PageProjects'
-//import PageTags from './pages/PageTags'
-//import PageAcceuil from './pages/PageAccueil'
 
 export function App() {
     const [isConnect, setIsConnect] = useState(false)
@@ -58,10 +50,10 @@ export function App() {
         <BrowserRouter>
             <Navbar sendLogOut={sendLogOut} navigation={navigation}>
                 <Routes>
-                    <Route path='/admin' element={isConnect ? <PageHome logOut={logOut} navigation={navigation}/> : <PageLogin logIn={logIn} />} />
+                    <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation}/> : <PageLogin logIn={logIn} />} />
                     {navigation.map(e => {
                         return (
-                            <Route path={'/admin/'+e.title} element={isConnect ? <PageTable logOut={logOut} /> : <PageLogin logIn={logIn} />} />
+                            <Route path={'/admin/'+e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()}/> : <PageLogin logIn={logIn} />} />
                         )
                     })}
                     <Route path='*' element={isConnect ? <NotFound /> : <PageLogin logIn={logIn} />} />
