@@ -17,7 +17,7 @@ class Article extends \App\Table {
             "image" => new \App\File(["jpg","jpeg","png","webp"], 500000),
         ];
         $this->foreignKeys = [
-            //"Model\Tag" => []
+            "Model\Tag" => []
         ];
         $this->adminPannel = [
             "title" => "Articles",
@@ -40,6 +40,12 @@ class Article extends \App\Table {
                     "type" => "url",
                     "table" => ["columns","insert","update"]
                 ],
+                "tag" => [
+                    "type" =>"selectMulti",
+                    "table" => ["insert","update"],
+                    "foreignTable" => "Model\\Tag",
+                    "key" => "nom"
+                ]
             ],
         ];
     }

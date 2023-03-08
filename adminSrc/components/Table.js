@@ -25,10 +25,10 @@ export default function Table(props) {
             [...data].sort((a, b) => {
                 let c = a[e]
                 let d = b[e]
-                if(typeof a[e] === "object") {
+                if (typeof a[e] === "object") {
                     for (var i = 0; i < props.columns.length; i++) {
-                        if(props.columns[i].name === e) {
-                            c= a[e][props.columns[i].key]
+                        if (props.columns[i].name === e) {
+                            c = a[e][props.columns[i].key]
                             d = b[e][props.columns[i].key]
                             break;
                         }
@@ -100,7 +100,7 @@ export default function Table(props) {
             let find = false
             props.columns.map((col) => {
                 let name
-                if(typeof row[col.name] === 'object') {
+                if (typeof row[col.name] === 'object') {
                     name = String(row[col.name][col.key])
 
                 } else {
@@ -143,7 +143,7 @@ export default function Table(props) {
             })
     }, [])
 
-    function loadSelect(table,name,key) {
+    function loadSelect(table, name, key) {
         setLoading("")
         fetch("../api.php" + '?table=' + table + '&id=all')
             .then((response) => {
@@ -162,11 +162,11 @@ export default function Table(props) {
                 let copyDataSelect = dataSelect;
                 let value = [];
                 response.map((e) => {
-                    value.push({value:e.id,name:e[key]})
+                    value.push({ value: e.id, name: e[key] })
                 })
                 copyDataSelect[name] = value
                 setDataSelect(copyDataSelect)
-     
+
             })
             .catch((e) => {
                 console.log(e.message)
@@ -176,22 +176,22 @@ export default function Table(props) {
     useEffect(() => {
         props.form.map((e) => {
             if (e.type === "select" || e.type === "selectMulti") {
-                loadSelect(e.table,e.name,e.key)
+                loadSelect(e.table, e.name, e.key)
             }
         })
-    }, [])
+    }, [props.form])
 
     return (
         <>
             <div className="flex justify-between items-center mb-4">
-                <ModalInsert form={props.form} table={props.table} key={uuidv4()} insert={insert} logOut={props.logOut} dataSelect={dataSelect}/>
+                <ModalInsert form={props.form} table={props.table} key={uuidv4()} insert={insert} logOut={props.logOut} dataSelect={dataSelect} />
                 <TableSearch search={search} />
             </div>
             <table className="w-full">
                 <TableHead sort={sort} columns={props.columns} sortState={sortState} deleteRow={deleteRow} />
                 <tbody>
                     {
-                        data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect}/>) : null}
+                        data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect} />) : null}
                 </tbody>
             </table>
             <Loading loading={loading} />

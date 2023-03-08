@@ -244,23 +244,25 @@ abstract class Table extends Debug {
     private function insertForeignKeys() {
         $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
         foreach (array_keys($this->foreignKeys) as $key) {
-            $foreignClass = substr($key, strrpos(get_called_class(), '\\') + 1);
-            $table = $class . "_" . $foreignClass;
-            $sql = "INSERT INTO `$table` (`$class`,`$foreignClass`) VALUES ";
-            $param = [":id" => $this->id];
-            $i = 0;
-            foreach (array_keys($this->foreignKeys[$key]) as $foreignId) {
-                $sql .= " (:id, :foreignId$i),";
-                $param[":foreignId$i"] = $foreignId;
-                $i++;
-            }
-            $sql = substr($sql, 0, -1);
-            try {
-                if (!BDD::Execute($sql, $param)) {
-                    throw new \Exception("Erreur SQL ($sql)");
+            if ($this->foreignKeys[$key] !== []) {
+                $foreignClass = substr($key, strrpos(get_called_class(), '\\') + 1);
+                $table = $class . "_" . $foreignClass;
+                $sql = "INSERT INTO `$table` (`$class`,`$foreignClass`) VALUES ";
+                $param = [":id" => $this->id];
+                $i = 0;
+                foreach (array_keys($this->foreignKeys[$key]) as $foreignId) {
+                    $sql .= " (:id, :foreignId$i),";
+                    $param[":foreignId$i"] = $foreignId;
+                    $i++;
                 }
-            } catch (\Exception $e) {
-                $this->alertDebug($e);
+                $sql = substr($sql, 0, -1);
+                try {
+                    if (!BDD::Execute($sql, $param)) {
+                        throw new \Exception("Erreur SQL ($sql)");
+                    }
+                } catch (\Exception $e) {
+                    $this->alertDebug($e);
+                }
             }
         }
     }
@@ -508,7 +510,7 @@ abstract class Table extends Debug {
         }
         return $error;
     }
-    
+
     /**
      * Récupère les différents types de champs de la table pour la génération de la BDD
      *
@@ -517,19 +519,19 @@ abstract class Table extends Debug {
     public function getSqlColumns() {
         $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $data = [$class => []];
-        foreach($this->fields as $name => $field) {
+        foreach ($this->fields as $name => $field) {
             $data[$class][$name] = $field->getTypeForSql();
         }
-        foreach(array_keys($this->files) as $file) {
+        foreach (array_keys($this->files) as $file) {
             $data[$class][strtolower($file)] = "text";
         }
-        foreach(array_keys($this->foreignKeys) as $foreign) {
+        foreach (array_keys($this->foreignKeys) as $foreign) {
             $foreignClass = strtolower(substr($foreign, strrpos($foreign, '\\') + 1));
-            $data[$class . "_" . $foreignClass ] = [$class => "int(11) NOT NULL", $foreignClass => "int(11) NOT NULL"];
+            $data[$class . "_" . $foreignClass] = [$class => "int(11) NOT NULL", $foreignClass => "int(11) NOT NULL"];
         }
         return $data;
     }
-    
+
     public function getForAdminPannel() {
         $this->adminPannel["className"] = get_called_class();
         return $this->adminPannel;

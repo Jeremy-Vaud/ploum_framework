@@ -15,9 +15,9 @@ export default function PageTable(props) {
                 if (e === "columns") {
                     array1.push({ name: name })
                 } else if (e === "insert") {
-                    array2.push({ name: name, type: obj.type })
+                    array2.push({ name: name, type: obj.type, table: obj.foreignTable, key: obj.key })
                 } else if (e === "update") {
-                    array3.push({ name: name, type: obj.type })
+                    array3.push({ name: name, type: obj.type, table: obj.foreignTable, key: obj.key })
                 }
             });
             setColumns(array1)
