@@ -2,3 +2,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /*
+     * Accueil
+     */
+    .home-card {
+        @apply w-64 h-32 text-center rounded shadow-xl border border-gray-800 mx-auto mb-10 inline-block bg-gray-800 hover:bg-green-500 transition duration-1000 text-gray-300 hover:text-gray-800 text-xl uppercase p-6
+    }
+    /*
+     * Boutons
+     */
+    .btn {
+        @apply inline-block px-5 py-2 cursor-pointer rounded transition border-none;
+    }
+    .btn-add {
+        @apply btn bg-green-600 hover:bg-green-500 text-white;
+    }
+    .btn-cancel {
+        @apply btn bg-gray-400 hover:bg-gray-300;
+    }
+    .btn-delete {
+        @apply btn bg-red-600 hover:bg-red-500 text-white;
+    }
+    .btn-update {
+        @apply btn bg-yellow-600 hover:bg-yellow-500;
+    }
+    /*
+     * Navbar
+     */
+    .nav-link {
+        @apply mb-2 cursor-pointer;
+    }
+    .nav-link-active {
+        @apply nav-link text-green-400;
+    }
+    .nav-link-disable {
+        @apply nav-link text-gray-300 transition;
+    }
+    .nav-link-disable:hover {
+        @apply text-green-300;
+    }
+    /*
+     * Formulaire
+     */
+    .select-multi-switch {
+        @apply inline-block px-2 py-1 m-2 text-sm cursor-pointer transition
+    }
+    .select-multi-switch-active {
+        @apply select-multi-switch bg-green-600 hover:bg-green-500 text-white
+    }
+    .select-multi-switch-disable {
+        @apply select-multi-switch bg-gray-400 hover:bg-gray-300
+    }
+    .text-warning {
+        @apply text-red-500;
+    }
+    /*
+     * Chargement
+     */
+    .spin {
+        @apply inline w-16 animate-spin text-gray-300 fill-green-600
+    }
+}

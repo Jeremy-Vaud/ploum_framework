@@ -40,13 +40,13 @@ export default function PageLogin(props) {
             <h1 className="text-2xl text-center mb-6">login</h1>
             <div className="flex justify-center">
                 <div className="min-w-[300px]">
-                    <p className="h-8 text-red-600">{warning}</p>
+                    <p className="text-warning h-8">{warning}</p>
                     <form id="logInForm" >
                         <FormInput key="email" name="email" type="email" warning={null} value={email} handleChange={handleChange} />
                         <FormInput key="password" name="password" type="password" warning="" value={password} handleChange={handleChange} />
                     </form>
                     <div className="text-center">
-                        <button onClick={submit} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white">Se connecter</button>
+                        <button onClick={submit} className="btn-add">Se connecter</button>
                     </div>
                 </div>
             </div>

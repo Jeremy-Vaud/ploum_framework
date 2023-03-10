@@ -39,7 +39,7 @@ export default function FormSelectMulti(props) {
         <div className="mb-3">
             <label htmlFor={id} className="block">
                 <span className="capitalize mr-2">{props.name}</span>
-                <span className="text-red-500">{props.warning}</span>
+                <span className="text-warning">{props.warning}</span>
             </label>
             <input name={props.table} id={id} type="hidden" value={selected.map((e)=>{
                 if(e.selected) {
@@ -51,8 +51,8 @@ export default function FormSelectMulti(props) {
                 {selected.map((e) => {
                     return (
                         <span value={e.value} key={e.key} onClick={select} className={e.selected ? 
-                            "inline-block px-2 py-1 m-2 text-sm bg-yellow-600 hover:bg-yellow-500 cursor-pointer"
-                        : "inline-block px-2 py-1 m-2 text-sm bg-gray-300 hover:bg-gray-200 cursor-pointer"}
+                            "select-multi-switch-active"
+                        : "select-multi-switch-disable"}
                         >{e.name}</span>
                     )
                 })}

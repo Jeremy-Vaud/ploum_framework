@@ -12,7 +12,7 @@ export default function PageHome(props) {
         <div className="flex flex-wrap justify-betewen ">
             {props.navigation.map(e => {
                 return (
-                    <Link to={'/admin/'+e.title} key={uuidv4()} className="w-64 h-32 text-center rounded shadow-xl border border-gray-800 mx-auto mb-10 inline-block bg-gray-800 hover:bg-yellow-600 transition-color duration-1000 text-gray-300 hover:text-gray-800 text-xl uppercase p-6">
+                    <Link to={'/admin/'+e.title} key={uuidv4()} className="home-card">
                         <FontAwesomeIcon icon={icons[e.icon]} />                  
                         <p>{e.title}</p>
                     </Link>

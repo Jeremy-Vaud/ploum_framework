@@ -95,7 +95,7 @@ export default function ModalInsert(props) {
 
     return (
         <>
-            <button onClick={show} className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 rounded">Ajouter</button>
+            <button onClick={show} className="btn-add">Ajouter</button>
             <div className={visibility}>
                 <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-10 z-20 bg-white w-[300px] md:w-[500px] max-h-[80%] overflow-auto">
                     <form id={formId} onSubmit={(e) => add(e)} method="post">
@@ -137,8 +137,8 @@ export default function ModalInsert(props) {
                         }
                     </form>
                     <div className="text-center">
-                        <button onClick={submit} className="px-5 py-2 bg-yellow-600 hover:bg-yellow-500 rounded mr-5">Ajouter</button>
-                        <button onClick={hide} className="px-5 py-2 bg-gray-300 hover:bg-gray-200 rounded">annuler</button>
+                        <button onClick={submit} className="btn-add mr-5">Ajouter</button>
+                        <button onClick={hide} className="btn-cancel">annuler</button>
                     </div>
                 </div>
                 <div onClick={hide} className="fixed top-0 left-0 w-screen h-screen opacity-40 bg-black"></div>
