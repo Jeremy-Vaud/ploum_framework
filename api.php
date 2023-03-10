@@ -1,8 +1,8 @@
 <?php
-
 require 'settings/global.php';
 require 'vendor/autoload.php';
 
+$DEBUG = false;
 
 session_start();
 if (isset($_GET['isLog'])) {
