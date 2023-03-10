@@ -1,9 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import * as icons from '@fortawesome/free-solid-svg-icons'
+import { faHome } from '@fortawesome/free-solid-svg-icons'
+import icons from '../icons'
 
 
 export default function Navbar(props) {
+    console.log(icons)
     return (
         <div className='flex'>
             <aside className="bg-gray-800 w-[250px]  p-3">
@@ -16,7 +18,7 @@ export default function Navbar(props) {
                         className={({ isActive }) => {
                             return 'block no-underline ' + (isActive ? 'text-yellow-600 mb-2' : 'text-gray-300 mb-2')
                         }}>
-                            <FontAwesomeIcon icon={icons["faHome"]} className="mr-3"/>
+                            <FontAwesomeIcon icon={faHome} className="mr-3"/>
                         Accueil
                     </NavLink>
                     {props.navigation.map(e =>

@@ -1,4 +1,5 @@
-import arrow from "../icons/sort-down-solid.svg"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import{ faCaretDown } from '@fortawesome/free-solid-svg-icons'
 
 export default function TableHead(props) {
 
@@ -17,9 +18,9 @@ export default function TableHead(props) {
             <th className="w-[75px]">action</th>
                 {props.columns.map(e =>
                     <th key={e.name} onClick={() => props.sort(e.name)}>
-                        <div className="flex justify-between pr-5 cursor-pointer">
+                        <div className="flex justify-between pr-5 cursor-pointer items-center">
                             <span>{e.name}</span>
-                            <img src={arrow} className={setArrowClasses(props.sortState[e.name])} />
+                            <FontAwesomeIcon icon={faCaretDown} className={setArrowClasses(props.sortState[e.name])} />
                         </div>
                     </th>
                 )}

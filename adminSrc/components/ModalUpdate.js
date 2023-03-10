@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from 'uuid'
-import edit from "../icons/pencil-solid.svg"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import{ faPen } from '@fortawesome/free-solid-svg-icons'
 import FormCheckbox from "./FormCheckbox"
 import FormInput from "./FormInput"
 import FormTextarea from "./FormTextarea"
@@ -94,7 +95,7 @@ export default function ModalUpdate(props) {
 
     return (
         <>
-            <button onClick={show}><img src={edit} className='w-[15px} h-[15px] mr-5' /></button>
+            <button onClick={show}><FontAwesomeIcon icon={faPen} className='w-[15px] mr-5'/></button>
             <div className={visibility}>
                 <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-10 z-20 bg-white w-[300px] md:w-[500px] max-h-[80%] overflow-auto">
                     <form id={formId} onSubmit={(e) => add(e)} method="post">

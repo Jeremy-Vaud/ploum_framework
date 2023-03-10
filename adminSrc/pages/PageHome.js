@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { v4 as uuidv4 } from 'uuid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import * as icons from '@fortawesome/free-solid-svg-icons'
+import icons from '../icons'
 
 
 export default function PageHome(props) {
