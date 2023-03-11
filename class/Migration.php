@@ -61,6 +61,9 @@ final class Migration {
                     if ($describe["Null"] === "NO") {
                         $string .= " NOT NULL";
                     }
+                    if($describe["Default"] !== null) {
+                        $string .= " DEFAULT '" . $describe["Default"] . "'";
+                    }
                     $this->current[$table][$describe["Field"]] = $string;
                 }
             }

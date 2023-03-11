@@ -109,11 +109,11 @@ final class Field extends Debug {
         } else if ($this->type === "bool") {
             return "tinyint(1) NOT NULL";
         } else if ($this->type === "dateTime") {
-            return "datetime NOT NULL";
+            return "datetime NOT NULL DEFAULT '1970-01-01 00:00:00'";
         } else if ($this->type === "date") {
-            return "date NOT NULL";
+            return "date NOT NULL DEFAULT '1970-01-01'";
         } else if ($this->type === "time") {
-            return "time NOT NULL";
+            return "time NOT NULL DEFAULT '00:00:00'";
         }
     }
 
