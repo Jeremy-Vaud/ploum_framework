@@ -7,6 +7,7 @@ import FormImage from "./FormImage"
 import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
+import FormDateTime from "./FormDateTime"
 
 
 
@@ -127,6 +128,10 @@ export default function ModalInsert(props) {
                                 let value = []
                                 return (
                                     <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} dataSelect={props.dataSelect[e.name]} table={table}/>  
+                                )
+                            } else if(e.type === "dateTime") {
+                                return (
+                                    <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
                                 )
                             } else {
                                 return (

@@ -28,11 +28,11 @@ export default function FormImage(props) {
                 <>
                     <img src={src} />
                     <div className="text-center">
-                        <span onClick={change} className="btn-update mt-2">Modifier l'image</span>
+                        <span onClick={change} className="btn-update mt-2">Supprimer l'image</span>
                     </div>
                 </>
                 :
-                <input type="file" name={props.name} id={id} onChange={props.handleChange} accept="image/*" className="w-[100%]" />}
+                <input type="file" name={props.name} id={id} onChange={props.handleChange} accept="image/*" className="file:btn-add w-[100%]" />}
         </div>
     )
 }

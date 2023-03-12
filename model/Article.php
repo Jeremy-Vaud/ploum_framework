@@ -58,7 +58,7 @@ class Article extends \App\Table {
                     "table" => ["columns","insert","update"]
                 ],
                 "datetime" => [
-                    "type" => "datetime",
+                    "type" => "dateTime",
                     "table" => ["columns","insert","update"]
                 ]
             ],

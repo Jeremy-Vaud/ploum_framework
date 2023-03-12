@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import{ faPen } from '@fortawesome/free-solid-svg-icons'
+import { faPen } from '@fortawesome/free-solid-svg-icons'
 import FormCheckbox from "./FormCheckbox"
 import FormInput from "./FormInput"
 import FormTextarea from "./FormTextarea"
@@ -9,6 +9,7 @@ import FormImage from "./FormImage"
 import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
+import FormDateTime from "./FormDateTime"
 
 export default function ModalUpdate(props) {
     const [visibility, setVisibility] = useState("hidden")
@@ -95,7 +96,7 @@ export default function ModalUpdate(props) {
 
     return (
         <>
-            <button onClick={show}><FontAwesomeIcon icon={faPen} className='w-[15px] mr-5'/></button>
+            <button onClick={show}><FontAwesomeIcon icon={faPen} className='w-[15px] mr-5' /></button>
             <div className={visibility}>
                 <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-10 z-20 bg-white w-[300px] md:w-[500px] max-h-[80%] overflow-auto">
                     <form id={formId} onSubmit={(e) => add(e)} method="post">
@@ -118,18 +119,22 @@ export default function ModalUpdate(props) {
                                 return (
                                     <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
                                 )
-                            } else if(e.type === "selectMulti" && props.dataSelect[e.name]) {
+                            } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
                                 let table;
                                 for (let i = 0; i < props.formUpdate.length; i++) {
-                                    if(props.formUpdate[i].name === e.name) {
+                                    if (props.formUpdate[i].name === e.name) {
                                         table = props.formUpdate[i].table
                                         break
                                     }
                                 }
                                 return (
-                                    <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={props.data[table]} dataSelect={props.dataSelect[e.name]} table={table}/>  
+                                    <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={props.data[table]} dataSelect={props.dataSelect[e.name]} table={table} />
                                 )
-                                } else {
+                            } else if (e.type === "dateTime") {
+                                return (
+                                <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} id={e.id} handleChange={handleChange} />
+                                )
+                            } else {
                                 return (
                                     <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} id={e.id} handleChange={handleChange} />
                                 )
