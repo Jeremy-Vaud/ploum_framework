@@ -531,9 +531,25 @@ abstract class Table extends Debug {
         }
         return $data;
     }
-
+    
+    /**
+     * Retourne tous les paramètres pour le panneau d'administration
+     *
+     * @return mixed Un tableau de paramètres ou false
+     */
     public function getForAdminPannel() {
-        $this->adminPannel["className"] = get_called_class();
-        return $this->adminPannel;
+        if ($this->adminPannel) {
+            $return = $this->adminPannel;
+            $return["className"] = get_called_class();
+            $return["fields"] = [];
+            foreach ($this->fields as $key => $field) {
+                $params = $field->getAdmin();
+                if ($params) {
+                    $return["fields"][$key] = $params;
+                }
+            }
+            return $return;
+        }
+        return false;
     }
 }

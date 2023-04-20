@@ -9,59 +9,25 @@ namespace Model;
 class Article extends \App\Table {
     public function __construct() {
         $this->fields = [
-            "titre" => new \App\Field(["type"=>"char","length"=>100]),
-            "texte" => new \App\Field(["type"=>"text"]),
-            "url" => new \App\Field(["type"=>"url"]),
-            "date" => new \App\Field(["type"=>"date"]),
-            "time" => new \App\Field(["type"=>"time"]),
-            "datetime" => new \App\Field(["type"=>"dateTime"])
+            "titre" => new \App\Field(["type"=>"char","length"=>100, "admin" => ["columns","insert","update"]]),
+            "texte" => new \App\Field(["type"=>"text", "admin" => ["columns","insert","update"]]),
+            "url" => new \App\Field(["type"=>"url", "admin" => ["columns","insert","update"]]),
+            "date" => new \App\Field(["type"=>"date", "admin" => ["columns","insert","update"]]),
+            "time" => new \App\Field(["type"=>"time", "admin" => ["columns","insert","update"]]),
+            "datetime" => new \App\Field(["type"=>"dateTime", "admin" => ["columns","insert","update"]]),
+            "nombre" => new \App\Field(["type"=>"int", "admin" => ["columns","insert","update"]]),
+            "cle" => new \App\ForeignKey("Model\Tag", ["key" => "nom", "pannel" => ["columns","insert","update"]])
          ];
          $this->files = [
-            "image" => new \App\File(["jpg","jpeg","png","webp"], 500000),
+            //"image" => new \App\File(["jpg","jpeg","png","webp"], 500000),
         ];
         $this->foreignKeys = [
-            "Model\Tag" => []
+            //"Model\Tag" => []
         ];
         $this->adminPannel = [
             "title" => "Articles",
             "icon" => "faNewspaper",
             "order" => 2,
-            "fields" => [
-                "image" => [
-                    "type" => "image",
-                    "table" => ["insert","update"]
-                ],
-                "titre" => [
-                    "type" => "text",
-                    "table" => ["columns","insert","update"]
-                ],
-                "texte" => [
-                    "type" => "textarea",
-                    "table" => ["columns","insert","update"]
-                ],
-                "url" => [
-                    "type" => "url",
-                    "table" => ["columns","insert","update"]
-                ],
-                "tag" => [
-                    "type" =>"selectMulti",
-                    "table" => ["insert","update"],
-                    "foreignTable" => "Model\\Tag",
-                    "key" => "nom"
-                ],
-                "date" => [
-                    "type" => "date",
-                    "table" => ["columns","insert","update"]
-                ],
-                "time" => [
-                    "type" => "time",
-                    "table" => ["columns","insert","update"]
-                ],
-                "datetime" => [
-                    "type" => "dateTime",
-                    "table" => ["columns","insert","update"]
-                ]
-            ],
         ];
     }
 }

@@ -9,18 +9,12 @@ namespace Model;
 class Tag extends \App\Table {
     public function __construct() {
         $this->fields = [
-            "nom" => new \App\Field(["type"=>"char","length"=>100])
+            "nom" => new \App\Field(["type"=>"char","length"=>100,"admin" => ["columns","insert","update"]])
          ];
          $this->adminPannel = [
             "title" => "Tags",
             "icon" => "faTags",
-            "order" => 3,
-            "fields" => [
-                "nom" => [
-                    "type" => "text",
-                    "table" => ["columns","insert","update"]
-                ],
-            ],
+            "order" => 3
         ];
     }
 }

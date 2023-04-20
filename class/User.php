@@ -16,38 +16,16 @@ class User extends Table {
      */
     public function __construct() {
         $this->fields = [
-            "nom" => new Field(["type" => "char", "length" => 20, "minLength" => 3]),
-            "prenom" => new Field(["type" => "char", "length" => 20, "minLength" => 3]),
-            "email" => new Field(["type" => "email", "unique" => true]),
-            "password" => new Field(["type" => "password", "length" => 16, "minLength" => 4]),
-            "admin" => new Field(["type" => "bool", "value" => 0]),
+            "nom" => new Field(["type" => "char", "length" => 20, "minLength" => 3, "admin" => ["columns","insert","update"]]),
+            "prenom" => new Field(["type" => "char", "length" => 20, "minLength" => 3, "admin" => ["columns","insert","update"]]),
+            "email" => new Field(["type" => "email", "unique" => true, "admin" => ["columns","insert","update"]]),
+            "password" => new Field(["type" => "password", "length" => 16, "minLength" => 4, "admin" => ["insert"]]),
+            "admin" => new Field(["type" => "bool", "value" => 0, "admin" => ["columns","insert","update"]]),
         ];
         $this->adminPannel = [
             "title" => "Utilisateurs",
             "icon" => "faUsers",
             "order" => 1,
-            "fields" => [
-                "nom" => [
-                    "type" => "text",
-                    "table" => ["columns","insert","update"]
-                ],
-                "prenom" => [
-                    "type" => "text",
-                    "table" => ["columns","insert","update"]
-                ],
-                "email" => [
-                    "type" => "email",
-                    "table" => ["columns","insert","update"]
-                ],
-                "password" => [
-                    "type" => "password",
-                    "table" => ["insert"]
-                ],
-                "admin" => [
-                    "type" => "checkbox",
-                    "table" => ["columns","insert","update"]
-                ],
-            ],
         ];
     }
     

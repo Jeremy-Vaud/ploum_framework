@@ -6,7 +6,7 @@ class BDD {
     // Attributs
     protected static $DB = 'mysql:host=localhost;dbname=ploum;charset=UTF8;port=3306';
     protected static $USER = 'root';
-    protected static $PASSWORD = '';
+    protected static $PASSWORD = 'pass';
     protected static $OPTION = [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING];
     protected static $PDO;
     protected static $REQ;

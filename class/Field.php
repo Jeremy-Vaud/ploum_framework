@@ -16,6 +16,7 @@ final class Field extends Debug {
     protected $minLength = null; // Taille minimum pour les chaine de caractères
     protected $value = null; // Valeur du champ
     protected $unique = false; // Doit avoir une valeur unique (ex: email pour les utilisateur)
+    protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
 
     /**
      * Vérifie les paramètres avant de construire
@@ -67,6 +68,16 @@ final class Field extends Debug {
                 }
                 $this->unique = $params["unique"];
             }
+            // Admin
+            if (isset($params["admin"])) {
+                foreach ($params["admin"] as $param) {
+                    if ($param === "columns" || $param === "insert" || $param === "update") {
+                        $this->admin[] = $param;
+                    } else {
+                        throw new \Exception("Paramètres admin invalides");
+                    }
+                }
+            }
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
@@ -91,14 +102,36 @@ final class Field extends Debug {
     }
     
     /**
+     * Retourne les paramètres du champ pour le panneau d'administration
+     *
+     * @return mixed Un tableau de paramètres ou false 
+     */
+    public function getAdmin() {
+        if($this->admin !== []) {
+            if ($this->type === "int") {
+                return ["type" => "number", "table" => $this->admin];
+            } else if ($this->type === "char") {
+                return ["type" => "text", "table" => $this->admin];
+            } else if ($this->type === "bool") {
+                return ["type" => "checkbox", "table" => $this->admin];
+            } else if($this->type === "text") {
+                return ["type" => "textarea", "table" => $this->admin];
+            }else {
+                return ["type" => $this->type, "table" => $this->admin];
+            }
+        }
+        return false;
+    }
+
+    /**
      * Retourne le type de colone pour la structure de la BDD
      *
      * @return string type
      */
     public function getTypeForSql() {
-        if($this->type === "int"){
+        if ($this->type === "int") {
             return "int(11) NOT NULL";
-        }else if ($this->type === "char") {
+        } else if ($this->type === "char") {
             return "varchar(" . $this->length . ") NOT NULL";
         } else if ($this->type === "email") {
             return "varchar(254) NOT NULL";
@@ -259,7 +292,7 @@ final class Field extends Debug {
      */
     private function isValidInt($val, bool $returnMessage = false) {
         try {
-            if (!(ctype_digit($val) || is_int($val))) {
+            if (!(is_int($val) || ctype_digit($val))) {
                 throw new \Exception("La valeur du champ n'est pas un entier");
             }
         } catch (\Exception $e) {

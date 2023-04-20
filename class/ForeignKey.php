@@ -11,31 +11,35 @@ namespace App;
 final class ForeignKey extends Debug{
     // Attributs
     protected $table;
-    protected $key;
+    protected $key = 0;
     protected $value = null;
+    protected $admin = ["key" => "id", "pannel" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
     
     /**
      * Constructeur
      *
      * @param  string $table Nom de la table de la clée étrangère
-     * @param  int $key Valeur de la clée
+     * @param  array $admin Liste des paramètres pour le panneau d'administration ("columns","insert","update")
      * @throws Exeption si la table n'existe pas
      * @return void
      */
-    public function __construct(string $table, int $key = 0) {
+    public function __construct(string $table, array $admin = []) {
         // Vérifie que la class exist avant de construire
         try {
             if (!class_exists($table)) {
                 throw new \Exception("La class " .  htmlentities($table) ." n'existe pas");
             }
+            if($admin !== []) {
+                if(isset($admin["key"])) {
+                    $this->admin["key"] = $admin["key"];
+                }
+                if(isset($admin["pannel"])) {
+                    $this->admin["pannel"] = $admin["pannel"];
+                }
+            }
             $this->table = $table;
         } catch (\Exception $e) {
             $this->alertDebug($e);
-        }
-        if($key > 0) {
-            $this->key = $key;
-        }else {
-            $this->key = 0;
         }
     }
     
@@ -84,5 +88,17 @@ final class ForeignKey extends Debug{
             return true;
         }
         return false;
+    }
+
+    /**
+     * Retourne les paramètres du champ pour le panneau d'administration
+     *
+     * @return mixed Un tableau de paramètres ou false 
+     */
+    public function getAdmin() {
+        if($this->admin["pannel"] !== []) {
+            return ["type" => "select", "table" => $this->admin["pannel"],"foreignTable" => $this->table,"key" => $this->admin["key"]];
+        }
+        return "false";
     }
 }
