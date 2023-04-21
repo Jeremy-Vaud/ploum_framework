@@ -542,7 +542,7 @@ abstract class Table extends Debug {
             $return = $this->adminPannel;
             $return["className"] = get_called_class();
             $return["fields"] = [];
-            foreach ($this->fields as $key => $field) {
+            foreach ($this->fields + $this->files as $key => $field) {
                 $params = $field->getAdmin();
                 if ($params) {
                     $return["fields"][$key] = $params;

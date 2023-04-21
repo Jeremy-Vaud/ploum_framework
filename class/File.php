@@ -8,24 +8,51 @@ namespace App;
  * @author  Jérémy Vaud
  * @final
  */
-final class File extends Debug {
+class File extends Debug {
     // Attributs
-    protected $name;
-    protected $path;
-    protected $type;
-    protected $maxSize;
+    protected $name; // Nom du fichier
+    protected $path; // Chemin du fichier
+    protected $type; // Tableau des extention de fichier possible (exemple: 'pdf')
+    protected $maxSize = null; // Taille maximum du fichier
+    protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
 
     /**
      * Constructeur
      *
-     * @param  array $type Tableau des extntion de fichier possible (exemple: 'jpg')
-     * @param  int $maxSize Taille du fichier
+     * @param  array $params Tableau de paramètres : type, maxSize, admin
      * @return void
      */
-    public function __construct(array $type, int $maxSize = null) {
+    public function __construct(array $params) {
         // Constructeur
-        $this->type = $type;
-        $this->maxSize = $maxSize;
+        try {
+            // Type
+            if (!isset($params["type"])) {
+                throw new \Exception("Le fichier n'as pas de format définit");
+            }
+            if ($params["type"] === [] || !is_array($params["type"]) || !array_is_list($params["type"])) {
+                throw new \Exception("Le paramètre type n'est pas valide");
+            }
+            $this->type = $params["type"];
+            // Max size
+            if (isset($params["maxSize"])) {
+                if (!is_int($params["maxSize"]) || $params["maxSize"] < 1) {
+                    throw new \Exception("La taille maximum du fichier n'est pas valide");
+                }
+                $this->maxSize = $params["maxSize"];
+            }     
+            // Admin
+            if (isset($params["admin"])) {
+                foreach ($params["admin"] as $param) {
+                    if ($param === "columns" || $param === "insert" || $param === "update") {
+                        $this->admin[] = $param;
+                    } else {
+                        throw new \Exception("Paramètres admin invalides");
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->alertDebug($e);
+        }
     }
 
     /**
@@ -47,6 +74,18 @@ final class File extends Debug {
             return $this->path . $this->name;
         }
         return null;
+    }
+
+    /**
+     * Retourne les paramètres du fichier pour le panneau d'administration
+     *
+     * @return mixed Un tableau de paramètres ou false 
+     */
+    public function getAdmin() {
+        if($this->admin !== []) {
+            return ["type" => "file", "table" => $this->admin];
+        }
+        return false;
     }
 
     /**
@@ -96,7 +135,7 @@ final class File extends Debug {
                 throw new \Exception("Une erreur est survenue lors de la création du répertoire");
             }
             if (!move_uploaded_file($file["tmp_name"], $target_file)) {
-                throw new \Exception("Une erreur est survenue pendant l'enregistrement de l'image");
+                throw new \Exception("Une erreur est survenue pendant l'enregistrement du fichier");
             }
             $this->deleteFile();
             $this->name = $file["name"];
@@ -135,7 +174,7 @@ final class File extends Debug {
      *
      * @return bool
      */
-    private function createDirectory() {
+    protected function createDirectory() {
         if (!is_dir($this->path)) {
             if (!mkdir($this->path, 0777, true)) {
                 return false;
@@ -150,7 +189,7 @@ final class File extends Debug {
      * @param  string $fileType fichier à vérifier
      * @return bool
      */
-    private function checkType(string $fileType) {
+    protected function checkType(string $fileType) {
         // Vérifie l'extention
         $ok = false;
         foreach ($this->type as $type) {
@@ -167,7 +206,7 @@ final class File extends Debug {
      * @param  int $fileSize taille du fichier
      * @return bool
      */
-    private function checkSize(int $fileSize) {
+    protected function checkSize(int $fileSize) {
         // Vérifie la taille du fichier
         if ($this->maxSize >= $fileSize) {
             return true;

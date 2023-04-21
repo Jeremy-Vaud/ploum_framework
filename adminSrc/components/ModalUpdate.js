@@ -116,8 +116,14 @@ export default function ModalUpdate(props) {
                                     <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
                                 )
                             } else if (e.type === "select" && props.dataSelect[e.name]) {
+                                let value
+                                if(typeof e.value === "string") {
+                                    value = e.value
+                                } else {
+                                    value = e.value.id
+                                }
                                 return (
-                                    <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value.id} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
+                                    <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
                                 )
                             } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
                                 let table;
