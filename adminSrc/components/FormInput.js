@@ -8,7 +8,7 @@ export default function FormInput(props) {
     const [hasFile, setHasFile] = useState(false)
 
     useEffect(() => {
-        if (props.type === "file" && props.value !== "") {
+        if (props.type === "file" && props.value !== "" && props.value !== null) {
             setHasFile(true)
         }
     }, [])

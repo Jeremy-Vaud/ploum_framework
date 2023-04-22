@@ -87,7 +87,16 @@ class File extends Debug {
         }
         return false;
     }
-
+    
+    /**
+     * Retourne le type de colone pour la structure de la BDD
+     *
+     * @return string
+     */
+    public function getTypeForSql() {
+        return "text";
+    }
+    
     /**
      * Attribuer un nouveau chemin au fichier
      *

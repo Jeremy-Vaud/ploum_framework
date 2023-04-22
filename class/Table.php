@@ -11,7 +11,6 @@ abstract class Table extends Debug {
     // Attributs
     protected $id = 0;
     protected $fields = [];
-    protected $files = [];
     protected $foreignKeys = [];
     protected $adminPannel = null;
 
@@ -26,8 +25,6 @@ abstract class Table extends Debug {
             return $this->id;
         } else if (isset($this->fields[$field])) {
             return $this->fields[$field]->get();
-        } else if (isset($this->files[$field])) {
-            return $this->files[$field]->get();
         }
         return null;
     }
@@ -70,14 +67,14 @@ abstract class Table extends Debug {
                     throw new \Exception("La valeur de l'id n'est pas valide");
                 }
             } else if (isset($this->fields[$field])) {
-                if (!$this->fields[$field]->set($val, $verif)) {
+                if(is_a($this->fields[$field],"App\File")) {
+                    if (is_string($val)) {
+                        $this->fields[$field]->set($val);
+                    } else if (is_array($val)) {
+                        $this->fields[$field]->save($val, false);
+                    }
+                } else if (!$this->fields[$field]->set($val, $verif)) {
                     throw new \Exception("La valeur du champs " . htmlentities($field) . " n'est pas valide");
-                }
-            } else if (isset($this->files[$field]) && $val !== null) {
-                if (is_string($val)) {
-                    $this->files[$field]->set($val);
-                } else if (is_array($val)) {
-                    $this->files[$field]->save($val, false);
                 }
             } else if (isset($this->foreignKeys[$field])) {
                 $this->setForeign($field, $val);
@@ -126,22 +123,23 @@ abstract class Table extends Debug {
      */
     public function saveFiles(array $array) {
         foreach ($array as $key => $val) {
-            if (isset($this->files[$key])) {
-                $this->files[$key]->save($val);
+            if (isset($this->fields[$key]) && is_a($this->fields[$key],"App\File")) {
+                $this->fields[$key]->save($val);
             }
         }
         $this->update();
     }
 
     /**
-     * Attribuer un chemin depuis leur nom à chaque élément de l'atribut $file
+     * Attribuer un chemin depuis leur nom à chaque élément de type file
      *
      * @return void
      */
     private function setFilesPath() {
         $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
-        foreach ($this->files as $name => $file) {
-            $file->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
+        foreach ($this->fields as $name => $val) {
+            if(is_a($val,"App\File"))
+            $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
         }
     }
 
@@ -213,10 +211,11 @@ abstract class Table extends Debug {
         $sql = "INSERT INTO `$class` SET ";
         $param = [];
         foreach ($this->fields as $field => $value) {
-            $sql .= "`$field` = :$field,";
             if (get_class($value) === "App\Field") {
+                $sql .= "`$field` = :$field,";
                 $param[$field] = $value->get();
             } elseif (get_class($value) === "App\ForeignKey") {
+                $sql .= "`$field` = :$field,";
                 $param[$field] = $value->getKey();
             }
         }
@@ -281,8 +280,10 @@ abstract class Table extends Debug {
             if (!BDD::Execute($sql, $param)) {
                 throw new \Exception("Erreur SQL ($sql)");
             }
-            foreach ($this->files as $file) {
-                $file->deleteFile();
+            foreach ($this->fields as $field) {
+                if(is_a($field,"App\File")) {
+                    $field->deleteFile();
+                }
             }
             if (is_dir("files/" . $class . "/" . $this->id)) {
                 rmdir("files/" . $class . "/" . $this->id);
@@ -331,11 +332,9 @@ abstract class Table extends Debug {
                 $param[$field] = $value->get();
             } elseif (get_class($value) === "App\ForeignKey") {
                 $param[$field] = $value->getKey();
+            } elseif(is_a($value,"App\File")) {
+                $param[$field] = $value->getName();
             }
-        }
-        foreach ($this->files as $field => $value) {
-            $sql .= "`$field` = :$field,";
-            $param[$field] = $value->getName();
         }
         $sql = substr($sql, 0, -1) . " WHERE `id`=:id";
         try {
@@ -438,16 +437,11 @@ abstract class Table extends Debug {
     public function toArray() {
         $array = ["id" => $this->id];
         foreach ($this->fields as $field => $value) {
-            if (get_class($value) === "App\Field") {
-                if ($value->getType() !== "password") {
-                    $array[$field] = $value->get();
-                }
-            } elseif (get_class($value) === "App\ForeignKey") {
+            if (get_class($value) === "App\ForeignKey") {
                 $array[$field] = $value->get()->toArray();
+            } else {
+                $array[$field] = $value->get();
             }
-        }
-        foreach ($this->files as $field => $value) {
-            $array[$field] = $value->get();
         }
         foreach (array_keys($this->foreignKeys) as $key) {
             $array[$key] = [];
@@ -501,8 +495,8 @@ abstract class Table extends Debug {
     public function checkFiles(array $array) {
         $error = [];
         foreach ($array as $file => $val) {
-            if (isset($this->files[$file])) {
-                $check = $this->files[$file]->checkFile($val);
+            if (isset($this->fields[$file]) && is_a($this->fields[$file],"App\File")) {
+                $check = $this->fields[$file]->checkFile($val);
                 if ($check !== true) {
                     $error[$file] = $check;
                 }
@@ -522,9 +516,6 @@ abstract class Table extends Debug {
         foreach ($this->fields as $name => $field) {
             $data[$class][$name] = $field->getTypeForSql();
         }
-        foreach (array_keys($this->files) as $file) {
-            $data[$class][strtolower($file)] = "text";
-        }
         foreach (array_keys($this->foreignKeys) as $foreign) {
             $foreignClass = strtolower(substr($foreign, strrpos($foreign, '\\') + 1));
             $data[$class . "_" . $foreignClass] = [$class => "int(11) NOT NULL", $foreignClass => "int(11) NOT NULL"];
@@ -542,7 +533,7 @@ abstract class Table extends Debug {
             $return = $this->adminPannel;
             $return["className"] = get_called_class();
             $return["fields"] = [];
-            foreach ($this->fields + $this->files as $key => $field) {
+            foreach ($this->fields as $key => $field) {
                 $params = $field->getAdmin();
                 if ($params) {
                     $return["fields"][$key] = $params;
