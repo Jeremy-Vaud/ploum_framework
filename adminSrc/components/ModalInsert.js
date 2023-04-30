@@ -67,6 +67,7 @@ export default function ModalInsert(props) {
         let formData = new FormData(form)
         formData.append("table", props.table)
         formData.append("action", "insert")
+        console.log(formData)
         setLoading("")
         fetch("../api.php", {
             method: 'POST',

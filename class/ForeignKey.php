@@ -13,7 +13,7 @@ final class ForeignKey extends Debug{
     protected $table;
     protected $key = 0;
     protected $value = null;
-    protected $admin = ["key" => "id", "pannel" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
+    protected $admin = ["key" => "id", "admin" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
     
     /**
      * Constructeur
@@ -33,8 +33,8 @@ final class ForeignKey extends Debug{
                 if(isset($admin["key"])) {
                     $this->admin["key"] = $admin["key"];
                 }
-                if(isset($admin["pannel"])) {
-                    $this->admin["pannel"] = $admin["pannel"];
+                if(isset($admin["admin"])) {
+                    $this->admin["admin"] = $admin["admin"];
                 }
             }
             $this->table = $table;
@@ -96,8 +96,8 @@ final class ForeignKey extends Debug{
      * @return mixed Un tableau de paramètres ou false 
      */
     public function getAdmin() {
-        if($this->admin["pannel"] !== []) {
-            return ["type" => "select", "table" => $this->admin["pannel"],"foreignTable" => $this->table,"key" => $this->admin["key"]];
+        if($this->admin["admin"] !== []) {
+            return ["type" => "select", "table" => $this->admin["admin"],"foreignTable" => $this->table,"key" => $this->admin["key"]];
         }
         return "false";
     }

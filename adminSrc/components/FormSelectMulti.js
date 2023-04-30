@@ -41,7 +41,7 @@ export default function FormSelectMulti(props) {
                 <span className="capitalize mr-2">{props.name}</span>
                 <span className="text-warning">{props.warning}</span>
             </label>
-            <input name={props.table} id={id} type="hidden" value={selected.map((e)=>{
+            <input name={props.name} id={id} type="hidden" value={selected.map((e)=>{
                 if(e.selected) {
                     return(
                        e.value 

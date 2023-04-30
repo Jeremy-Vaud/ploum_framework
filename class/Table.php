@@ -11,8 +11,16 @@ abstract class Table extends Debug {
     // Attributs
     protected $id = 0;
     protected $fields = [];
-    protected $foreignKeys = [];
+    /*protected $foreignKeys = [];*/
     protected $adminPannel = null;
+
+    public function __construct() {
+        foreach (array_keys($this->fields) as $key) {
+            if (get_class($this->fields[$key]) === "App\MultipleForeignKeys") {
+                $this->fields[$key]->setTable(get_called_class());
+            }
+        }
+    }
 
     /**
      * Retourne la valeur d'un champ de la table
@@ -25,24 +33,6 @@ abstract class Table extends Debug {
             return $this->id;
         } else if (isset($this->fields[$field])) {
             return $this->fields[$field]->get();
-        }
-        return null;
-    }
-
-    /**
-     * Retourne un des tableaux d'objet contenu dans l'attribut foreignKeys après les avoir récupéré dans la base de donnée si néscessaire
-     *
-     * @param  string $class Nom de la classe à retouner
-     * @return array Tableau d'objets de l'attribut foreignKeys avec l'index $class
-     */
-    public function getForeign(string $class) {
-        if (isset($this->foreignKeys[$class])) {
-            foreach ($this->foreignKeys[$class] as $key => $object) {
-                if ($object->get('id') === 0) {
-                    $object->loadFromId($key);
-                }
-            }
-            return $this->foreignKeys[$class];
         }
         return null;
     }
@@ -67,39 +57,20 @@ abstract class Table extends Debug {
                     throw new \Exception("La valeur de l'id n'est pas valide");
                 }
             } else if (isset($this->fields[$field])) {
-                if(is_a($this->fields[$field],"App\File")) {
+                if (is_a($this->fields[$field], "App\File")) {
                     if (is_string($val)) {
                         $this->fields[$field]->set($val);
                     } else if (is_array($val)) {
                         $this->fields[$field]->save($val, false);
                     }
+                } else if (is_a($this->fields[$field], "App\MultipleForeignKeys")) {
+                    $this->fields[$field]->set($val);
                 } else if (!$this->fields[$field]->set($val, $verif)) {
                     throw new \Exception("La valeur du champs " . htmlentities($field) . " n'est pas valide");
                 }
-            } else if (isset($this->foreignKeys[$field])) {
-                $this->setForeign($field, $val);
             }
         } catch (\Exception $e) {
             $this->alertDebug($e);
-        }
-    }
-
-    /**
-     * Attribuer des id à l'attribut $foreignKeys
-     *
-     * @param  string $class Nom de la class
-     * @param  string $keys liste d'id (ex: 1,2,3)
-     * @return void
-     */
-    private function setForeign(string $class, string $keys) {
-        if (isset($this->foreignKeys[$class])) {
-            $this->foreignKeys[$class] = [];
-            $arrayKeys = explode(",", $keys);
-            foreach ($arrayKeys as $id) {
-                if (ctype_digit($id)) {
-                    $this->foreignKeys[$class][$id] = new $class;
-                }
-            }
         }
     }
 
@@ -123,7 +94,7 @@ abstract class Table extends Debug {
      */
     public function saveFiles(array $array) {
         foreach ($array as $key => $val) {
-            if (isset($this->fields[$key]) && is_a($this->fields[$key],"App\File")) {
+            if (isset($this->fields[$key]) && is_a($this->fields[$key], "App\File")) {
                 $this->fields[$key]->save($val);
             }
         }
@@ -138,8 +109,8 @@ abstract class Table extends Debug {
     private function setFilesPath() {
         $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
         foreach ($this->fields as $name => $val) {
-            if(is_a($val,"App\File"))
-            $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
+            if (is_a($val, "App\File"))
+                $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
         }
     }
 
@@ -174,33 +145,6 @@ abstract class Table extends Debug {
     }
 
     /**
-     * Récupère les clés étrangère de l'attribut foreignKeys
-     *
-     * @throws Excepton Erreur sql 
-     * @return void
-     */
-    private function loadForeignKeys() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
-        $param = [":id" => $this->id];
-        foreach (array_keys($this->foreignKeys) as $key) {
-            $foreignClass = substr($key, strrpos(get_called_class(), '\\') + 1);
-            $table = $class . "_" . $foreignClass;
-            $sql = "SELECT `$foreignClass` FROM `$table` WHERE `$class` = :id";
-            try {
-                if (!BDD::Execute($sql, $param)) {
-                    throw new \Exception("Erreur SQL ($sql)");
-                }
-                $results = BDD::FetchAll();
-                foreach ($results as $result) {
-                    $this->foreignKeys[$key][$result[$foreignClass]] = new $key;
-                }
-            } catch (\Exception $e) {
-                $this->alertDebug($e);
-            }
-        }
-    }
-
-    /**
      * Inserer une nouvelle ligne dans la base de donnée
      *
      * @throws Excepton Erreur sql 
@@ -226,44 +170,18 @@ abstract class Table extends Debug {
             }
             $this->id = BDD::LastInsertId();
             $this->setFilesPath();
-            $this->insertForeignKeys();
+            foreach($this->fields as $key => $val) {
+                if(get_class($val) === "App\MultipleForeignKeys") {
+                    $this->fields[$key]->setId($this->id);
+                    $this->fields[$key]->insert();
+                }
+            }
+            $this->loadForeignKeys();
         } catch (\Exception $e) {
             $this->alertDebug($e);
             return false;
         }
         return true;
-    }
-
-    /**
-     * Insere toutes les clés étrangère de l'attribut foreignKeys dans la base de donnée
-     *
-     * @throws Excepton Erreur sql
-     * @return void
-     */
-    private function insertForeignKeys() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
-        foreach (array_keys($this->foreignKeys) as $key) {
-            if ($this->foreignKeys[$key] !== []) {
-                $foreignClass = substr($key, strrpos(get_called_class(), '\\') + 1);
-                $table = $class . "_" . $foreignClass;
-                $sql = "INSERT INTO `$table` (`$class`,`$foreignClass`) VALUES ";
-                $param = [":id" => $this->id];
-                $i = 0;
-                foreach (array_keys($this->foreignKeys[$key]) as $foreignId) {
-                    $sql .= " (:id, :foreignId$i),";
-                    $param[":foreignId$i"] = $foreignId;
-                    $i++;
-                }
-                $sql = substr($sql, 0, -1);
-                try {
-                    if (!BDD::Execute($sql, $param)) {
-                        throw new \Exception("Erreur SQL ($sql)");
-                    }
-                } catch (\Exception $e) {
-                    $this->alertDebug($e);
-                }
-            }
-        }
     }
 
     /**
@@ -281,8 +199,10 @@ abstract class Table extends Debug {
                 throw new \Exception("Erreur SQL ($sql)");
             }
             foreach ($this->fields as $field) {
-                if(is_a($field,"App\File")) {
+                if (is_a($field, "App\File")) {
                     $field->deleteFile();
+                } elseif (is_a($this->fields[$field], "App\MultipleForeignKeys")) {
+                    $field->delete();
                 }
             }
             if (is_dir("files/" . $class . "/" . $this->id)) {
@@ -290,29 +210,6 @@ abstract class Table extends Debug {
             }
         } catch (\Exception $e) {
             $this->alertDebug($e);
-        }
-    }
-
-    /**
-     * Suprime toutes les clés étrangère de l'attribut foreignKeys dans la base de donnée
-     *
-     * @throws Excepton Erreur sql
-     * @return void
-     */
-    private function deleteFroreignKeys() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
-        foreach (array_keys($this->foreignKeys) as $key) {
-            $foreignClass = substr($key, strrpos(get_called_class(), '\\') + 1);
-            $table = $class . "_" . $foreignClass;
-            $sql = "DELETE FROM `$table` WHERE `$class` = :id";
-            $param = [":id" => $this->id];
-            try {
-                if (!BDD::Execute($sql, $param)) {
-                    throw new \Exception("Erreur SQL ($sql)");
-                }
-            } catch (\Exception $e) {
-                $this->alertDebug($e);
-            }
         }
     }
 
@@ -327,12 +224,14 @@ abstract class Table extends Debug {
         $sql = "UPDATE `$class` SET ";
         $param = [":id" => $this->id];
         foreach ($this->fields as $field => $value) {
-            $sql .= "`$field` = :$field,";
             if (get_class($value) === "App\Field") {
+                $sql .= "`$field` = :$field,";
                 $param[$field] = $value->get();
             } elseif (get_class($value) === "App\ForeignKey") {
+                $sql .= "`$field` = :$field,";
                 $param[$field] = $value->getKey();
-            } elseif(is_a($value,"App\File")) {
+            } elseif (is_a($value, "App\File")) {
+                $sql .= "`$field` = :$field,";
                 $param[$field] = $value->getName();
             }
         }
@@ -341,8 +240,12 @@ abstract class Table extends Debug {
             if (!BDD::Execute($sql, $param)) {
                 throw new \Exception("Erreur SQL ($sql)");
             }
-            $this->deleteFroreignKeys();
-            $this->insertForeignKeys();
+            foreach($this->fields as $field) {
+                if (is_a($field, "App\MultipleForeignKeys")) {
+                    $field->update();
+                }
+            }
+            $this->loadForeignKeys();
         } catch (\Exception $e) {
             $this->alertDebug($e);
             return false;
@@ -387,6 +290,20 @@ abstract class Table extends Debug {
             $this->alertDebug($e);
         }
         return $return;
+    }
+    
+    /**
+     * Charger les objets des champs MutipleForeignKey
+     *
+     * @return void
+     */
+    public function loadForeignKeys() {
+        foreach($this->fields as $key => $val) {
+            if(is_a($val, "App\MultipleForeignKeys")) {
+                $this->fields[$key]->setId($this->id);
+                $this->fields[$key]->load();
+            }
+        }
     }
 
     /**
@@ -439,17 +356,22 @@ abstract class Table extends Debug {
         foreach ($this->fields as $field => $value) {
             if (get_class($value) === "App\ForeignKey") {
                 $array[$field] = $value->get()->toArray();
-            } else {
+            } else if(is_a($value, "App\MultipleForeignKeys")) {
+                $array[$field] = [];
+                foreach ($value->get() as $object) {
+                    $array[$field][] = $object->toArray();
+                }
+            }else {
                 $array[$field] = $value->get();
             }
         }
-        foreach (array_keys($this->foreignKeys) as $key) {
+        /*foreach (array_keys($this->foreignKeys) as $key) {
             $array[$key] = [];
             $foreign = $this->getForeign($key);
             foreach ($foreign as $object) {
                 $array[$key][] = $object->toArray();
             }
-        }
+        }*/
         return $array;
     }
 
@@ -495,7 +417,7 @@ abstract class Table extends Debug {
     public function checkFiles(array $array) {
         $error = [];
         foreach ($array as $file => $val) {
-            if (isset($this->fields[$file]) && is_a($this->fields[$file],"App\File")) {
+            if (isset($this->fields[$file]) && is_a($this->fields[$file], "App\File")) {
                 $check = $this->fields[$file]->checkFile($val);
                 if ($check !== true) {
                     $error[$file] = $check;
@@ -514,15 +436,19 @@ abstract class Table extends Debug {
         $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $data = [$class => []];
         foreach ($this->fields as $name => $field) {
-            $data[$class][$name] = $field->getTypeForSql();
+            if(is_a($field, "App\MultipleForeignKeys")) {
+                $data[$class . "_" . $name] = [$class => "int(11) NOT NULL", $name => "int(11) NOT NULL"];
+            } else {
+                $data[$class][$name] = $field->getTypeForSql();
+            }     
         }
-        foreach (array_keys($this->foreignKeys) as $foreign) {
+        /*foreach (array_keys($this->foreignKeys) as $foreign) {
             $foreignClass = strtolower(substr($foreign, strrpos($foreign, '\\') + 1));
             $data[$class . "_" . $foreignClass] = [$class => "int(11) NOT NULL", $foreignClass => "int(11) NOT NULL"];
-        }
+        }*/
         return $data;
     }
-    
+
     /**
      * Retourne tous les paramètres pour le panneau d'administration
      *

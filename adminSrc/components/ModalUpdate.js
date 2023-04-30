@@ -134,7 +134,7 @@ export default function ModalUpdate(props) {
                                     }
                                 }
                                 return (
-                                    <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={props.data[table]} dataSelect={props.dataSelect[e.name]} table={table} />
+                                    <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} dataSelect={props.dataSelect[e.name]} table={table} />
                                 )
                             } else if (e.type === "dateTime") {
                                 return (
