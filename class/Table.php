@@ -365,13 +365,6 @@ abstract class Table extends Debug {
                 $array[$field] = $value->get();
             }
         }
-        /*foreach (array_keys($this->foreignKeys) as $key) {
-            $array[$key] = [];
-            $foreign = $this->getForeign($key);
-            foreach ($foreign as $object) {
-                $array[$key][] = $object->toArray();
-            }
-        }*/
         return $array;
     }
 
@@ -442,10 +435,6 @@ abstract class Table extends Debug {
                 $data[$class][$name] = $field->getTypeForSql();
             }     
         }
-        /*foreach (array_keys($this->foreignKeys) as $foreign) {
-            $foreignClass = strtolower(substr($foreign, strrpos($foreign, '\\') + 1));
-            $data[$class . "_" . $foreignClass] = [$class => "int(11) NOT NULL", $foreignClass => "int(11) NOT NULL"];
-        }*/
         return $data;
     }
 
