@@ -26,8 +26,8 @@ final class View extends Debug {
     // Attributs pour les styles et scripts
     protected $scripts;
     protected $styles;
-    // Attributs fragement 
-    protected $fragment;
+    // Attribut variables
+    protected $variables = [];
     // Racine du site
     protected $root = "/";
 
@@ -89,7 +89,7 @@ final class View extends Debug {
             $this->alertDebug($e);
         }
     }
-    
+
     /**
      * Retourne la valeur d'un attribut
      *
@@ -97,12 +97,12 @@ final class View extends Debug {
      * @return mixed Valeur de l'attribut si il existe sinon null
      */
     public function get(string $attr) {
-        if(isset($this->$attr)) {
+        if (isset($this->$attr)) {
             return $this->$attr;
         }
         return null;
     }
-    
+
     /**
      * Modifier la valeur d'un attribut ou ajouter des scripts et des styles à la vue
      *
@@ -113,18 +113,18 @@ final class View extends Debug {
      */
     public function set(string $attr, $val) {
         try {
-            if($attr === "scripts" || $attr === "styles") {
-                if(is_string($val)) {
-                    if(!file_exists($val)){
+            if ($attr === "scripts" || $attr === "styles") {
+                if (is_string($val)) {
+                    if (!file_exists($val)) {
                         throw new \Exception("Le fichier " . htmlentities($val) . " est introuvable");
                     }
                     $this->$attr[] = $val;
-                }else if(is_array($val)) {
-                    foreach($val as $string) {
-                        if(!is_string($string)) {
+                } else if (is_array($val)) {
+                    foreach ($val as $string) {
+                        if (!is_string($string)) {
                             throw new \Exception("Le nom du fichier " . htmlentities($string) . " n'est pas une chaine de caractère");
                         }
-                        if(!file_exists($string)) {
+                        if (!file_exists($string)) {
                             throw new \Exception("Le fichier " . htmlentities($string) . " est introuvable");
                         }
                         $this->$attr[] = $string;
@@ -132,29 +132,32 @@ final class View extends Debug {
                 } else {
                     throw new \Exception("Pour l'attribut $attr le paramètre \$val doit être un tableau ou une chaine de caractère");
                 }
-            } else if(isset($this->$attr)){
-                if(!is_string($val)) {
+            } else if (isset($this->$attr)) {
+                if (!is_string($val)) {
                     throw new \Exception("Le nom du fichier de l'attribut $attr n'est pas une chaine de caractère");
                 }
                 $this->$attr = $val;
             } else {
                 throw new \Exception("Le nom du paramètre " . htmlentities($attr) . " n'est pas valide");
             }
-        } catch(Exception $e){
+        } catch (Exception $e) {
             $this->alertDebug($e);
         }
     }
 
-    /**
-     * Ajouter du contenu à l'attribut main
-     *
-     * @param  string $content Contenu à ajouter
-     * @return void
-     */
-    public function addContent(string $content) {
-        $this->main .= $content;
+    public function setVariables(array $var) {
+        foreach ($var as $key => $val) {
+            try {
+                if($key === "title" || $key === "styles" || $key === "scripts") {
+                    throw new \Exception("Le nom de variable $key n'est pas valide.");
+                }
+                $this->variables[$key] = $val;
+            } catch (Exception $e) {
+                $this->alertDebug($e);
+            }
+        }
     }
-    
+
     /**
      * Ajouter un template à l'attribut main
      *
@@ -163,29 +166,16 @@ final class View extends Debug {
      * @return void
      */
     public function addTemplate(string $template) {
-        try{
-            if(!file_exists($template)) {
+        try {
+            if (!file_exists($template)) {
                 throw new \Exception("Le fichier " . htmlentities($template) . " est introuvable");
             }
-            ob_start();
-            include $template;
-            $this->main .= ob_get_clean();
-        } catch(\Exception $e) {
+            $this->main = $template;
+        } catch (\Exception $e) {
             $this->alertDebug($e);
         }
     }
-    
-    /**
-     * Ajouter du contenu à l'attribut fragment
-     *
-     * @param  string $name Nom du fragment
-     * @param  string $fragment Contenu du fragment
-     * @return void
-     */
-    public function addFragment(string $name, string $fragment) {
-        $this->fragment[$name] = $fragment;
-    }
-    
+
     /**
      * Affiche la vue
      * 
@@ -193,14 +183,17 @@ final class View extends Debug {
      */
     public function render() {
         $title = $this->title;
-        if($this->tag !== ""){
-            $title .= " - ".$this->tag;
+        if ($this->tag !== "") {
+            $title .= " - " . $this->tag;
+        }
+        foreach ($this->variables as $key => $var) {
+            ${$key} = $var;
         }
         $styles = $this->renderStyles();
         $scripts = $this->renderScripts();
         include $this->base;
     }
-    
+
     /**
      * Créer la liste des fichiers de style
      *
@@ -213,7 +206,7 @@ final class View extends Debug {
         }
         return $styles;
     }
-    
+
     /**
      * Créer la liste des fichiers js
      *
@@ -226,7 +219,7 @@ final class View extends Debug {
         }
         return $scripts;
     }
-    
+
     /**
      * Retourne la racine
      *
@@ -235,5 +228,4 @@ final class View extends Debug {
     public function getRoot() {
         return $this->root;
     }
-    
 }

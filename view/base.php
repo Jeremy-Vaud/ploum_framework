@@ -12,7 +12,7 @@
 <body>
     <?php include $this->header ?>
     <main class="overflow-hidden">
-        <?= $this->main ?>
+        <?= include $this->main ?>
     </main>
     <?php include $this->footer ?>
     <?= $scripts ?>
