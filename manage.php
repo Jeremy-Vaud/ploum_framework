@@ -3,6 +3,7 @@
  * CLI
  */
 require 'vendor/autoload.php';
+require "settings/global.php";
 
 echo "\n";
 if (isset($argv[1])) {
@@ -12,6 +13,7 @@ if (isset($argv[1])) {
             echo "migrate : Génére ou modifie les tables de la BDD\n";
             echo "create-admin-user 'email' 'password': Créer un compte admin\n";
             echo "create-admin-pannel : Génére un fichier JSON pour la construction du panneau d'administration\n";
+            echo "download-fonts : Télécharge des polices depuis Google Fonts\n";
             break;
 
         case 'migrate':
@@ -48,6 +50,11 @@ if (isset($argv[1])) {
         case 'create-admin-pannel':
             $adminPannel = new App\AdminPannel;
             $adminPannel->generate();
+            break;
+
+        case 'download-fonts':
+            $gfd = new GFontsDownloader\GFontsDownloader\GFontsDownloader($FONTS);
+            $gfd->download();
             break;
 
         default:

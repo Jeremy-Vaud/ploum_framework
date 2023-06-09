@@ -14,6 +14,7 @@
         }
     ],
     "require": {
-        "phpmailer/phpmailer": "^6.7"
+        "phpmailer/phpmailer": "^6.7",
+        "gfontsdownloader/gfontsdownloader": "^1.0"
     }
 }
