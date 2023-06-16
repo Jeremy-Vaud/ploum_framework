@@ -4,8 +4,9 @@
   "description": "",
   "scripts": {
     "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url ../admin",
-    "importIcons":  "node --experimental-json-modules AdminSrc/importIcons.mjs",
-    "watchCss" : "npx tailwindcss -i css/input.css -o css/output.css --watch"
+    "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
+    "watchCss": "npx tailwindcss -i css/input.css -o css/output.css --watch",
+    "maildev": "npx maildev"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/Jeremy-Vaud/backend_ploum_cms#readme",
   "devDependencies": {
+    "maildev": "^2.0.5",
     "parcel": "^2.8.2",
     "postcss": "^8.4.21",
     "process": "^0.11.10",

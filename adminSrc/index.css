@@ -28,6 +28,12 @@
     .btn-update {
         @apply btn bg-yellow-600 hover:bg-yellow-500;
     }
+    .btn-link {
+        @apply text-green-600;
+    }
+    .btn-link:hover {
+        @apply text-green-500;
+    }
     /*
      * Navbar
      */

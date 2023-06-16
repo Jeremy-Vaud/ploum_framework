@@ -15,15 +15,13 @@ if (isset($_GET['isLog'])) {
         session_destroy();
         http_response_code(401);
     }
-
-} else if(isset($_GET['logOut'])) {
+} else if (isset($_GET['logOut'])) {
     /*
      * Déconnection
      */
     session_destroy();
     http_response_code(200);
-
-}else if (isset($_SESSION["admin"]) && $_SESSION["admin"]) {
+} else if (isset($_SESSION["admin"]) && $_SESSION["admin"]) {
     /*
      * Traitement des requète si connecté
      */
@@ -114,18 +112,34 @@ if (isset($_GET['isLog'])) {
             if (isset($data["table"])) {
                 throw new \Exception("Connection requise");
             }
-            if (!(isset($data["email"]) && isset($data["password"]))) {
-                throw new \Exception("");
+            if (!(isset($data["action"]) && isset($data["email"]))) {
+                throw new \Exception("Une erreur est survenue");
             }
-            $user = new App\User;
-            if (!$user->connect($data["email"], $data["password"])) {
-                throw new \Exception("Identifiants incorrect");
-            }
-            if (!$_SESSION["admin"]) {
-                throw new \Exception("La connection néssecite un compte administrateur");
-            } else {
+            if ($data["action"] === "logIn" && isset($data["password"])) {
+                $user = new App\User;
+                if (!$user->connect($data["email"], $data["password"])) {
+                    throw new \Exception("Identifiants incorrect");
+                }
+                if (!$_SESSION["admin"]) {
+                    throw new \Exception("La connection néssecite un compte administrateur");
+                } else {
+                    http_response_code(200);
+                    echo json_encode($_SESSION);
+                }
+            } elseif ($data["action"] === "forgotPass") {
+                $user = new App\User;
+                if (!$user->userExist($data["email"], true)) {
+                    throw new \Exception("Adresse email inconnue");
+                }
+                if (!$user->createAdminRecoveryLink()) {
+                    throw new \Exception("Une erreur est survenue");
+                }
+                if (!$user->sendRecoveryLink()) {
+                    throw new \Exception("Une erreur est survenue");
+                }
                 http_response_code(200);
-                echo json_encode($_SESSION);
+            } else {
+                throw new \Exception("Une erreur est survenue");
             }
         } catch (\Exception $e) {
             http_response_code(401);

@@ -25,3 +25,13 @@ $STYLES = [
 $BASE = "view/base.php";
 $HEADER = "view/header.php";
 $FOOTER = "view/footer.php";
+
+// Email admin
+$adminMail = [
+    "Host" => "localhost",
+    "SMTPAuth" => false,
+    "Username" => null,
+    "Password" => null,
+    "SMTPSecure" => "",
+    "Port" => 1025
+];
