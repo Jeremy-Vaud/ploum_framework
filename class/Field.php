@@ -17,11 +17,12 @@ final class Field extends Debug {
     protected $value = null; // Valeur du champ
     protected $unique = false; // Doit avoir une valeur unique (ex: email pour les utilisateur)
     protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
+    protected $null = false; // True si valeur null possible
 
     /**
      * Vérifie les paramètres avant de construire
      *
-     * @param  array $params [type(requis):string, length(optionnel): int, length(optionnel): int, minLength(optionnel): int, maxLength(optionnel): int, value(optionnel), unique(optionnel) : bool]
+     * @param  array $params [type(requis):string, length(optionnel): int, length(optionnel): int, minLength(optionnel): int, maxLength(optionnel): int, value(optionnel), unique(optionnel) : bool, null(optionnel): bool]
      * @throws Exeption Si les valeurs des paramètres ne sont pas conformes
      * @return void
      */
@@ -78,6 +79,14 @@ final class Field extends Debug {
                     }
                 }
             }
+            // Null
+            if(isset($params["null"])) {
+                if(is_bool($params["null"])) {
+                    $this->null = $params["null"];
+                } else {
+                    throw new \Exception("La valeur de 'null' n'est pas un booléen");
+                }
+            }
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
@@ -129,24 +138,28 @@ final class Field extends Debug {
      * @return string type
      */
     public function getTypeForSql() {
+        $null = " NOT NULL";
+        if($this->null) {
+            $null = "";
+        }
         if ($this->type === "int") {
-            return "int(11) NOT NULL";
+            return "int(11)$null";
         } else if ($this->type === "char") {
-            return "varchar(" . $this->length . ") NOT NULL";
+            return "varchar(" . $this->length . ")$null";
         } else if ($this->type === "email") {
-            return "varchar(254) NOT NULL";
+            return "varchar(254)$null";
         } else if ($this->type === "password") {
-            return "varchar(80) NOT NULL";
+            return "varchar(80)$null";
         } else if ($this->type === "text" || $this->type === "url") {
-            return "text NOT NULL";
+            return "text$null";
         } else if ($this->type === "bool") {
-            return "tinyint(1) NOT NULL";
+            return "tinyint(1)$null";
         } else if ($this->type === "dateTime") {
-            return "datetime NOT NULL DEFAULT '1970-01-01 00:00:00'";
+            return "datetime$null";
         } else if ($this->type === "date") {
-            return "date NOT NULL DEFAULT '1970-01-01'";
+            return "date$null";
         } else if ($this->type === "time") {
-            return "time NOT NULL DEFAULT '00:00:00'";
+            return "time$null";
         }
     }
 
@@ -198,6 +211,9 @@ final class Field extends Debug {
      * 
      */
     public function isValid($val, bool $returnMessage = false) {
+        if($this->null && is_null($val)) {
+            return true;
+        }
         $action = "isValid" . ucfirst($this->type);
         return $this->$action($val, $returnMessage);
     }

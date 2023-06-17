@@ -21,8 +21,8 @@ class User extends Table {
             "email" => new Field(["type" => "email", "unique" => true, "admin" => ["columns", "insert", "update"]]),
             "password" => new Field(["type" => "password", "length" => 16, "minLength" => 4, "admin" => ["insert"]]),
             "admin" => new Field(["type" => "bool", "value" => 0, "admin" => ["columns", "insert", "update"]]),
-            "recoveryLink" => new Field(["type" => "url"]),
-            "recoveryDate" => new Field(["type" => "dateTime"])
+            "recoveryLink" => new Field(["type" => "url", "null" => true]),
+            "recoveryDate" => new Field(["type" => "dateTime", "null" => true])
         ];
         $this->adminPannel = [
             "title" => "Utilisateurs",
