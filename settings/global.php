@@ -33,5 +33,6 @@ $adminMail = [
     "Username" => null,
     "Password" => null,
     "SMTPSecure" => "",
-    "Port" => 1025
+    "Port" => 1025,
+    "From" => ["admin@ploum.fr", "admin"]
 ];

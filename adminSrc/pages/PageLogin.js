@@ -36,7 +36,11 @@ export default function PageLogin(props) {
                 if (response.status === 401) {
                     return response.json();
                 } else if (response.status === 200) {
-                    props.logIn()
+                    if(data.action === "logIn") {
+                        props.logIn()
+                    } else {
+                        setForgotPass(false)
+                    }
                     return response.json()
                 }
             })

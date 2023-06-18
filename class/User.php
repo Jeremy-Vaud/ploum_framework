@@ -82,8 +82,13 @@ class User extends Table {
 
     public function createAdminRecoveryLink() {
         if ($this->get("admin")) {
+            $uniqueLink = false;
+            while(!$uniqueLink) {
+                $link = "https://" . $_SERVER["SERVER_NAME"] . "/admin/recovery?code=" . bin2hex(random_bytes(16));
+                $uniqueLink = $this->checkRecoveryLink($link);
+            }
             $date = date("Y-m-d h:i:s");
-            $this->set("recoveryLink", "https://" . $_SERVER["SERVER_NAME"] . "/admin/recovery/" . password_hash($date . $this->get("email"), PASSWORD_DEFAULT));
+            $this->set("recoveryLink", $link);
             $this->set("recoveryDate", $date);
             if ($this->update()) {
                 return true;
@@ -92,38 +97,42 @@ class User extends Table {
         return false;
     }
 
-    public function sendRecoveryLink() {
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+    private function checkRecoveryLink(string $link) {
+        $sql = "SELECT * FROM `user` WHERE `recoveryLink` = :link";
+        $param = ["link" => $link];
+        if(!BDD::Execute($sql, $param)) {
+            return false;
+        }
+        if(BDD::RowCount() > 0) {
+            return false;
+        }
+        return true;
+    }
 
+    public function sendRecoveryLink(array $SMTPParams) {
+        $mail = new \PHPMailer\PHPMailer\PHPMailer();
         try {
-            //Server settings
-            $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-            $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = 'smtp.example.com';                     //Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = 'user@example.com';                     //SMTP username
-            $mail->Password   = 'secret';                               //SMTP password
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+            $mail->isSMTP();
+            $mail->Host       = $SMTPParams["Host"];
+            $mail->SMTPAuth   = $SMTPParams["SMTPAuth"];
+            $mail->Username   = $SMTPParams["Username"];
+            $mail->Password   = $SMTPParams["Password"];
+            $mail->SMTPSecure = $SMTPParams["SMTPSecure"];
+            $mail->Port       = $SMTPParams["Port"];
 
-            //Recipients
-            $mail->setFrom('from@example.com', 'Mailer');
-            $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
-            $mail->addAddress('ellen@example.com');               //Name is optional
-            $mail->addReplyTo('info@example.com', 'Information');
-            $mail->addCC('cc@example.com');
-            $mail->addBCC('bcc@example.com');
+            $mail->setFrom($SMTPParams["From"][0], $SMTPParams["From"][1]);
+            $mail->addAddress($this->get("email"), $this->get("nom") . " " . $this->get("prenom"));
 
-            //Content
-            $mail->isHTML(true);                                  //Set email format to HTML
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+            $mail->isHTML(true);
+            $mail->Subject = "Mot de passe oublié";
+            $mail->Body    = "<p>Pour réinitialiser votre mot passe cliqué <a href='" . htmlentities($this->get("recoveryLink")) . "'>ici</a>.</p>";
+            $mail->AltBody = 'Pour réinitialiser votre mot passe suivez le lien '. $this->get("recoveryLink");
 
             $mail->send();
-            echo 'Message has been sent';
+            return true;
         } catch (\Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            return false;
         }
     }
 }

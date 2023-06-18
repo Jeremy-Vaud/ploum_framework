@@ -134,10 +134,11 @@ if (isset($_GET['isLog'])) {
                 if (!$user->createAdminRecoveryLink()) {
                     throw new \Exception("Une erreur est survenue");
                 }
-                if (!$user->sendRecoveryLink()) {
+                if (!$user->sendRecoveryLink($adminMail)) {
                     throw new \Exception("Une erreur est survenue");
                 }
                 http_response_code(200);
+                echo json_encode(["warning" => "Un email de récupération viens de vous être envoyé"]);
             } else {
                 throw new \Exception("Une erreur est survenue");
             }
