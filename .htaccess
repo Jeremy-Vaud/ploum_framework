@@ -19,5 +19,4 @@ RewriteCond %{REQUEST_URI} !.*\.lottie$ [NC]
 RewriteCond %{REQUEST_URI} !.*\.txt$ [NC]
 RewriteCond %{REQUEST_URI} !.*\.xml$ [NC]
 RewriteCond %{REQUEST_URI} !^/admin [NC]
-RewriteCond %{REQUEST_URI} !^/api.php [NC]
 RewriteRule .* /index.php

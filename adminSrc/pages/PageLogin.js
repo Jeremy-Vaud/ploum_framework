@@ -18,31 +18,29 @@ export default function PageLogin(props) {
     }
 
     function submit() {
-        let data = { email: email}
+        let formData = new FormData
+        formData.append("email", email)
         if(forgotPass) {
-            data.action = 'forgotPass'
+            formData.append("action", "forgotPass")
         } else {
-            data.action = "logIn"
-            data.password = password
+            formData.append("action", "logIn")
+            formData.append("password", password)
         }
         setLoading("")
-        fetch("../api.php", {
-            headers: {
-                "Content-Type": "application/json",
-            }, method: 'POST', body: JSON.stringify(data)
+        fetch("/api", {
+            method: 'POST',
+            body: formData
         })
             .then((response) => {
                 setLoading("hidden")
-                if (response.status === 401) {
-                    return response.json();
-                } else if (response.status === 200) {
-                    if(data.action === "logIn") {
+                if (response.status === 200) {
+                    if(formData.get("action") === "logIn") {
                         props.logIn()
                     } else {
                         setForgotPass(false)
                     }
-                    return response.json()
                 }
+                return response.json()
             })
             .then((response) => {
                 setWarning(response.warning)

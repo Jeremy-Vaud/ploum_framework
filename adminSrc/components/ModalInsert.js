@@ -69,7 +69,7 @@ export default function ModalInsert(props) {
         formData.append("action", "insert")
         console.log(formData)
         setLoading("")
-        fetch("../api.php", {
+        fetch("/api", {
             method: 'POST',
             body: formData
         })

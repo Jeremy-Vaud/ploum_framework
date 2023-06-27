@@ -201,7 +201,7 @@ abstract class Table extends Debug {
             foreach ($this->fields as $field) {
                 if (is_a($field, "App\File")) {
                     $field->deleteFile();
-                } elseif (is_a($this->fields[$field], "App\MultipleForeignKeys")) {
+                } elseif (is_a($field, "App\MultipleForeignKeys")) {
                     $field->delete();
                 }
             }

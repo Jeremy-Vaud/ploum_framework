@@ -21,7 +21,7 @@ export default function ModalDelete(props) {
         formData.append("id", props.id)
         formData.append("action", "delete")
         setLoading("")
-        fetch("../api.php", {
+        fetch("/api", {
             method: 'POST',
             body: formData
         })

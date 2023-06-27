@@ -23,7 +23,7 @@ export function App() {
     }
 
     useEffect(() => {
-        fetch("../api.php" + '?isLog=1')
+        fetch("/api" + '?isLog=1')
             .then((response) => {
                 if (response.status === 200) {
                     setIsConnect(true)
@@ -35,7 +35,7 @@ export function App() {
     }, [])
 
     function sendLogOut() {
-        fetch("../api.php" + '?logOut=1')
+        fetch("/api" + '?logOut=1')
             .then((response) => {
                 if (response.status === 200) {
                     setIsConnect(false);

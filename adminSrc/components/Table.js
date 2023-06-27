@@ -121,7 +121,7 @@ export default function Table(props) {
 
     useEffect(() => {
         setLoading("")
-        fetch("../api.php" + '?table=' + props.table + '&id=all')
+        fetch("/api" + '?table=' + props.table + '&id=all')
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {
@@ -145,7 +145,7 @@ export default function Table(props) {
 
     function loadSelect(table, name, key) {
         setLoading("")
-        fetch("../api.php" + '?table=' + table + '&id=all')
+        fetch("/api" + '?table=' + table + '&id=all')
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {

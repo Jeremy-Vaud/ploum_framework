@@ -69,7 +69,7 @@ export default function ModalUpdate(props) {
                 formData.append(input.name, "0")
             }
         })
-        fetch("../api.php", {
+        fetch("/api", {
             method: 'POST',
             body: formData
         })
