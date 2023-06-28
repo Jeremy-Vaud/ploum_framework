@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url ../admin",
+    "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
     "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
     "watchCss": "npx tailwindcss -i css/input.css -o css/output.css --watch",
     "maildev": "npx maildev"

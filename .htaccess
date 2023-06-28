@@ -21,5 +21,4 @@ RewriteCond %{REQUEST_URI} !.*\.xml$ [NC]
 RewriteCond %{REQUEST_URI} !.*\.ttf$ [NC]
 RewriteCond %{REQUEST_URI} !.*\.woff$ [NC]
 RewriteCond %{REQUEST_URI} !.*\.woff2$ [NC]
-RewriteCond %{REQUEST_URI} !^/admin [NC]
 RewriteRule .* /index.php

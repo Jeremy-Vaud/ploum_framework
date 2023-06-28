@@ -83,10 +83,14 @@ class Router extends Debug{
             $this->controller = $this->home;
             return;
         }
+        if(preg_match("#^admin(\/[\w]+)*$#i", $this->url)) {
+            $this->controller = "admin/index.html";
+            return;
+        }
         foreach($this->routes as $path => $controller) {
             $regex =  "#^".preg_replace('#:([\w]+)#', '([^/]+)', $path)."$#i";
             if(preg_match($regex, $this->url, $matches)) {
-                $this->controller = $controller;
+                $this->controller = "controller/" . $controller;
                 array_shift($matches);
                 if($matches !== []) {
                     $this->setParams($path, $matches);
@@ -94,7 +98,7 @@ class Router extends Debug{
                 return;
             }
         }
-        $this->controller = $this->not_found;
+        $this->controller = "controller/" . $this->not_found;
     }
     
     /**
@@ -123,14 +127,14 @@ class Router extends Debug{
      */
     public function getController() {
         try {
-            if(!file_exists("controller/".$this->controller)) {
-                throw new \Exception("Fichier controller/".$this->controller." introuvable");
+            if(!file_exists($this->controller)) {
+                throw new \Exception("Fichier ".$this->controller." introuvable");
             }
         } catch(\Exception $e){
             $this->alertDebug($e);
             die();
         }
-        return "controller/".$this->controller;
+        return $this->controller;
     }
 
     public function getParams() {
