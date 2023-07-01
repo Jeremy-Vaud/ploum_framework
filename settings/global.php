@@ -13,13 +13,14 @@ $FAVICON = "img/favicon.ico";
 $FONTS = "https://fonts.googleapis.com/css2?family=Langar&family=Niramit:wght@300;700&display=swap";
 
 // Scripts et styles
-$SCRIPTS = [
-    
-];
+$SCRIPTS = [];
 $STYLES = [
     "fonts/font-face.css",
     "css/output.css"
 ];
+
+// Date
+date_default_timezone_set('Europe/Paris');
 
 // Templates
 $BASE = "view/base.php";

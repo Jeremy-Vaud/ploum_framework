@@ -6,6 +6,7 @@ import PageLogin from './pages/PageLogin'
 import NotFound from './pages/NotFound'
 import PageHome from './pages/PageHome'
 import PageTable from './pages/pageTable'
+import PageRecovery from './pages/PageRecovery'
 import data from './data.json'
 
 export function App() {
@@ -50,12 +51,13 @@ export function App() {
         <BrowserRouter>
             <Navbar sendLogOut={sendLogOut} navigation={navigation}>
                 <Routes>
-                    <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation}/> : <PageLogin logIn={logIn} />} />
+                    <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation} /> : <PageLogin logIn={logIn} />} />
                     {navigation.map(e => {
                         return (
-                            <Route path={'/admin/'+e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()}/> : <PageLogin logIn={logIn} />} />
+                            <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} /> : <PageLogin logIn={logIn} />} />
                         )
                     })}
+                    <Route path='/admin/recovery' element={<PageRecovery />} />
                     <Route path='*' element={isConnect ? <NotFound /> : <PageLogin logIn={logIn} />} />
                 </Routes>
             </Navbar>

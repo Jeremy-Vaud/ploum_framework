@@ -9,7 +9,7 @@ final class Api {
     private $action = null;
     private $object = null;
     private $adminMail = [];
-    
+
     /**
      * __construct
      *
@@ -26,6 +26,8 @@ final class Api {
                 $this->action = "logOut";
             } else if (isset($_GET["table"])) {
                 $this->action = "getTable";
+            } else if (isset($_GET["isValidRecoveryLink"])) {
+                $this->action = "isValidRecoveryLink";
             }
         } elseif ($_SERVER['REQUEST_METHOD'] === "POST") {
             if (isset($_POST["action"])) {
@@ -34,13 +36,13 @@ final class Api {
                         $this->action = $_POST["action"];
                         $this->object = new $_POST["table"];
                     }
-                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass") {
+                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass") {
                     $this->action = $_POST["action"];
                 }
             }
         }
     }
-    
+
     /**
      * Exécute la fonction dont le nom est stocké dans l'attribut action
      *
@@ -55,7 +57,7 @@ final class Api {
             http_response_code(400);
         }
     }
-    
+
     /**
      * Vérifie que la personne connecté a bien un compte administrateur
      *
@@ -67,7 +69,7 @@ final class Api {
         }
         return false;
     }
-    
+
     /**
      * Vérifie que l'utilisateur est bien connecté avec un compte admin
      *
@@ -81,7 +83,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Détruit la session
      *
@@ -91,7 +93,7 @@ final class Api {
         session_destroy();
         http_response_code(200);
     }
-    
+
     /**
      * Renvoi des données d'une tabbles de la BDD si l'utilisateur est bien connecté avec un compte admin
      *
@@ -118,7 +120,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Insert une nouvelle ligne à la BDD si l'utilisateur est bien connecté avec un compte admin
      *
@@ -146,7 +148,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Mise à jour d'une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin
      *
@@ -172,7 +174,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Suprime une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin
      *
@@ -190,7 +192,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Se connecter si l'utilisateur est bien admin
      *
@@ -217,7 +219,7 @@ final class Api {
             echo json_encode(["warning" => $e->getMessage()]);
         }
     }
-    
+
     /**
      * Envoi d'un email de récupération de compte
      *
@@ -244,5 +246,23 @@ final class Api {
             http_response_code(401);
             echo json_encode(["warning" => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Vérifie que le lien de rénitialistion de mot passe est valide
+     *
+     * @return void
+     */
+    private function isValidRecoveryLink() {
+        echo json_encode((new User)->isValidRecoveryLink($_GET["isValidRecoveryLink"]));
+    }
+
+    /**
+     * Mise à jour du mot de passe
+     *
+     * @return void
+     */
+    private function changePass() {
+        echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
     }
 }
