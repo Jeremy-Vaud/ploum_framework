@@ -102,7 +102,7 @@ final class Migration {
      * @return void
      */
     private function create(string $name, array $fields) {
-        $sql = "CREATE TABLE `$name` (`id` int(11) NOT NULL AUTO_INCREMENT,";
+        $sql = "CREATE TABLE `$name` (`id` int NOT NULL AUTO_INCREMENT,";
         foreach ($fields as $nameField => $type) {
             $sql .= $nameField . " " . $type . ",";
         }

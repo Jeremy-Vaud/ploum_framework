@@ -430,7 +430,7 @@ abstract class Table extends Debug {
         $data = [$class => []];
         foreach ($this->fields as $name => $field) {
             if(is_a($field, "App\MultipleForeignKeys")) {
-                $data[$class . "_" . $name] = [$class => "int(11) NOT NULL", $name => "int(11) NOT NULL"];
+                $data[$class . "_" . $name] = [$class => "int NOT NULL", $name => "int NOT NULL"];
             } else {
                 $data[$class][$name] = $field->getTypeForSql();
             }     

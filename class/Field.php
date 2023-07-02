@@ -143,7 +143,7 @@ final class Field extends Debug {
             $null = "";
         }
         if ($this->type === "int") {
-            return "int(11)$null";
+            return "int$null";
         } else if ($this->type === "char") {
             return "varchar(" . $this->length . ")$null";
         } else if ($this->type === "email") {
