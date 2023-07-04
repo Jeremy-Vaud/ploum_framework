@@ -11,6 +11,7 @@ if (isset($argv[1])) {
         case 'help':
             echo "Liste des commandes:\n";
             echo "migrate : Génére ou modifie les tables de la BDD\n";
+            echo "export-DB : Expote la Base de données";
             echo "create-admin-user 'email' 'password': Créer un compte admin\n";
             echo "create-admin-pannel : Génére un fichier JSON pour la construction du panneau d'administration\n";
             echo "download-fonts : Télécharge des polices depuis Google Fonts\n";
@@ -19,6 +20,11 @@ if (isset($argv[1])) {
         case 'migrate':
             $migration = new App\Migration;
             $migration->migrate();
+            break;
+
+        case 'export-DB':
+            $migration = new App\Migration;
+            $migration->export();
             break;
 
         case "create-admin-user":
