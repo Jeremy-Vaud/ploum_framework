@@ -8,7 +8,7 @@ export default function FormSelect(props) {
                 <span className="capitalize mr-2">{props.name}</span>
                 <span className="text-warning">{props.warning}</span>
             </label>
-            <select name={props.name} id={id} onChange={props.handleChange} className="border border-gray-800 w-[100%]" value={props.value}>
+            <select name={props.name} id={id} onChange={props.handleChange} value={props.value}>
                 {props.dataSelect.map((e) => {
                     return (
                         <option value={e.value} key={uuidv4()}>{e.name}</option>

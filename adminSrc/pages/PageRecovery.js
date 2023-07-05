@@ -85,11 +85,11 @@ export default function PageRecovery() {
                         <input type="hidden" value={code} name="code" />
                         <div className="text-left mb-3">
                             <label for="pass1">Mot de passe</label>
-                            <input type="password" name="pass1" id="pass1" className="border border-gray-800 w-[100%]" />
+                            <input type="password" name="pass1" id="pass1" />
                         </div>
                         <div className="text-left mb-3">
                             <label for="pass1">Mot de passe</label>
-                            <input type="password" name="pass2" id="pass2" className="border border-gray-800 w-[100%]" />
+                            <input type="password" name="pass2" id="pass2" />
                         </div>
                         <button type="submit" className="btn-add">Modifier le mot de passe</button>
                     </form>

@@ -20,7 +20,7 @@ export default function FormInput(props) {
                     <span className="capitalize mr-2">{props.name}</span>
                     <span className="text-warning">{props.warning}</span>
                 </label>
-                <input type={props.type} name={props.name} id={id} onChange={props.handleChange} className="border border-gray-800 w-[100%]" value={props.value} />
+                <input type={props.type} name={props.name} id={id} onChange={props.handleChange} value={props.value} />
             </div>
         )
     } else if (!hasFile){
@@ -30,7 +30,7 @@ export default function FormInput(props) {
                     <span className="capitalize mr-2">{props.name}</span>
                     <span className="text-warning">{props.warning}</span>
                 </label>
-                <input type={props.type} name={props.name} id={id} onChange={props.handleChange} className="w-[100%]" />
+                <input type={props.type} name={props.name} id={id} onChange={props.handleChange} className="file:btn-add" />
             </div>
         )
     } else {

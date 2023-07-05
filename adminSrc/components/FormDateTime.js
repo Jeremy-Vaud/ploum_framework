@@ -43,8 +43,8 @@ export default function FormDateTime(props) {
                 <span className="text-warning">{props.warning}</span>
             </label>
             <input type="hidden" name={props.name} id={id} value={props.value} />
-            <input type="date" value={date} className="border border-gray-800 w-[50%]" onChange={changeDate} />
-            <input type="time" value={time} className="border border-gray-800 w-[50%]" onChange={changeTime} />
+            <input type="date" value={date} className="!w-[50%]" onChange={changeDate} />
+            <input type="time" value={time} className="!w-[50%]" onChange={changeTime} />
         </div>
     )
 }

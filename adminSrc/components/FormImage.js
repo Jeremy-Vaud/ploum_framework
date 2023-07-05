@@ -32,7 +32,7 @@ export default function FormImage(props) {
                     </div>
                 </>
                 :
-                <input type="file" name={props.name} id={id} onChange={props.handleChange} accept="image/*" className="file:btn-add w-[100%]" />}
+                <input type="file" name={props.name} id={id} onChange={props.handleChange} accept="image/*" className="file:btn-add" />}
         </div>
     )
 }

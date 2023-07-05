@@ -9,7 +9,7 @@ export default function FormTextarea(props) {
                 <span className="capitalize mr-2">{props.name}</span>
                 <span className="text-warning">{props.warning}</span>
             </label>
-            <textarea rows="10" type={props.type} name={props.name} id={id} onChange={props.handleChange} className="border border-gray-800 w-[100%] resize-none" value={props.value}></textarea>
+            <textarea rows="10" type={props.type} name={props.name} id={id} onChange={props.handleChange} value={props.value}></textarea>
         </div>
     )
 }

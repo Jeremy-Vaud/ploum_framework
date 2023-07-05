@@ -5,7 +5,7 @@ export default function TableSearch(props) {
     return (
         <div className="flex items-center">
             <FontAwesomeIcon icon={faMagnifyingGlass} className="h-[20px] mr-2"/>
-            <input type="text" className="border border-gray-800" onChange={props.search}/>
+            <input type="text" onChange={props.search}/>
         </div>
     )
 }
