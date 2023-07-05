@@ -8,8 +8,10 @@ import PageHome from './pages/PageHome'
 import PageTable from './pages/pageTable'
 import PageRecovery from './pages/PageRecovery'
 import data from './data.json'
+import Loading from './components/Loading'
 
 export function App() {
+    const [loading, setLoading] = useState(true)
     const [isConnect, setIsConnect] = useState(false)
     const navigation = [...data].sort((a, b) => {
         return a.order - b.order
@@ -29,6 +31,7 @@ export function App() {
                 if (response.status === 200) {
                     setIsConnect(true)
                 }
+                setLoading(false)
             })
             .catch((e) => {
                 console.log(e.message)
@@ -36,31 +39,39 @@ export function App() {
     }, [])
 
     function sendLogOut() {
+        setLoading(true)
         fetch("/api" + '?logOut=1')
             .then((response) => {
                 if (response.status === 200) {
                     setIsConnect(false);
                 }
+                setLoading(false)
             })
             .catch((e) => {
                 console.log(e.message)
             })
     }
 
-    return (
-        <BrowserRouter>
-            <Navbar sendLogOut={sendLogOut} navigation={navigation}>
-                <Routes>
-                    <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation} /> : <PageLogin logIn={logIn} />} />
-                    {navigation.map(e => {
-                        return (
-                            <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} /> : <PageLogin logIn={logIn} />} />
-                        )
-                    })}
-                    <Route path='/admin/recovery' element={<PageRecovery />} />
-                    <Route path='*' element={isConnect ? <NotFound /> : <PageLogin logIn={logIn} />} />
-                </Routes>
-            </Navbar>
-        </BrowserRouter>
-    )
+    if (!loading) {
+        return (
+            <BrowserRouter>
+                <Navbar sendLogOut={sendLogOut} navigation={navigation}>
+                    <Routes>
+                        <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation} /> : <PageLogin logIn={logIn} />} />
+                        {navigation.map(e => {
+                            return (
+                                <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} /> : <PageLogin logIn={logIn} />} />
+                            )
+                        })}
+                        <Route path='/admin/recovery' element={<PageRecovery />} />
+                        <Route path='*' element={isConnect ? <NotFound /> : <PageLogin logIn={logIn} />} />
+                    </Routes>
+                </Navbar>
+            </BrowserRouter>
+        )
+    } else {
+        return (
+            <Loading loading=""/>
+        )
+    }
 }
