@@ -80,7 +80,7 @@ class Router extends Debug{
      */
     private function match() {
         if($this->url === "" || $this->url === false) {
-            $this->controller = $this->home;
+            $this->controller = "controller/" . $this->home;
             return;
         }
         if(preg_match("#^admin(\/[\w]+)*$#i", $this->url)) {
