@@ -55,7 +55,7 @@ export function App() {
     if (!loading) {
         return (
             <BrowserRouter>
-                <Navbar sendLogOut={sendLogOut} navigation={navigation}>
+                <Navbar sendLogOut={sendLogOut} navigation={navigation} isConnect={isConnect}>
                     <Routes>
                         <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation} /> : <PageLogin logIn={logIn} />} />
                         {navigation.map(e => {

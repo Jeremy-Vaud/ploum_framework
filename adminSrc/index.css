@@ -46,16 +46,28 @@
     /*
      * Navbar
      */
-    .nav-link {
-        @apply mb-2 cursor-pointer;
+    .nav-bg {
+        @apply bg-gray-800;
+    }
+    .nav-color {
+        @apply text-gray-300;
+    }
+    .nav-title {
+        @apply nav-color text-2xl transition;
     }
     .nav-link-active {
-        @apply nav-link text-green-400;
+        @apply cursor-pointer text-green-400;
     }
     .nav-link-disable {
-        @apply nav-link text-gray-300 transition;
+        @apply cursor-pointer nav-color transition;
     }
-    .nav-link-disable:hover {
+    .pannel-link-active {
+        @apply mb-3 nav-link-active;
+    }
+    .pannel-link-disable {
+        @apply mb-3 nav-link-disable;
+    }
+    .nav-link-disable:hover, .nav-title:hover {
         @apply text-green-300;
     }
     /*
