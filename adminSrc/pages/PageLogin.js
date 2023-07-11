@@ -17,10 +17,11 @@ export default function PageLogin(props) {
         }
     }
 
-    function submit() {
+    function submit(e) {
+        e.preventDefault();
         let formData = new FormData
         formData.append("email", email)
-        if(forgotPass) {
+        if (forgotPass) {
             formData.append("action", "forgotPass")
         } else {
             formData.append("action", "logIn")
@@ -34,7 +35,7 @@ export default function PageLogin(props) {
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 200) {
-                    if(formData.get("action") === "logIn") {
+                    if (formData.get("action") === "logIn") {
                         props.logIn()
                     } else {
                         setForgotPass(false)
@@ -56,31 +57,29 @@ export default function PageLogin(props) {
         <>
             <h1 className="text-2xl text-center mb-6">{forgotPass ? "Récupération de mot passe" : "login"}</h1>
             <div className="flex justify-center">
-                <div className="min-w-[300px]">
+                <form className="min-w-[300px]" onSubmit={submit}>
                     <p className="text-warning h-8">{warning}</p>
-                    <form>
-                        <FormInput key="email" name="email" type="email" warning={null} value={email} handleChange={handleChange} />
-                        {forgotPass ? "" : <FormInput key="password" name="password" type="password" warning="" value={password} handleChange={handleChange} />}
-                    </form>
+                    <FormInput key="email" name="email" type="email" warning={null} value={email} handleChange={handleChange} />
+                    {forgotPass ? "" : <FormInput key="password" name="password" type="password" warning="" value={password} handleChange={handleChange} />}
                     <div className="text-center">
                         {forgotPass ?
                             <>
-                                <button onClick={submit} className="btn-add mb-2">Envoi d'email de récupération</button>
+                                <button type="submit" className="btn-add mb-2">Envoi d'email de récupération</button>
                                 <div>
-                                    <button onClick={changeForm} className="btn-link">Annuler</button>
+                                    <button type="button" onClick={changeForm} className="btn-link">Annuler</button>
                                 </div>
                             </>
                             : <>
                                 <div>
-                                    <button onClick={changeForm} className="mb-2 btn-link">Mot de passe oublié</button>
+                                    <button type="button" onClick={changeForm} className="mb-2 btn-link">Mot de passe oublié</button>
                                 </div>
-                                <button onClick={submit} className="btn-add">Se connecter</button>
+                                <button type="submit" className="btn-add">Se connecter</button>
                             </>
                         }
                     </div>
-                </div>
+                </form>
             </div>
-            <Loading loading={loading}/>
+            <Loading loading={loading} />
         </>
     )
 
