@@ -5,7 +5,7 @@ namespace App;
 /**
  * Représente un champ d' une base de donnée
  * 
- * Type possible: char, email, password, text, bool, dateTime, date, time, url
+ * Type possible: char, email, password, text, bool, dateTime, date, time, url, select
  * @author  Jérémy Vaud
  * @final
  */
@@ -18,11 +18,12 @@ final class Field extends Debug {
     protected $unique = false; // Doit avoir une valeur unique (ex: email pour les utilisateur)
     protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
     protected $null = false; // True si valeur null possible
+    protected $choices = []; // Choix select
 
     /**
      * Vérifie les paramètres avant de construire
      *
-     * @param  array $params [type(requis):string, length(optionnel): int, length(optionnel): int, minLength(optionnel): int, maxLength(optionnel): int, value(optionnel), unique(optionnel) : bool, null(optionnel): bool]
+     * @param  array $params [type(requis):string, length(optionnel): int, length(optionnel): int, minLength(optionnel): int, maxLength(optionnel): int, value(optionnel), unique(optionnel) : bool, null(optionnel): bool, admin(optionel): array, choices(requis pour type select): array]
      * @throws Exeption Si les valeurs des paramètres ne sont pas conformes
      * @return void
      */
@@ -54,6 +55,16 @@ final class Field extends Debug {
                     throw new \Exception("La taille du max du champ est inférieure à la taille min");
                 }
             }
+            // Choices
+            if ($this->type === "select") {
+                if (!isset($params["choices"])) {
+                    throw new \Exception("Les champs de type select doit posséder l'attribut 'choices'");
+                }
+                if (!is_array($params["choices"]) || count($params["choices"]) < 1) {
+                    throw new \Exception("Paramètres 'choices' invalides");
+                }
+                $this->choices = $params["choices"];
+            }
             // Value
             if (isset($params["value"])) {
                 $action = "isValid" . ucfirst($this->type);
@@ -75,13 +86,13 @@ final class Field extends Debug {
                     if ($param === "columns" || $param === "insert" || $param === "update") {
                         $this->admin[] = $param;
                     } else {
-                        throw new \Exception("Paramètres admin invalides");
+                        throw new \Exception("Paramètres 'admin' invalides");
                     }
                 }
             }
             // Null
-            if(isset($params["null"])) {
-                if(is_bool($params["null"])) {
+            if (isset($params["null"])) {
+                if (is_bool($params["null"])) {
                     $this->null = $params["null"];
                 } else {
                     throw new \Exception("La valeur de 'null' n'est pas un booléen");
@@ -109,23 +120,34 @@ final class Field extends Debug {
     public function getType() {
         return $this->type;
     }
-    
+
+    /**
+     * Retourne la valeur de l'attribut choices
+     *
+     * @return array
+     */
+    public function getChoices() {
+        return $this->choices;
+    }
+
     /**
      * Retourne les paramètres du champ pour le panneau d'administration
      *
      * @return mixed Un tableau de paramètres ou false 
      */
     public function getAdmin() {
-        if($this->admin !== []) {
+        if ($this->admin !== []) {
             if ($this->type === "int") {
                 return ["type" => "number", "table" => $this->admin];
             } else if ($this->type === "char") {
                 return ["type" => "text", "table" => $this->admin];
             } else if ($this->type === "bool") {
                 return ["type" => "checkbox", "table" => $this->admin];
-            } else if($this->type === "text") {
+            } else if ($this->type === "text") {
                 return ["type" => "textarea", "table" => $this->admin];
-            }else {
+            } else if ($this->type === "select") {
+                return ["type" => "select", "table" => $this->admin, "choices" => $this->choices];
+            } else {
                 return ["type" => $this->type, "table" => $this->admin];
             }
         }
@@ -139,7 +161,7 @@ final class Field extends Debug {
      */
     public function getTypeForSql() {
         $null = " NOT NULL";
-        if($this->null) {
+        if ($this->null) {
             $null = "";
         }
         if ($this->type === "int") {
@@ -160,6 +182,15 @@ final class Field extends Debug {
             return "date$null";
         } else if ($this->type === "time") {
             return "time$null";
+        } elseif ($this->type === "select") {
+            $length = 0;
+            foreach($this->choices as $choice) {
+                $strlen = strlen($choice);
+                if($length < $strlen) {
+                    $length = $strlen;
+                }
+            }
+            return "varchar($length)$null";
         }
     }
 
@@ -211,7 +242,7 @@ final class Field extends Debug {
      * 
      */
     public function isValid($val, bool $returnMessage = false) {
-        if($this->null && is_null($val)) {
+        if ($this->null && is_null($val)) {
             return true;
         }
         $action = "isValid" . ucfirst($this->type);
@@ -451,6 +482,29 @@ final class Field extends Debug {
         try {
             if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $val)) {
                 throw new \Exception("Url non valide");
+            }
+        } catch (\Exception $e) {
+            if ($returnMessage) {
+                return $e->getMessage();
+            } else {
+                $this->alertDebug($e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function isValidSelect(string $val, bool $returnMessage = false) {
+        try {
+            $valExist = false;
+            foreach($this->choices as $choice) {
+                if($val === $choice) {
+                    $valExist = true;
+                    break;
+                }
+            }
+            if (!$valExist) {
+                throw new \Exception("Valeur non valide");
             }
         } catch (\Exception $e) {
             if ($returnMessage) {

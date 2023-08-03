@@ -85,6 +85,9 @@ export default function ModalUpdate(props) {
                 if ((result.status === "success")) {
                     hide()
                     props.updateRow(result.data)
+                    if(result.session) {
+                        props.setSession(result.session)
+                    }
                 } else if (result.status === "invalid") {
                     setWarnings(result.data)
                 }

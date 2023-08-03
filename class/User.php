@@ -2,9 +2,6 @@
 
 namespace App;
 
-use DateInterval;
-use DateTime;
-
 /**
  * Utilisateur
  * 
@@ -23,7 +20,7 @@ class User extends Table {
             "prenom" => new Field(["type" => "char", "length" => 20, "minLength" => 3, "admin" => ["columns", "insert", "update"]]),
             "email" => new Field(["type" => "email", "unique" => true, "admin" => ["columns", "insert", "update"]]),
             "password" => new Field(["type" => "password", "length" => 16, "minLength" => 4, "admin" => ["insert"]]),
-            "admin" => new Field(["type" => "bool", "value" => 0, "admin" => ["columns", "insert", "update"]]),
+            "role" => new Field(["type" => "select", "value" => "user", "choices" => ["user", "admin", "superAdmin"], "admin" => ["columns", "insert", "update"]]),
             "recoveryLink" => new Field(["type" => "url", "null" => true]),
             "recoveryDate" => new Field(["type" => "dateTime", "null" => true])
         ];
@@ -56,13 +53,26 @@ class User extends Table {
         if (!password_verify($password, $result["password"])) {
             return false;
         }
-        session_start();
         foreach ($result as $field => $val) {
-            if ($field !== "password") {
-                $_SESSION[$field] = $val;
+            $this->set($field, $val, false);
+        }
+        session_start();
+        $this->updateSession();
+        return true;
+    }
+
+    /**
+     * Mis à jour des données stockées dans $_SESSION
+     *
+     * @return void
+     */
+    public function updateSession() {
+        $_SESSION = ["id" => $this->get("id")];
+        foreach ($this->fields as $field => $val) {
+            if (!($field === "password" || $field === "recoveryDate" || $field === "recoveryLink")) {
+                $_SESSION[$field] = $val->get();
             }
         }
-        return true;
     }
 
     /**
@@ -85,7 +95,8 @@ class User extends Table {
         foreach ($result as $field => $val) {
             $this->set($field, $val, false);
         }
-        if ($admin && $this->get("admin") || !$admin) {
+        $role = $this->get("role");
+        if (!$admin || $admin && ($role === "admin" || $role === "superAdmin")) {
             return true;
         }
     }
@@ -96,7 +107,8 @@ class User extends Table {
      * @return bool
      */
     public function createAdminRecoveryLink() {
-        if ($this->get("admin")) {
+        $role = $this->get("role");
+        if ($role === "admin" || $role === "superAdmin") {
             $uniqueLink = false;
             while (!$uniqueLink) {
                 $link = "https://" . $_SERVER["SERVER_NAME"] . "/admin/recovery?code=" . bin2hex(random_bytes(16));

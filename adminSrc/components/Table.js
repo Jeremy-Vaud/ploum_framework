@@ -176,7 +176,16 @@ export default function Table(props) {
     useEffect(() => {
         props.form.map((e) => {
             if (e.type === "select" || e.type === "selectMulti") {
-                loadSelect(e.table, e.name, e.key)
+                if(typeof e.table !== 'undefined') {
+                    loadSelect(e.table, e.name, e.key)
+                } else if(typeof e.choices !== 'undefined') {
+                    let copyDataSelect = dataSelect
+                    copyDataSelect[e.name] = []
+                    e.choices.map((choice) => {
+                        copyDataSelect[e.name].push({ value: choice, name: choice})
+                    })
+                    setDataSelect(copyDataSelect)
+                }              
             }
         })
     }, [props.form])
@@ -191,7 +200,7 @@ export default function Table(props) {
                 <TableHead sort={sort} columns={props.columns} sortState={sortState} deleteRow={deleteRow} />
                 <tbody>
                     {
-                        data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect} />) : null}
+                        data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect} setSession={props.setSession}/>) : null}
                 </tbody>
             </table>
             <Loading loading={loading} />

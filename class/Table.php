@@ -361,7 +361,11 @@ abstract class Table extends Debug {
                 foreach ($value->get() as $object) {
                     $array[$field][] = $object->toArray();
                 }
-            }else {
+            }else if(get_class($value) === "App\Field"){
+                if($value->getType() !== "password") {
+                    $array[$field] = $value->get();
+                }          
+            } else {
                 $array[$field] = $value->get();
             }
         }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import Loading from "../components/Loading"
+import { Link } from "react-router-dom"
 
 export default function PageRecovery() {
     const code = new URLSearchParams(window.location.search).get('code')
@@ -79,7 +80,7 @@ export default function PageRecovery() {
         <>
             <h1 className="text-2xl text-center mb-6">Modification de mot de passe</h1>
             <div className="max-w-[300px] mx-auto text-center">
-                <p className="text-center text-warning h-8">{msg}</p>
+                <p className="text-warning h-8">{msg}</p>
                 {isValidLink ?
                     <form onSubmit={submit} id="changePassForm">
                         <input type="hidden" value={code} name="code" />
@@ -94,7 +95,7 @@ export default function PageRecovery() {
                         <button type="submit" className="btn-add">Modifier le mot de passe</button>
                     </form>
                     :
-                    null
+                    <Link to="/admin" className="btn-add">Se connecter</Link>
                 }
             </div>
             <Loading loading={loading} />

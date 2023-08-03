@@ -20,10 +20,11 @@ export default function PageLogin(props) {
     function submit(e) {
         e.preventDefault();
         let formData = new FormData
+        let isLog = false
         formData.append("email", email)
         if (forgotPass) {
             formData.append("action", "forgotPass")
-        } else {
+        } else {         
             formData.append("action", "logIn")
             formData.append("password", password)
         }
@@ -36,15 +37,19 @@ export default function PageLogin(props) {
                 setLoading("hidden")
                 if (response.status === 200) {
                     if (formData.get("action") === "logIn") {
-                        props.logIn()
+                        isLog = true
                     } else {
                         setForgotPass(false)
                     }
                 }
                 return response.json()
             })
-            .then((response) => {
-                setWarning(response.warning)
+            .then((result) => {
+                if(isLog) {
+                    props.logIn(result)
+                } else {
+                    setWarning(result.warning)
+                }
             })
     }
 

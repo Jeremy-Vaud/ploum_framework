@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Jeremy-Vaud/backend_ploum_cms#readme",
   "devDependencies": {
+    "buffer": "^5.7.1",
     "maildev": "^2.0.5",
     "parcel": "^2.8.2",
     "postcss": "^8.4.21",

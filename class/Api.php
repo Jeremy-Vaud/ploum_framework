@@ -36,7 +36,7 @@ final class Api {
                         $this->action = $_POST["action"];
                         $this->object = new $_POST["table"];
                     }
-                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass") {
+                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser") {
                     $this->action = $_POST["action"];
                 }
             }
@@ -64,7 +64,19 @@ final class Api {
      * @return bool
      */
     private function isAdmin() {
-        if (isset($_SESSION["admin"]) && $_SESSION["admin"]) {
+        if (isset($_SESSION["role"]) && ($_SESSION["role"] === "admin" || $_SESSION["role"] === "superAdmin")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Vérifie que la personne connecté a bien un compte super administrateur
+     *
+     * @return bool
+     */
+    private function isSuperAdmin() {
+        if (isset($_SESSION["role"]) && $_SESSION["role"] === "superAdmin") {
             return true;
         }
         return false;
@@ -77,7 +89,7 @@ final class Api {
      */
     private function isLog() {
         if ($this->isAdmin()) {
-            http_response_code(200);
+            echo json_encode($_SESSION);
         } else {
             session_destroy();
             http_response_code(401);
@@ -100,8 +112,8 @@ final class Api {
      * @return void
      */
     private function getTable() {
-        if ($this->isAdmin()) {
-            $class = $_GET["table"];
+        $class = $_GET["table"];
+        if ($this->isAdmin() && $class !== "App\\User" || $this->isSuperAdmin()) {
             if (class_exists($class) && isset($_GET["id"])) {
                 $object = new $class;
                 if ($_GET["id"] === 'all') {
@@ -127,7 +139,7 @@ final class Api {
      * @return void
      */
     private function insert() {
-        if ($this->isAdmin()) {
+        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
             $check = $this->object->checkData($_POST);
             $checkFiles = $this->object->checkFiles($_FILES);
             if ($check === [] && $checkFiles === []) {
@@ -155,7 +167,7 @@ final class Api {
      * @return void
      */
     private function update() {
-        if ($this->isAdmin()) {
+        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
             $this->object->loadFromId($_POST["id"]);
             $check = $this->object->checkData($_POST);
             $checkFiles = $this->object->checkFiles($_FILES);
@@ -163,7 +175,12 @@ final class Api {
                 $this->object->setFromArray($_POST);
                 $this->object->setFromArray($_FILES);
                 if ($this->object->update()) {
-                    echo json_encode(["status" => "success", "data" => $this->object->toArray()]);
+                    $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
+                    if($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
+                        $this->object->updateSession();
+                        $response["session"] = $_SESSION;
+                    }
+                    echo json_encode($response);
                 } else {
                     http_response_code(400);
                 }
@@ -176,12 +193,39 @@ final class Api {
     }
 
     /**
+     * Mise à jour d'un compte utilisteur
+     *
+     * @return void
+     */
+    private function updateUser() {
+        if ($this->isAdmin() && $_SESSION["id"] === (int)$_POST["id"]) {
+            $this->object = new User;
+            $this->object->loadFromId($_POST["id"]);
+            $data = ["nom" => $_POST["nom"],"prenom" => $_POST["prenom"], "email" => $_POST["email"]];
+            $check = $this->object->checkData($data);
+            if ($check === []) {
+                $this->object->setFromArray($data);
+                if ($this->object->update()) {
+                    $this->object->updateSession();
+                    echo json_encode(["status" => "success", "session" => $_SESSION]);
+                } else {
+                    http_response_code(400);
+                }
+            } else {
+                echo json_encode(["status" => "invalid", "data" => $check]);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
      * Suprime une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin
      *
      * @return void
      */
     private function delete() {
-        if ($this->isAdmin()) {
+        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
             if ($this->object->loadFromId($_POST["id"])) {
                 $this->object->delete();
                 http_response_code(200);
@@ -207,7 +251,7 @@ final class Api {
             if (!$user->connect($_POST["email"], $_POST["password"])) {
                 throw new \Exception("Identifiants incorrect");
             }
-            if (!$_SESSION["admin"]) {
+            if (!$this->isAdmin()) {
                 session_destroy();
                 throw new \Exception("La connection néssecite un compte administrateur");
             } else {

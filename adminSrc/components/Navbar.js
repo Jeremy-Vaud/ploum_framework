@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faBars, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faBars, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons'
 import icons from '../icons'
 import { useState } from 'react'
 
@@ -41,19 +41,34 @@ export default function Navbar(props) {
                             <FontAwesomeIcon icon={faHome} className="mr-3" />
                             Accueil
                         </NavLink>
-                        {props.navigation.map(e =>
-                            <NavLink
-                                to={'/admin/' + e.title}
-                                key={e.title}
-                                end={true}
-                                onClick={moveNav}
-                                className={({ isActive }) => {
-                                    return 'block no-underline ' + (isActive ? 'pannel-link-active' : 'pannel-link-disable')
-                                }}>
-                                <FontAwesomeIcon icon={icons[e.icon]} className="mr-3" />
-                                {e.title}
-                            </NavLink>
-                        )}
+                        <NavLink
+                            to='/admin/account'
+                            key='MyAccount'
+                            end={true}
+                            onClick={moveNav}
+                            className={({ isActive }) => {
+                                return 'block no-underline ' + (isActive ? 'pannel-link-active' : 'pannel-link-disable')
+                            }}>
+                            <FontAwesomeIcon icon={faUser} className="mr-3" />
+                            Mon compte
+                        </NavLink>
+                        {props.navigation.map((e) => {
+                            if (e.className !== "App\\User" || props.session.role === "superAdmin") {
+                                return (
+                                    <NavLink
+                                        to={'/admin/' + e.title}
+                                        key={e.title}
+                                        end={true}
+                                        onClick={moveNav}
+                                        className={({ isActive }) => {
+                                            return 'block no-underline ' + (isActive ? 'pannel-link-active' : 'pannel-link-disable')
+                                        }}>
+                                        <FontAwesomeIcon icon={icons[e.icon]} className="mr-3" />
+                                        {e.title}
+                                    </NavLink>
+                                )
+                            }
+                        })}
                     </nav>
                 </aside>
                 <div className='px-3 pt-16'>
