@@ -19,7 +19,8 @@ class Article extends \App\Table {
             "datetime" => new \App\Field(["type"=>"dateTime", "admin" => ["columns","insert","update"]]),
             "nombre" => new \App\Field(["type"=>"int", "admin" => ["columns","insert","update"]]),
             "cle" => new \App\ForeignKey("Model\Tag", ["key" => "nom", "admin" => ["columns","insert","update"]]),
-            "tag" => new \App\MultipleForeignKeys("Model\Tag", ["key" => "nom", "admin" => ["insert","update"]])
+            "tag" => new \App\MultipleForeignKeys("Model\Tag", ["key" => "nom", "admin" => ["insert","update"]]),
+            "checkbox" => new \App\Field(["type"=>"bool", "admin" => ["columns","insert","update"]])
          ];
         $this->adminPannel = [
             "title" => "Articles",

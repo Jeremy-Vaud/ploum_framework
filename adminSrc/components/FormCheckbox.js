@@ -5,17 +5,18 @@ export default function FormCheckbox(props) {
 
     function change(e) {
         setChecked(!checked)
-        if(e.target.checked) {
-            e.target.value = '1'
+        if (e.target.checked) {
+            e.target.value = 1
         } else {
-            e.target.value = '0'
+            e.target.value = 0
         }
         props.handleChange(e)
     }
-        return (
-            <div className="mb-3">
-                <input type="checkbox" name={props.name} className="mr-2" onChange={change} checked={checked}/>
-                <label htmlFor={props.name} className="capitalize">{props.name}</label>
-            </div>
-        )
+
+    return (
+        <div className="mb-3">
+            <input type="checkbox" name={props.name} className="mr-2" onChange={change} checked={checked} />
+            <label htmlFor={props.name} className="capitalize">{props.name}</label>
+        </div>
+    )
 }

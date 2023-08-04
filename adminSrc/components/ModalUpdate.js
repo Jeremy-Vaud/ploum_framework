@@ -106,9 +106,8 @@ export default function ModalUpdate(props) {
                         <input type="hidden" name="id" value={props.data.id} />
                         {inputs.map(e => {
                             if (e.type === "checkbox") {
-                                let val = e.value === '1' ? true : false
                                 return (
-                                    <FormCheckbox key={e.key} name={e.name} value={val} handleChange={handleChange} />
+                                    <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
                                 )
                             } else if (e.type === "textarea") {
                                 return (
