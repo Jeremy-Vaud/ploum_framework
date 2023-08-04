@@ -39,6 +39,7 @@ final class Migration {
                 $tables = $obj->getSqlColumns();
                 foreach ($tables as $key => $val) {
                     $this->tables[$key] = $val;
+                    ksort($this->tables[$key]);
                 }
             }
         }
@@ -67,6 +68,7 @@ final class Migration {
                     $this->current[$table][$describe["Field"]] = $string;
                 }
             }
+            ksort($this->current[$table]);
         }
     }
 
@@ -81,7 +83,7 @@ final class Migration {
             if (!isset($this->current[$tableName])) {
                 $diff = true;
                 $this->create($tableName, $tableField);
-            } elseif (array_diff_assoc($this->current[$tableName],$tableField) !== []) {
+            } else if ($this->current[$tableName] !== $tableField) {
                 $diff = true;
                 $this->alter($tableName, $tableField);
             }

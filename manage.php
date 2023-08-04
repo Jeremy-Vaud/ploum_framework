@@ -12,7 +12,7 @@ if (isset($argv[1])) {
             echo "Liste des commandes:\n";
             echo "migrate : Génére ou modifie les tables de la BDD\n";
             echo "export-DB : Expote la Base de données";
-            echo "create-admin-user 'email' 'password': Créer un compte admin\n";
+            echo "create-superAdmin 'email' 'password': Créer un compte superAdmin\n";
             echo "create-admin-pannel : Génére un fichier JSON pour la construction du panneau d'administration\n";
             echo "download-fonts : Télécharge des polices depuis Google Fonts\n";
             break;
@@ -27,10 +27,10 @@ if (isset($argv[1])) {
             $migration->export();
             break;
 
-        case "create-admin-user":
+        case "create-superAdmin":
             if ($argc !== 4) {
                 echo "Paramètres de la commande invalide\n";
-                echo "Commande pour créer un admin : php manage.php create-admin-user 'email' 'password'\n";
+                echo "Commande pour créer un superAdmin : php manage.php create-superAdmin 'email' 'password'\n";
             } else {
                 $user = new App\User;
                 $check = $user->checkData(["email" => $argv[2], "password" => $argv[3]]);
@@ -43,7 +43,7 @@ if (isset($argv[1])) {
                     $user->set("prenom", "admin");
                     $user->set("email", $argv[2]);
                     $user->set("password", $argv[3]);
-                    $user->set("admin", 1);
+                    $user->set("role", "superAdmin");
                     if ($user->insert()) {
                         echo "Nouvel admin crée\n\n";
                     } else {
