@@ -72,7 +72,7 @@ final class ForeignKey extends Debug{
      * @return string type
      */
     public function getTypeForSql() {
-        return "int(11) NOT NULL";
+        return "int NOT NULL";
     }
     
     /**

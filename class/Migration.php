@@ -76,21 +76,24 @@ final class Migration {
      * @return void
      */
     public function migrate() {
-        if ($this->tables == $this->current) {
-            echo "Aucune différence n'a été trouvé entre les classes et la base de donnée";
-        } else {
-            foreach ($this->tables as $tableName => $tableField) {
-                if (!isset($this->current[$tableName])) {
-                    $this->create($tableName, $tableField);
-                } elseif ($this->current[$tableName] !== $tableField) {
-                    $this->alter($tableName, $tableField);
-                }
+        $diff = false;
+        foreach ($this->tables as $tableName => $tableField) {
+            if (!isset($this->current[$tableName])) {
+                $diff = true;
+                $this->create($tableName, $tableField);
+            } elseif (array_diff_assoc($this->current[$tableName],$tableField) !== []) {
+                $diff = true;
+                $this->alter($tableName, $tableField);
             }
-            foreach (array_keys($this->current) as $currentName) {
-                if (!isset($this->tables[$currentName])) {
-                    $this->drop($currentName);
-                }
+        }
+        foreach (array_keys($this->current) as $currentName) {
+            if (!isset($this->tables[$currentName])) {
+                $diff = true;
+                $this->drop($currentName);
             }
+        }
+        if (!$diff) {
+            echo "Aucune différence n'a été trouvé entre les classes et la base de donnée\n";
         }
     }
 
@@ -151,7 +154,7 @@ final class Migration {
             echo "La table $name a été suprimé\n";
         }
     }
-    
+
     /**
      * Exporte la BDD dans un fichier sql
      *
@@ -194,7 +197,7 @@ final class Migration {
             }
             $path = "migrations/" . date("Y-m-d_H-i-s") . ".sql";
             $file = fopen($path, "w");
-            if(fwrite($file, $string)) {
+            if (fwrite($file, $string)) {
                 echo "BDD exportée\n";
             } else {
                 echo "Une erreur est survenu\n";
