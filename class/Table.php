@@ -11,7 +11,6 @@ abstract class Table extends Debug {
     // Attributs
     protected $id = 0;
     protected $fields = [];
-    /*protected $foreignKeys = [];*/
     protected $adminPannel = null;
 
     public function __construct() {
