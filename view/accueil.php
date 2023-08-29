@@ -4,6 +4,6 @@
     <br>
     <h6><?= htmlentities($example) ?></h6>
     <?php foreach($articles as $art): ?>
-        <p> <?= htmlentities($art->get("titre") ?? "") ?>
+        <p> <?= $art->html("titre") ?></p>
     <?php endforeach; ?>
 </div>

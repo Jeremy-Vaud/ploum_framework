@@ -5,7 +5,7 @@ namespace App;
 /**
  * Représente un champ d' une base de donnée
  * 
- * Type possible: char, email, password, text, bool, dateTime, date, time, url, select
+ * Type possible: char, email, password, text, bool, dateTime, date, time, url, select, richText
  * @author  Jérémy Vaud
  * @final
  */
@@ -111,6 +111,21 @@ final class Field extends Debug {
     public function get() {
         return $this->value;
     }
+    
+    /**
+     * Retourne la valeur de l'attribut value convertit en entités HTML
+     *
+     * @return string
+     */
+    public function html() {
+        if ($this->type === "richText") {
+            $config = \HTMLPurifier_Config::createDefault();
+            $purifier = new \HTMLPurifier($config);
+            $clean_html = $purifier->purify($this->value);
+            return $clean_html;
+        }
+        return htmlentities($this->value ?? "");
+    }
 
     /**
      * Retourne la valeur de l'attribut type
@@ -172,7 +187,7 @@ final class Field extends Debug {
             return "varchar(254)$null";
         } else if ($this->type === "password") {
             return "varchar(80)$null";
-        } else if ($this->type === "text" || $this->type === "url") {
+        } else if ($this->type === "text" || $this->type === "url" || $this->type === "richText") {
             return "text$null";
         } else if ($this->type === "bool") {
             return "tinyint(1)$null";
@@ -184,9 +199,9 @@ final class Field extends Debug {
             return "time$null";
         } elseif ($this->type === "select") {
             $length = 0;
-            foreach($this->choices as $choice) {
+            foreach ($this->choices as $choice) {
                 $strlen = strlen($choice);
-                if($length < $strlen) {
+                if ($length < $strlen) {
                     $length = $strlen;
                 }
             }
@@ -497,14 +512,43 @@ final class Field extends Debug {
     private function isValidSelect(string $val, bool $returnMessage = false) {
         try {
             $valExist = false;
-            foreach($this->choices as $choice) {
-                if($val === $choice) {
+            foreach ($this->choices as $choice) {
+                if ($val === $choice) {
                     $valExist = true;
                     break;
                 }
             }
             if (!$valExist) {
                 throw new \Exception("Valeur non valide");
+            }
+        } catch (\Exception $e) {
+            if ($returnMessage) {
+                return $e->getMessage();
+            } else {
+                $this->alertDebug($e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Validtions de la valeur du champs de type richText
+     *
+     * @param  string $val Valeur à vérifier
+     * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
+     * @return bool True $val correct et $returnMessage = false
+     */
+    private function isValidRichText(string $val, bool $returnMessage = false) {
+        try {
+            if (isset($this->length)) {
+                $config = \HTMLPurifier_Config::createDefault();
+                $purifier = new \HTMLPurifier($config);
+                $clean_html = $purifier->purify($val);
+                $len = strlen(strip_tags(html_entity_decode(str_replace(["&lt;p&gt;&nbsp;&lt;/p&gt;", "\r\n"], "", htmlentities($clean_html)))));
+                if ($len > $this->length) {
+                    throw new \Exception($len - $this->length . " caractère(s) en trop");
+                }
             }
         } catch (\Exception $e) {
             if ($returnMessage) {

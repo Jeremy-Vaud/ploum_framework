@@ -8,6 +8,7 @@ import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
 import FormDateTime from "./FormDateTime"
+import FormRichText from "./FormRichText"
 
 
 
@@ -64,11 +65,16 @@ export default function ModalInsert(props) {
 
     function submit() {
         let form = document.getElementById(formId)
+        let checkbox = form.querySelectorAll('input[type=checkbox]')
         let formData = new FormData(form)
         formData.append("table", props.table)
         formData.append("action", "insert")
-        console.log(formData)
         setLoading("")
+        checkbox.forEach((input) => {
+            if (!input.checked) {
+                formData.append(input.name, "0")
+            }
+        })
         fetch("/api", {
             method: 'POST',
             body: formData
@@ -104,7 +110,7 @@ export default function ModalInsert(props) {
                         {inputs.map(e => {
                             if (e.type === "checkbox") {
                                 return (
-                                    <FormCheckbox key={e.key} name={e.name} value={false} handleChange={handleChange} />
+                                    <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
                                 )
                             } else if (e.type === "textarea") {
                                 return (
@@ -133,6 +139,10 @@ export default function ModalInsert(props) {
                             } else if(e.type === "dateTime") {
                                 return (
                                     <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                                )
+                            } else if(e.type === "richText") {
+                                return(
+                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
                                 )
                             } else {
                                 return (

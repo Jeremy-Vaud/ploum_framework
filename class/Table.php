@@ -38,6 +38,21 @@ abstract class Table extends Debug {
     }
 
     /**
+     * Retourne la valeur d'un champ de la table convertit en entités HTML
+     *
+     * @param  string $field Nom du champ
+     * @return string
+     */
+    public function html(string $field) {
+        if ($field === "id") {
+            return htmlentities($this->id);
+        } else if (isset($this->fields[$field])) {
+            return $this->fields[$field]->html();
+        }
+        return "";
+    }
+
+    /**
      * Attribut une valeur à un champ se la table
      *
      * @param  mixed $field Nom du champ

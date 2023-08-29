@@ -10,6 +10,7 @@ import FormSelect from "./FormSelect"
 import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
 import FormDateTime from "./FormDateTime"
+import FormRichText from "./FormRichText"
 
 export default function ModalUpdate(props) {
     const [visibility, setVisibility] = useState("hidden")
@@ -142,7 +143,11 @@ export default function ModalUpdate(props) {
                                 return (
                                 <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} id={e.id} handleChange={handleChange} />
                                 )
-                            } else {
+                            } else if(e.type === "richText") {
+                                return(
+                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                                )
+                            }else {
                                 return (
                                     <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} id={e.id} handleChange={handleChange} />
                                 )
