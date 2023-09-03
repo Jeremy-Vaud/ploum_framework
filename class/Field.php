@@ -148,10 +148,9 @@ final class Field extends Debug {
     /**
      * Retourne les paramètres du champ pour le panneau d'administration
      *
-     * @return mixed Un tableau de paramètres ou false 
+     * @return mixed Un tableau de paramètres
      */
     public function getAdmin() {
-        if ($this->admin !== []) {
             if ($this->type === "int") {
                 return ["type" => "number", "table" => $this->admin];
             } else if ($this->type === "char") {
@@ -165,8 +164,6 @@ final class Field extends Debug {
             } else {
                 return ["type" => $this->type, "table" => $this->admin];
             }
-        }
-        return false;
     }
 
     /**

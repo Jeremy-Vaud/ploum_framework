@@ -6,9 +6,9 @@ namespace App;
  * Api du panneau d'administration
  */
 final class Api {
-    private $action = null;
+    private string | null $action = null;
     private $object = null;
-    private $adminMail = [];
+    private array $adminMail = [];
 
     /**
      * __construct
@@ -28,6 +28,8 @@ final class Api {
                 $this->action = "getTable";
             } else if (isset($_GET["isValidRecoveryLink"])) {
                 $this->action = "isValidRecoveryLink";
+            } else if (isset($_GET["edit_area"])) {
+                $this->action = "getEditArea";
             }
         } elseif ($_SERVER['REQUEST_METHOD'] === "POST") {
             if (isset($_POST["action"])) {
@@ -38,6 +40,11 @@ final class Api {
                     }
                 } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser") {
                     $this->action = $_POST["action"];
+                } else if ($_POST["action"] === "upsert") {
+                    if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
+                        $this->action = $_POST["action"];
+                        $this->object = new $_POST["edit_area"];
+                    }
                 }
             }
         }
@@ -107,7 +114,7 @@ final class Api {
     }
 
     /**
-     * Renvoi des données d'une tabbles de la BDD si l'utilisateur est bien connecté avec un compte admin
+     * Renvoi des données d'une tables de la BDD si l'utilisateur est bien connecté avec un compte admin
      *
      * @return void
      */
@@ -125,6 +132,26 @@ final class Api {
                         http_response_code(404);
                     }
                 }
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Renvoi des données d'une 'EditArea' si l'utilisateur est bien connecté avec un compte admin
+     *
+     * @return void
+     */
+    private function getEditArea() {
+        $class = $_GET["edit_area"];
+        if ($this->isAdmin()) {
+            if (class_exists($class)) {
+                $object = new $class;
+                $object->load();
+                echo $object->valuesToJSON(true);
             } else {
                 http_response_code(400);
             }
@@ -176,7 +203,7 @@ final class Api {
                 $this->object->setFromArray($_FILES);
                 if ($this->object->update()) {
                     $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
-                    if($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
+                    if ($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
                         $this->object->updateSession();
                         $response["session"] = $_SESSION;
                     }
@@ -201,7 +228,7 @@ final class Api {
         if ($this->isAdmin() && $_SESSION["id"] === (int)$_POST["id"]) {
             $this->object = new User;
             $this->object->loadFromId($_POST["id"]);
-            $data = ["nom" => $_POST["nom"],"prenom" => $_POST["prenom"], "email" => $_POST["email"]];
+            $data = ["nom" => $_POST["nom"], "prenom" => $_POST["prenom"], "email" => $_POST["email"]];
             $check = $this->object->checkData($data);
             if ($check === []) {
                 $this->object->setFromArray($data);
@@ -231,6 +258,32 @@ final class Api {
                 http_response_code(200);
             } else {
                 http_response_code(404);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Mise à jour ou création d'une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin 
+     *
+     * @return void
+     */
+    private function upsert() {
+        if ($this->isAdmin()) {
+            $check = $this->object->checkData($_POST);
+            $checkFiles = $this->object->checkFiles($_FILES);
+            if ($check === [] && $checkFiles === []) {
+                $this->object->setFromArray($_POST);
+                $this->object->setFromArray($_FILES);
+                if ($this->object->upsert()) {
+                    $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
+                    echo json_encode($response);
+                } else {
+                    http_response_code(400);
+                }
+            } else {
+                echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
             }
         } else {
             http_response_code(401);

@@ -56,13 +56,10 @@ final class Image extends File {
     /**
      * Retourne les paramètres de l'image pour le panneau d'administration
      *
-     * @return mixed Un tableau de paramètres ou false 
+     * @return mixed Un tableau de paramètres
      */
     public function getAdmin() {
-        if ($this->admin !== []) {
-            return ["type" => "image", "table" => $this->admin];
-        }
-        return false;
+        return ["type" => "image", "table" => $this->admin];
     }
 
     /**

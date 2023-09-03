@@ -9,9 +9,9 @@ namespace App;
  */
 abstract class Table extends Debug {
     // Attributs
-    protected $id = 0;
-    protected $fields = [];
-    protected $adminPannel = null;
+    protected int $id = 0;
+    protected array $fields = [];
+    protected array | null $adminPannel = null;
 
     public function __construct() {
         foreach (array_keys($this->fields) as $key) {
@@ -52,7 +52,7 @@ abstract class Table extends Debug {
     }
 
     /**
-     * Attribut une valeur à un champ se la table
+     * Attribut une valeur à un champ de la table
      *
      * @param  mixed $field Nom du champ
      * @param  mixed $val Valeur du champ
@@ -123,8 +123,9 @@ abstract class Table extends Debug {
     private function setFilesPath() {
         $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
         foreach ($this->fields as $name => $val) {
-            if (is_a($val, "App\File"))
+            if (is_a($val, "App\File")) {
                 $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
+            }
         }
     }
 
@@ -184,8 +185,8 @@ abstract class Table extends Debug {
             }
             $this->id = BDD::LastInsertId();
             $this->setFilesPath();
-            foreach($this->fields as $key => $val) {
-                if(get_class($val) === "App\MultipleForeignKeys") {
+            foreach ($this->fields as $key => $val) {
+                if (get_class($val) === "App\MultipleForeignKeys") {
                     $this->fields[$key]->setId($this->id);
                     $this->fields[$key]->insert();
                 }
@@ -254,7 +255,7 @@ abstract class Table extends Debug {
             if (!BDD::Execute($sql, $param)) {
                 throw new \Exception("Erreur SQL ($sql)");
             }
-            foreach($this->fields as $field) {
+            foreach ($this->fields as $field) {
                 if (is_a($field, "App\MultipleForeignKeys")) {
                     $field->update();
                 }
@@ -305,15 +306,15 @@ abstract class Table extends Debug {
         }
         return $return;
     }
-    
+
     /**
      * Charger les objets des champs MutipleForeignKey
      *
      * @return void
      */
     public function loadForeignKeys() {
-        foreach($this->fields as $key => $val) {
-            if(is_a($val, "App\MultipleForeignKeys")) {
+        foreach ($this->fields as $key => $val) {
+            if (is_a($val, "App\MultipleForeignKeys")) {
                 $this->fields[$key]->setId($this->id);
                 $this->fields[$key]->load();
             }
@@ -370,15 +371,15 @@ abstract class Table extends Debug {
         foreach ($this->fields as $field => $value) {
             if (get_class($value) === "App\ForeignKey") {
                 $array[$field] = $value->get()->toArray();
-            } else if(is_a($value, "App\MultipleForeignKeys")) {
+            } else if (is_a($value, "App\MultipleForeignKeys")) {
                 $array[$field] = [];
                 foreach ($value->get() as $object) {
                     $array[$field][] = $object->toArray();
                 }
-            }else if(get_class($value) === "App\Field"){
-                if($value->getType() !== "password") {
+            } else if (get_class($value) === "App\Field") {
+                if ($value->getType() !== "password") {
                     $array[$field] = $value->get();
-                }          
+                }
             } else {
                 $array[$field] = $value->get();
             }
@@ -445,13 +446,13 @@ abstract class Table extends Debug {
      */
     public function getSqlColumns() {
         $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
-        $data = [$class => []];
+        $data = [$class => ["id" => "int NOT NULL AUTO_INCREMENT"]];
         foreach ($this->fields as $name => $field) {
-            if(is_a($field, "App\MultipleForeignKeys")) {
-                $data[$class . "_" . $name] = [$class => "int NOT NULL", $name => "int NOT NULL"];
+            if (is_a($field, "App\MultipleForeignKeys")) {
+                $data[$class . "_" . $name] = ["id" => "int NOT NULL AUTO_INCREMENT", $class => "int NOT NULL", $name => "int NOT NULL"];
             } else {
                 $data[$class][$name] = $field->getTypeForSql();
-            }     
+            }
         }
         return $data;
     }
@@ -466,9 +467,10 @@ abstract class Table extends Debug {
             $return = $this->adminPannel;
             $return["className"] = get_called_class();
             $return["fields"] = [];
+            $return["type"] = "table";
             foreach ($this->fields as $key => $field) {
                 $params = $field->getAdmin();
-                if ($params) {
+                if ($params["table"] !== []) {
                     $return["fields"][$key] = $params;
                 }
             }

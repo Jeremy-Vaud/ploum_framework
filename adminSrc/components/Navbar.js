@@ -15,7 +15,7 @@ export default function Navbar(props) {
     if (props.isConnect) {
         return (
             <>
-                <div className='nav-bg px-3 py-1 fixed top-0 left-0 w-full z-10 flex justify-between items-center'>
+                <div className='nav-bg px-3 py-1 fixed top-0 left-0 w-full z-20 flex justify-between items-center'>
                     <button onClick={moveNav}><FontAwesomeIcon icon={faBars} size='2x' className={showNav ? 'nav-link-active' : 'nav-link-disable'} /></button>
                     <NavLink
                         to='/admin'
@@ -27,7 +27,7 @@ export default function Navbar(props) {
                     </NavLink>
                     <button onClick={props.sendLogOut}><FontAwesomeIcon icon={faRightFromBracket} size='2x' className='nav-link-disable' /></button>
                 </div>
-                <aside className={showNav ? "nav-bg w-[250px] p-3 fixed top-0 left-0 h-screen transition-all z-0 pt-16"
+                <aside className={showNav ? "nav-bg w-[250px] p-3 fixed top-0 left-0 h-screen transition-all z-10 pt-16"
                     : "nav-bg w-[250px] p-3 fixed top-0 -left-full h-screen transition-all z-0"}>
                     <nav>
                         <NavLink

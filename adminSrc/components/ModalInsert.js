@@ -106,7 +106,7 @@ export default function ModalInsert(props) {
             <button onClick={show} className="btn-add">Ajouter</button>
             <div className={visibility}>
                 <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-10 z-20 bg-white w-[300px] md:w-[500px] max-h-[80%] overflow-auto">
-                    <form id={formId} onSubmit={(e) => add(e)} method="post">
+                    <form id={formId}>
                         {inputs.map(e => {
                             if (e.type === "checkbox") {
                                 return (

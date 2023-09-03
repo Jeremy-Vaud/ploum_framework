@@ -15,6 +15,7 @@ final class Migration {
     public function __construct() {
         $this->loadCurrent();
         $this->findTables();
+        $this->sortArrays();
     }
 
     /**
@@ -34,12 +35,11 @@ final class Migration {
             }
         }
         foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, "App\Table")) {
+            if (is_subclass_of($class, "App\Table") || is_subclass_of($class, "App\EditArea")) {
                 $obj = new $class;
                 $tables = $obj->getSqlColumns();
                 foreach ($tables as $key => $val) {
                     $this->tables[$key] = $val;
-                    ksort($this->tables[$key]);
                 }
             }
         }
@@ -57,18 +57,37 @@ final class Migration {
             $this->current[$table] = [];
             BDD::Execute("DESCRIBE " . $table);
             foreach (BDD::FetchAll() as $describe) {
-                if ($describe["Field"] !== "id") {
-                    $string = $describe["Type"];
-                    if ($describe["Null"] === "NO") {
-                        $string .= " NOT NULL";
-                    }
-                    if ($describe["Default"] !== null) {
-                        $string .= " DEFAULT '" . $describe["Default"] . "'";
-                    }
-                    $this->current[$table][$describe["Field"]] = $string;
+                $string = $describe["Type"];
+                if ($describe["Null"] === "NO") {
+                    $string .= " NOT NULL";
                 }
+                if ($describe["Default"] !== null) {
+                    $string .= " DEFAULT '" . $describe["Default"] . "'";
+                } else if ($describe["Extra"] === "auto_increment") {
+                    $string .= " AUTO_INCREMENT";
+                }
+                $this->current[$table][$describe["Field"]] = $string;
             }
-            ksort($this->current[$table]);
+        }
+    }
+    
+    /**
+     * Trie les tableaux des attributs current et tables
+     *
+     * @return void
+     */
+    private function sortArrays() {
+        foreach (array_keys($this->tables) as  $tableName) {
+            $idVal = $this->tables[$tableName]["id"];
+            unset($this->tables[$tableName]["id"]);
+            ksort($this->tables[$tableName]);
+            $this->tables[$tableName] = ["id" => $idVal] + $this->tables[$tableName];
+        }
+        foreach (array_keys($this->current) as  $tableName) {
+            $idVal = $this->current[$tableName]["id"];
+            unset($this->current[$tableName]["id"]);
+            ksort($this->current[$tableName]);
+            $this->current[$tableName] = ["id" => $idVal] + $this->current[$tableName];
         }
     }
 
@@ -107,7 +126,7 @@ final class Migration {
      * @return void
      */
     private function create(string $name, array $fields) {
-        $sql = "CREATE TABLE `$name` (`id` int NOT NULL AUTO_INCREMENT,";
+        $sql = "CREATE TABLE `$name` (";
         foreach ($fields as $nameField => $type) {
             $sql .= $nameField . " " . $type . ",";
         }
@@ -165,7 +184,7 @@ final class Migration {
     public function export() {
         $string = "";
         foreach (array_keys($this->current) as $name) {
-            $string .= "CREATE TABLE `$name` (`id` int NOT NULL AUTO_INCREMENT,";
+            $string .= "CREATE TABLE `$name` (";
             foreach ($this->current[$name] as $nameField => $type) {
                 $string .= $nameField . " " . $type . ",";
             }

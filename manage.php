@@ -11,7 +11,7 @@ if (isset($argv[1])) {
         case 'help':
             echo "Liste des commandes:\n";
             echo "migrate : Génére ou modifie les tables de la BDD\n";
-            echo "export-DB : Expote la Base de données";
+            echo "export-DB : Expote la Base de données\n";
             echo "create-superAdmin 'email' 'password': Créer un compte superAdmin\n";
             echo "create-admin-pannel : Génére un fichier JSON pour la construction du panneau d'administration\n";
             echo "download-fonts : Télécharge des polices depuis Google Fonts\n";

@@ -6,6 +6,7 @@ import PageLogin from './pages/PageLogin'
 import NotFound from './pages/NotFound'
 import PageHome from './pages/PageHome'
 import PageTable from './pages/pageTable'
+import PageEditArea from './pages/PageEditArea'
 import PageAccount from './pages/PageAccount'
 import PageRecovery from './pages/PageRecovery'
 import data from './data.json'
@@ -72,9 +73,15 @@ export function App() {
                         <Route path='/admin/account' key={uuidv4()} element={isConnect ? <PageAccount logOut={logOut} session={session} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
                         {session ? (navigation.map(e => {
                             if (e.className !== "App\\User" || session.role === "superAdmin") {
-                                return (
-                                    <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
-                                )
+                                if (e.type === "table") {
+                                    return (
+                                        <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
+                                    )
+                                } else if(e.type === "edit_area") {
+                                    return (
+                                        <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageEditArea logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
+                                    )
+                                }
                             }
                         })) : null}
                         <Route path='/admin/recovery' element={<PageRecovery />} />

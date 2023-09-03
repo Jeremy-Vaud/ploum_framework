@@ -18,7 +18,7 @@ class AdminPannel {
             }
         }
         foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, "App\Table")) {
+            if (is_subclass_of($class, "App\Table") || is_subclass_of($class, "App\EditArea")) {
                 $obj = new $class;
                 $data = $obj->getForAdminPannel();
                 if ($data) {
