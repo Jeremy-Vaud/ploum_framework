@@ -23,8 +23,8 @@ export default function FormRichText(props) {
             <Editor
                 tinymceScriptSrc="../../lib/tinymce/tinymce.min.js"
                 onInit={(evt, editor) => editorRef.current = editor}
-                initialValue={props.value}
-                onChange={onChange}
+                value={props.value}
+                onEditorChange={onChange}
                 init={{
                     height: 500,
                     menubar: false,

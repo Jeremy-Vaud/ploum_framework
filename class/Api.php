@@ -277,7 +277,7 @@ final class Api {
                 $this->object->setFromArray($_POST);
                 $this->object->setFromArray($_FILES);
                 if ($this->object->upsert()) {
-                    $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
+                    $response = ["status" => "success", "session" => null];
                     echo json_encode($response);
                 } else {
                     http_response_code(400);
