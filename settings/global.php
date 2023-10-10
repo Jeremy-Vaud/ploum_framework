@@ -19,7 +19,7 @@ $FONTS = "https://fonts.googleapis.com/css2?family=Langar&family=Niramit:wght@30
 $SCRIPTS = [];
 $STYLES = [
     "fonts/font-face.css",
-    "css/output.css"
+    "dist/style.css"
 ];
 
 // Date
