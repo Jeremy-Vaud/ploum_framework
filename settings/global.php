@@ -3,6 +3,9 @@
 // Afficher les messages d'erreur
 $DEBUG = true;
 
+// Redirection https
+$HTTPS = false;
+
 // Pour la balise head
 $TITLE = "Ploum";
 $LANG = "fr";
