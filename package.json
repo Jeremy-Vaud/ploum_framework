@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "migrate" : "php manage.php migrate",
+    "exportDB" : "php manage.php export-DB",
+    "createSuperAdmin" : "php manage.php create-superAdmin",
+    "createAdminPannel" : "php manage.php create-admin-pannel",
+    "downloadFonts" : "php manage.php download-fonts",
     "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
     "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
     "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
