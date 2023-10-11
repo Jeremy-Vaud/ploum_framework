@@ -41,7 +41,7 @@ class User extends Table {
     public function connect(string $email, string $password) {
         // Connection d'un utilisateur
         session_destroy();
-        $sql = "SELECT * from `User` WHERE `email` = :email";
+        $sql = "SELECT * from `user` WHERE `email` = :email";
         $param = [":email" => $email];
         if (!BDD::Execute($sql, $param)) {
             return false;
@@ -83,7 +83,7 @@ class User extends Table {
      * @return bool
      */
     public function userExist(string $email, bool $admin = false) {
-        $sql = "SELECT * from `User` WHERE `email` = :email";
+        $sql = "SELECT * from `user` WHERE `email` = :email";
         $param = [":email" => $email];
         if (!BDD::Execute($sql, $param)) {
             return false;

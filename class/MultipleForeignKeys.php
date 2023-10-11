@@ -54,6 +54,15 @@ final class MultipleForeignKeys extends Debug {
     }
     
     /**
+     * Retourne la valeur de l'attribut foreignTable
+     *
+     * @return string
+     */
+    public function getForeignTable() {
+        return $this->foreignTable;
+    }
+    
+    /**
      * Attribuer une valeur à l'attribut $id
      *
      * @param  int $id
@@ -62,14 +71,21 @@ final class MultipleForeignKeys extends Debug {
     public function setId(int $id) {
         $this->id = $id;
     }
-
+    
+    /**
+     * Attribut les noms des attributs table et foreignTable
+     *
+     * @param  string $table
+     * @throws Exeption si table n'existe pas
+     * @return void
+     */
     public function setTable(string $table) {
         try {
             if (!class_exists($table)) {
                 throw new \Exception("La class " .  htmlentities($table) . " n'existe pas");
             }
             $this->table = $table;
-            $this->tableName = explode("\\", $table)[1] . "_" . explode("\\", $this->foreignTable)[1];
+            $this->tableName = strtolower(explode("\\", $table)[1]) . "_" . strtolower(explode("\\", $this->foreignTable)[1]);
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }

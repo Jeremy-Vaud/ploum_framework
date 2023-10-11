@@ -121,7 +121,7 @@ abstract class Table extends Debug {
      * @return void
      */
     private function setFilesPath() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         foreach ($this->fields as $name => $val) {
             if (is_a($val, "App\File")) {
                 $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
@@ -137,7 +137,7 @@ abstract class Table extends Debug {
      * @return bool
      */
     public function loadFromId(int $id) {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "SELECT * FROM `$class` WHERE `id` = :id";
         $param = [":id" => $id];
         try {
@@ -166,7 +166,7 @@ abstract class Table extends Debug {
      * @return bool
      */
     public function insert() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "INSERT INTO `$class` SET ";
         $param = [];
         foreach ($this->fields as $field => $value) {
@@ -206,7 +206,7 @@ abstract class Table extends Debug {
      * @return void
      */
     public function delete() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "DELETE FROM `$class` WHERE `id` = :id";
         $param = [":id" => $this->id];
         try {
@@ -235,7 +235,7 @@ abstract class Table extends Debug {
      * @return bool
      */
     public function update() {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "UPDATE `$class` SET ";
         $param = [":id" => $this->id];
         foreach ($this->fields as $field => $value) {
@@ -277,7 +277,7 @@ abstract class Table extends Debug {
      * @return array Liste d'objet
      */
     public function listAll(string $orderBy = "", int $limit = 0) {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "SELECT * FROM `$class`";
         if (isset($this->fields[$orderBy])) {
             $sql .= " ORDER BY `$orderBy`";
@@ -330,7 +330,7 @@ abstract class Table extends Debug {
      * @return bool True si existe ou si erreur sinon false
      */
     private function alreadyExist(string $field, $value) {
-        $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         $sql = "SELECT * FROM `$class` WHERE `$field` = :val AND `id` != :id";
         $param = [":val" => $value, ":id" => $this->id];
         try {
@@ -449,7 +449,8 @@ abstract class Table extends Debug {
         $data = [$class => ["id" => "int NOT NULL AUTO_INCREMENT"]];
         foreach ($this->fields as $name => $field) {
             if (is_a($field, "App\MultipleForeignKeys")) {
-                $data[$class . "_" . $name] = ["id" => "int NOT NULL AUTO_INCREMENT", $class => "int NOT NULL", $name => "int NOT NULL"];
+                $foreignClass = strtolower(substr($field->getForeignTable(), strrpos($field->getForeignTable(), '\\') + 1));
+                $data[$class . "_" . $foreignClass] = ["id" => "int NOT NULL AUTO_INCREMENT", $class => "int NOT NULL", $foreignClass => "int NOT NULL"];
             } else {
                 $data[$class][$name] = $field->getTypeForSql();
             }
