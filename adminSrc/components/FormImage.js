@@ -7,7 +7,7 @@ export default function FormImage(props) {
     const [src, setSrc] = useState("");
 
     useEffect(() => {
-        if (props.value !== "") {
+        if (props.value !== null && props.value !== "") {
             setSrc("../"+props.value)
             setHasFile(true)
         }

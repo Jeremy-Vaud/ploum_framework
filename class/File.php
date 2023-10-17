@@ -15,6 +15,7 @@ class File extends Debug {
     protected $type; // Tableau des extention de fichier possible (exemple: 'pdf')
     protected $maxSize = null; // Taille maximum du fichier
     protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
+    protected $default = null; // Chemin du fichier par défaut
 
     /**
      * Constructeur
@@ -39,7 +40,7 @@ class File extends Debug {
                     throw new \Exception("La taille maximum du fichier n'est pas valide");
                 }
                 $this->maxSize = $params["maxSize"];
-            }     
+            }
             // Admin
             if (isset($params["admin"])) {
                 foreach ($params["admin"] as $param) {
@@ -49,6 +50,10 @@ class File extends Debug {
                         throw new \Exception("Paramètres admin invalides");
                     }
                 }
+            }
+            // Default
+            if (isset($params["default"])) {
+                $this->default = $param["default"];
             }
         } catch (\Exception $e) {
             $this->alertDebug($e);
@@ -70,10 +75,10 @@ class File extends Debug {
      * @return string Chemin du fichier
      */
     public function get() {
-        if ($this->name !== null && $this->name !== "") {
+        if (file_exists($this->path . $this->name)) {
             return $this->path . $this->name;
         }
-        return null;
+        return $this->default;
     }
 
     /**
@@ -84,7 +89,7 @@ class File extends Debug {
     public function getAdmin() {
         return ["type" => "file", "table" => $this->admin];
     }
-    
+
     /**
      * Retourne le type de colone pour la structure de la BDD
      *
@@ -93,7 +98,7 @@ class File extends Debug {
     public function getTypeForSql() {
         return "text";
     }
-    
+
     /**
      * Attribuer un nouveau chemin au fichier
      *
@@ -137,19 +142,19 @@ class File extends Debug {
                     throw new \Exception("Fichier trop volumineux");
                 }
             }
+            $this->deleteFile();
             if (!$this->createDirectory()) {
                 throw new \Exception("Une erreur est survenue lors de la création du répertoire");
             }
             if (!move_uploaded_file($file["tmp_name"], $target_file)) {
                 throw new \Exception("Une erreur est survenue pendant l'enregistrement du fichier");
             }
-            $this->deleteFile();
             $this->name = $file["name"];
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
     }
-    
+
     /**
      * Vérifie qu'un fichier est conforme aux paramètre
      *
@@ -219,18 +224,15 @@ class File extends Debug {
         }
         return false;
     }
-    
+
     /**
      * Suprimer le fichier du serveur
      *
      * @return void
      */
     public function deleteFile() {
-        if(is_file($this->path.$this->name)) {
-            unlink($this->path.$this->name);
-        }
-        $iterator = new \FilesystemIterator($this->path);
-        if(!$iterator->valid()) {
+        if (is_file($this->path . $this->name)) {
+            unlink($this->path . $this->name);
             rmdir($this->path);
         }
     }

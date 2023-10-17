@@ -9,8 +9,8 @@ namespace Model;
 class Article extends \App\Table {
     public function __construct() {
         $this->fields = [
-            "image" => new \App\Image(["width"=>800, "maxSize"=>500000, "admin"=>["insert","update"]]),
-            //"pdf" => new \App\File(["type"=>["pdf"], "maxSize"=>500000, "admin"=>["insert","update"]]),
+            "image" => new \App\Image(["width"=>800, "maxSize"=>500000,"default" => "img/favicon.ico", "admin"=>["insert","update"]]),
+            "pdf" => new \App\File(["type"=>["pdf"], "maxSize"=>500000, "admin"=>["insert","update"]]),
             "titre" => new \App\Field(["type"=>"char","length"=>100, "admin" => ["columns","insert","update"]]),
             //"texte" => new \App\Field(["type"=>"text", "admin" => ["columns","insert","update"]]),
             //"url" => new \App\Field(["type"=>"url", "admin" => ["columns","insert","update"]]),

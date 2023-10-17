@@ -9,6 +9,7 @@ final class Api {
     private string | null $action = null;
     private $object = null;
     private array $adminMail = [];
+    private $files = ["add" => [], "del" => []];
 
     /**
      * __construct
@@ -37,6 +38,7 @@ final class Api {
                     if (isset($_POST["table"]) && class_exists($_POST["table"])) {
                         $this->action = $_POST["action"];
                         $this->object = new $_POST["table"];
+                        $this->sortFiles();
                     }
                 } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser") {
                     $this->action = $_POST["action"];
@@ -44,6 +46,7 @@ final class Api {
                     if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
                         $this->action = $_POST["action"];
                         $this->object = new $_POST["edit_area"];
+                        $this->sortFiles();
                     }
                 }
             }
@@ -168,12 +171,12 @@ final class Api {
     private function insert() {
         if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
             $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($_FILES);
+            $checkFiles = $this->object->checkFiles($this->files["add"]);
             if ($check === [] && $checkFiles === []) {
                 $this->object->setFromArray($_POST);
                 if ($this->object->insert()) {
                     if ($_FILES !== []) {
-                        $this->object->setFromArray($_FILES);
+                        $this->object->setFromArray($this->files["add"]);
                         $this->object->update();
                     }
                     echo json_encode(["status" => "success", "data" => $this->object->toArray()]);
@@ -197,10 +200,11 @@ final class Api {
         if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
             $this->object->loadFromId($_POST["id"]);
             $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($_FILES);
+            $checkFiles = $this->object->checkFiles($this->files["add"]);
             if ($check === [] && $checkFiles === []) {
                 $this->object->setFromArray($_POST);
-                $this->object->setFromArray($_FILES);
+                $this->object->setFromArray($this->files["add"]);
+                $this->object->deleteFiles($this->files["del"]);
                 if ($this->object->update()) {
                     $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
                     if ($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
@@ -361,5 +365,20 @@ final class Api {
      */
     private function changePass() {
         echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
+    }
+    
+    /**
+     * Trie les fichiers à supprimer et à ajouter
+     *
+     * @return void
+     */
+    private function sortFiles() {
+        foreach ($_FILES as $key => $file) {
+            if ($file["size"] !== 0) {
+                $this->files["add"][$key] = $file;
+            } else {
+                $this->files["del"][] = $key;
+            }
+        }
     }
 }

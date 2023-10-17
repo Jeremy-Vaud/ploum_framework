@@ -479,4 +479,18 @@ abstract class Table extends Debug {
         }
         return false;
     }
+    
+    /**
+     * Suprimer des fichiers
+     *
+     * @param  mixed $list des champs files ou images a suprimer
+     * @return void
+     */
+    public function deleteFiles(array $list) {
+        foreach ($list as $key) {
+            if (isset($this->fields[$key])) {
+                $this->fields[$key]->deleteFile();
+            }
+        }
+    }
 }

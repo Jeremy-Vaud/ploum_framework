@@ -48,6 +48,10 @@ final class Image extends File {
                 }
                 $this->width = $params["width"];
             }
+            // Default
+            if (isset($params["default"])) {
+                $this->default = $params["default"];
+            }
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
@@ -84,23 +88,22 @@ final class Image extends File {
                     throw new \Exception("Fichier trop volumineux");
                 }
             }
+            $this->deleteFile();
             if (!$this->createDirectory()) {
                 throw new \Exception("Une erreur est survenue lors de la création du répertoire");
             }
             $name = explode(".", $file["name"])[0] . ".webp";
             $target_file = $this->path . $name;
             $image = imagecreatefromstring(file_get_contents($file["tmp_name"]));
-            if($this->width) {
+            if ($this->width) {
                 $image = imagescale($image, $this->width);
             }
             if (!imagewebp($image, $target_file)) {
                 throw new \Exception("Une erreur est survenue pendant l'enregistrement de l'image");
             }
-            $this->deleteFile();
             $this->name = $name;
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
     }
-
 }
