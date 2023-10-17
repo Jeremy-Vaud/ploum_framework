@@ -14,7 +14,7 @@ export default function FormRichText(props) {
         }
     }
     return (
-        <>
+        <div className="mb-5">
             <input type="hidden" name={props.name} id={id} value={props.value} />
             <span className="block">
                 <span className="capitalize mr-2">{props.name}</span>
@@ -34,6 +34,6 @@ export default function FormRichText(props) {
                     language: "fr_FR"
                 }}
             />
-        </>
+        </div>
     );
 }

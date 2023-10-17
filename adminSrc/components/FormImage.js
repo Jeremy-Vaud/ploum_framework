@@ -26,7 +26,7 @@ export default function FormImage(props) {
             </label>
             {hasFile ?
                 <>
-                    <img src={src} />
+                    <img src={src} className="mx-auto"/>
                     <div className="text-center">
                         <span onClick={change} className="btn-update mt-2">Supprimer l'image</span>
                     </div>

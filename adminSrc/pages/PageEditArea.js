@@ -110,7 +110,7 @@ export default function PageEditArea(props) {
     }
 
     function hide() {
-        setModalVisibility("hidden")
+        location.reload()
     }
 
     return (
@@ -162,7 +162,7 @@ export default function PageEditArea(props) {
                 })}
             </form>
             <div className="text-center">
-                <button onClick={submit} className="btn-add mt-5">Enregistrer</button>
+                <button onClick={submit} className="btn-add mb-5">Enregistrer</button>
             </div>
             <div className={modalVisiblity}>
                 <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-center p-10 z-40 bg-white">

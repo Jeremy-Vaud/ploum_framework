@@ -46,6 +46,7 @@ final class Api {
                     if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
                         $this->action = $_POST["action"];
                         $this->object = new $_POST["edit_area"];
+                        $this->object->load();
                         $this->sortFiles();
                     }
                 }
@@ -276,10 +277,11 @@ final class Api {
     private function upsert() {
         if ($this->isAdmin()) {
             $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($_FILES);
+            $checkFiles = $this->object->checkFiles($this->files["add"]);
             if ($check === [] && $checkFiles === []) {
                 $this->object->setFromArray($_POST);
-                $this->object->setFromArray($_FILES);
+                $this->object->setFromArray($this->files["add"]);
+                $this->object->deleteFiles($this->files["del"]);
                 if ($this->object->upsert()) {
                     $response = ["status" => "success", "session" => null];
                     echo json_encode($response);
