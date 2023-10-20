@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from 'uuid'
+import Modal from "./Modal"
 import FormCheckbox from "./FormCheckbox"
 import FormInput from "./FormInput"
 import FormTextarea from "./FormTextarea"
@@ -14,17 +15,17 @@ import FormRichText from "./FormRichText"
 
 
 export default function ModalInsert(props) {
-    const [visibility, setVisibility] = useState("hidden")
+    const [visibility, setVisibility] = useState(false)
     const formId = useState(uuidv4())
     const [inputs, setInputs] = useState([])
     const [loading, setLoading] = useState("hidden")
 
     function show() {
-        setVisibility("")
+        setVisibility(true)
     }
 
     function hide() {
-        setVisibility("hidden")
+        setVisibility(false)
     }
 
     function reset() {
@@ -104,61 +105,58 @@ export default function ModalInsert(props) {
     return (
         <>
             <button onClick={show} className="btn-add">Ajouter</button>
-            <div className={visibility}>
-                <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] p-10 z-20 bg-white w-[300px] md:w-[500px] max-h-[80%] overflow-auto">
-                    <form id={formId}>
-                        {inputs.map(e => {
-                            if (e.type === "checkbox") {
-                                return (
-                                    <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
-                                )
-                            } else if (e.type === "textarea") {
-                                return (
-                                    <FormTextarea key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                                )
-                            } else if (e.type === "image") {
-                                return (
-                                    <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                                )
-                            } else if (e.type === "select" && props.dataSelect[e.name]){
-                                return (
-                                    <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />                               
-                                )                
-                            } else if(e.type === "selectMulti" && props.dataSelect[e.name]) {
-                                let table;
-                                for (let i = 0; i < props.form.length; i++) {
-                                    if(props.form[i].name === e.name) {
-                                        table = props.form[i].table
-                                        break
-                                    }
+            <Modal visibility={visibility} hide={hide}>
+                <form id={formId}>
+                    {inputs.map(e => {
+                        if (e.type === "checkbox") {
+                            return (
+                                <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
+                            )
+                        } else if (e.type === "textarea") {
+                            return (
+                                <FormTextarea key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
+                        } else if (e.type === "image") {
+                            return (
+                                <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
+                        } else if (e.type === "select" && props.dataSelect[e.name]) {
+                            return (
+                                <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
+                            )
+                        } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
+                            let table;
+                            for (let i = 0; i < props.form.length; i++) {
+                                if (props.form[i].name === e.name) {
+                                    table = props.form[i].table
+                                    break
                                 }
-                                let value = []
-                                return (
-                                    <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} dataSelect={props.dataSelect[e.name]} table={table}/>  
-                                )
-                            } else if(e.type === "dateTime") {
-                                return (
-                                    <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                                )
-                            } else if(e.type === "richText") {
-                                return(
-                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                                )
-                            } else {
-                                return (
-                                    <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                                )
                             }
-                        })
+                            let value = []
+                            return (
+                                <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} dataSelect={props.dataSelect[e.name]} table={table} />
+                            )
+                        } else if (e.type === "dateTime") {
+                            return (
+                                <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
+                        } else if (e.type === "richText") {
+                            return (
+                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
+                        } else {
+                            return (
+                                <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
                         }
-                    </form>
-                    <div className="text-center">
-                        <button onClick={submit} className="btn-add mr-5">Ajouter</button>
-                        <button onClick={hide} className="btn-cancel">annuler</button>
-                    </div>
+                    })
+                    }
+                </form>
+                <div className="text-center">
+                    <button onClick={submit} className="btn-add mr-5">Ajouter</button>
+                    <button onClick={hide} className="btn-cancel">annuler</button>
                 </div>
-                <div onClick={hide} className="fixed top-0 left-0 w-screen h-screen opacity-40 bg-black"></div>
-            </div>
+            </Modal>
             <Loading loading={loading} />
         </>
     )

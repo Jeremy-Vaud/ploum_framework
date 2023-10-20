@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "migrate" : "php manage.php migrate",
-    "exportDB" : "php manage.php export-DB",
-    "createSuperAdmin" : "php manage.php create-superAdmin",
-    "createAdminPannel" : "php manage.php create-admin-pannel",
-    "downloadFonts" : "php manage.php download-fonts",
+    "migrate": "php manage.php migrate",
+    "exportDB": "php manage.php export-DB",
+    "createSuperAdmin": "php manage.php create-superAdmin",
+    "createAdminPannel": "php manage.php create-admin-pannel",
+    "downloadFonts": "php manage.php download-fonts",
     "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
     "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
     "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@tinymce/tinymce-react": "^4.3.0",
@@ -43,6 +44,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.6.2",
+    "tailwind-scrollbar-hide": "^1.1.7",
     "uuid": "^9.0.0"
   }
 }

@@ -4,7 +4,9 @@
 @tailwind utilities;
 
 @layer base {
-    input:not([type='checkbox']):not([type='file']), select, textarea {
+    input:not([type="checkbox"]):not([type="file"]),
+    select,
+    textarea {
         @apply border border-gray-800 w-[100%] py-1 px-2;
     }
     textarea {
@@ -17,7 +19,7 @@
      * Accueil
      */
     .home-card {
-        @apply w-64 h-32 text-center rounded shadow-xl border border-gray-800 mx-auto mb-10 inline-block bg-gray-800 hover:bg-green-500 transition duration-1000 text-gray-300 hover:text-gray-800 text-xl uppercase p-6
+        @apply w-64 h-32 text-center rounded shadow-xl border border-gray-800 mx-auto mb-10 inline-block bg-gray-800 hover:bg-green-500 transition duration-1000 text-gray-300 hover:text-gray-800 text-xl uppercase p-6;
     }
     /*
      * Boutons
@@ -67,20 +69,21 @@
     .pannel-link-disable {
         @apply mb-3 nav-link-disable;
     }
-    .nav-link-disable:hover, .nav-title:hover {
+    .nav-link-disable:hover,
+    .nav-title:hover {
         @apply text-green-300;
     }
     /*
      * Formulaire
      */
     .select-multi-switch {
-        @apply inline-block px-2 py-1 m-2 text-sm cursor-pointer transition
+        @apply inline-block px-2 py-1 m-2 text-sm cursor-pointer transition;
     }
     .select-multi-switch-active {
-        @apply select-multi-switch bg-green-600 hover:bg-green-500 text-white
+        @apply select-multi-switch bg-green-600 hover:bg-green-500 text-white;
     }
     .select-multi-switch-disable {
-        @apply select-multi-switch bg-gray-400 hover:bg-gray-300
+        @apply select-multi-switch bg-gray-400 hover:bg-gray-300;
     }
     .text-warning {
         @apply text-red-500;
@@ -89,6 +92,21 @@
      * Chargement
      */
     .spin {
-        @apply inline w-16 animate-spin text-gray-300 fill-green-600
+        @apply inline w-16 animate-spin text-gray-300 fill-green-600;
+    }
+    /*
+     * Modal
+     */
+    .modal {
+        @apply fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] px-10 pb-10 z-30 bg-white w-[600px] max-w-[calc(100%-20px)] max-h-[calc(100%-20px)] overflow-y-scroll scrollbar-hide rounded-xl;
+    }
+    .bg-modal {
+        @apply fixed top-0 left-0 w-screen h-screen opacity-40 bg-black z-20;
+    }
+    .close-modal {
+        @apply flex flex-row-reverse items-center h-10;
+    }
+    .close-modal > svg {
+        @apply w-5 h-5 cursor-pointer translate-x-[30px];
     }
 }

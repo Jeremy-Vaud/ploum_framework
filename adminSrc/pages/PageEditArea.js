@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid'
+import Modal from "../components/Modal"
 import FormCheckbox from "../components/FormCheckbox"
 import FormInput from "../components/FormInput"
 import FormTextarea from "../components/FormTextarea"
@@ -14,7 +15,7 @@ export default function PageEditArea(props) {
     const formId = useState(uuidv4())
     const [inputs, setInputs] = useState([])
     const [loading, setLoading] = useState("hidden")
-    const [modalVisiblity, setModalVisibility] = useState("hidden")
+    const [modalVisibility, setModalVisibility] = useState(false)
 
     useEffect(() => {
         setLoading("")
@@ -106,7 +107,7 @@ export default function PageEditArea(props) {
     }
 
     function show() {
-        setModalVisibility("")
+        setModalVisibility(true)
     }
 
     function hide() {
@@ -164,13 +165,12 @@ export default function PageEditArea(props) {
             <div className="text-center">
                 <button onClick={submit} className="btn-add mb-5">Enregistrer</button>
             </div>
-            <div className={modalVisiblity}>
-                <div className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-center p-10 z-40 bg-white">
+            <Modal visibility={modalVisibility} hide={hide} >
+                <div className="text-center">
                     <p className="mb-3">Enregistrement réussi</p>
                     <button onClick={hide} className="btn-cancel">Fermer</button>
                 </div>
-                <div onClick={hide} className="fixed top-0 left-0 w-screen h-screen opacity-40 z-30 bg-black"></div>
-            </div>
+            </Modal>
             <Loading loading={loading} />
         </>
     )
