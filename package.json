@@ -1,50 +1,50 @@
 {
-  "name": "ploum_framework",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "migrate": "php manage.php migrate",
-    "exportDB": "php manage.php export-DB",
-    "createSuperAdmin": "php manage.php create-superAdmin",
-    "createAdminPannel": "php manage.php create-admin-pannel",
-    "downloadFonts": "php manage.php download-fonts",
-    "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
-    "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
-    "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
-    "watchJs": "npx parcel watch src/*.js src/*.ts --dist-dir dist",
-    "buildJs": "npx parcel build src/*.js src/*.ts --dist-dir dist",
-    "browserSync": "browser-sync start --proxy localhost --files dist/* view/*",
-    "maildev": "npx maildev"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Jeremy-Vaud/ploum_framework"
-  },
-  "author": "Jeremy Vaud",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Jeremy-Vaud/ploum_framework/issues"
-  },
-  "homepage": "https://github.com/Jeremy-Vaud/backend_ploum_cms#readme",
-  "devDependencies": {
-    "buffer": "^5.7.1",
-    "maildev": "^2.0.5",
-    "parcel": "^2.8.2",
-    "postcss": "^8.4.21",
-    "process": "^0.11.10",
-    "tailwindcss": "^3.2.4"
-  },
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.2.1",
-    "@fortawesome/free-regular-svg-icons": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.2.1",
-    "@fortawesome/react-fontawesome": "^0.2.0",
-    "@tinymce/tinymce-react": "^4.3.0",
-    "browser-sync": "^2.29.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.6.2",
-    "tailwind-scrollbar-hide": "^1.1.7",
-    "uuid": "^9.0.0"
-  }
+    "name": "ploum_framework",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "migrate": "php manage.php migrate",
+        "exportDB": "php manage.php export-DB",
+        "createSuperAdmin": "php manage.php create-superAdmin",
+        "createAdminPannel": "php manage.php create-admin-pannel",
+        "downloadFonts": "php manage.php download-fonts",
+        "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
+        "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
+        "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
+        "watchJs": "npx parcel watch src/*.js src/*.ts --dist-dir dist",
+        "buildJs": "npx parcel build src/*.js src/*.ts --dist-dir dist",
+        "browserSync": "browser-sync start --proxy localhost --files dist/* view/*",
+        "maildev": "npx maildev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Jeremy-Vaud/ploum_framework"
+    },
+    "author": "Jeremy Vaud",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Jeremy-Vaud/ploum_framework/issues"
+    },
+    "homepage": "https://github.com/Jeremy-Vaud/backend_ploum_cms#readme",
+    "devDependencies": {
+        "buffer": "^5.7.1",
+        "maildev": "^2.0.5",
+        "parcel": "^2.8.2",
+        "postcss": "^8.4.21",
+        "process": "^0.11.10",
+        "tailwindcss": "^3.2.4"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.2.1",
+        "@fortawesome/free-regular-svg-icons": "^6.4.2",
+        "@fortawesome/free-solid-svg-icons": "^6.2.1",
+        "@fortawesome/react-fontawesome": "^0.2.0",
+        "@tinymce/tinymce-react": "^4.3.0",
+        "browser-sync": "^2.29.3",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.6.2",
+        "tailwind-scrollbar-hide": "^1.1.7",
+        "uuid": "^9.0.0"
+    }
 }
