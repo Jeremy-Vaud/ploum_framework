@@ -11,7 +11,6 @@ export default function Navbar(props) {
     function moveNav() {
         setShowNav(!showNav)
     }
-
     if (props.isConnect) {
         return (
             <>
@@ -28,7 +27,7 @@ export default function Navbar(props) {
                     <button onClick={props.sendLogOut}><FontAwesomeIcon icon={faRightFromBracket} size='2x' className='nav-link-disable' /></button>
                 </div>
                 <aside className={showNav ? "nav-bg w-[250px] p-3 fixed top-0 left-0 h-screen transition-all z-10 pt-16"
-                    : "nav-bg w-[250px] p-3 fixed top-0 -left-full h-screen transition-all z-0"}>
+                    : "nav-bg w-[250px] p-3 fixed top-0 -left-full h-screen transition-all z-10"}>
                     <nav>
                         <NavLink
                             to='/admin'
@@ -70,6 +69,7 @@ export default function Navbar(props) {
                             }
                         })}
                     </nav>
+                    <div onClick={moveNav} className={showNav ? 'fixed top-0 left-0 w-screen h-screen opacity-40 bg-black -z-10' : 'hidden'}></div>
                 </aside>
                 <div className='px-3 pt-16'>
                     {props.children}
