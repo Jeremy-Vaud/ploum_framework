@@ -60,9 +60,9 @@ export default function PageLogin(props) {
 
     return (
         <>
-            <h1 className="text-2xl text-center mb-6">{forgotPass ? "Récupération de mot passe" : "login"}</h1>
+            <h1>{forgotPass ? "Récupération de mot passe" : "login"}</h1>
             <div className="flex justify-center">
-                <form className="min-w-[300px]" onSubmit={submit}>
+                <form className="w-full max-w-xs" onSubmit={submit}>
                     <p className="text-warning h-8">{warning}</p>
                     <FormInput key="email" name="email" type="email" warning={null} value={email} handleChange={handleChange} />
                     {forgotPass ? "" : <FormInput key="password" name="password" type="password" warning="" value={password} handleChange={handleChange} />}

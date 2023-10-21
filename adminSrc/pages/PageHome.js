@@ -8,9 +8,7 @@ import icons from '../icons'
 export default function PageHome(props) {
 
     return (<>
-        <h1 className="text-2xl text-center mb-6">Administration</h1>
-
-        <div className="flex flex-wrap justify-betewen ">
+        <div className="flex flex-wrap justify-betewen mt-20">
             <Link to={'/admin/account'} key={uuidv4()} className="home-card">
                 <FontAwesomeIcon icon={faUser} />
                 <p>Mon Compte</p>

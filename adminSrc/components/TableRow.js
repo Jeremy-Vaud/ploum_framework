@@ -6,7 +6,7 @@ export default function TableRow(props) {
     if(!props.hidden) {
     return (
         <tr>
-            <td className='p-3'>
+            <td className="w-24">
                 <ModalUpdate table={props.table} data={props.data} formUpdate={props.formUpdate} updateRow={props.updateRow} handleChange={props.handleChange} logOut={props.logOut} dataSelect={props.dataSelect} setSession={props.setSession}/>
                 <ModalDelete table={props.table} id={props.data.id} deleteRow={props.deleteRow} logOut={props.logOut}/>            
             </td>

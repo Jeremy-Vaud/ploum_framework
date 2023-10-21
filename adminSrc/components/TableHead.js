@@ -14,8 +14,8 @@ export default function TableHead(props) {
     }
     return (
         <thead>
-            <tr className="bg-gray-800 text-white">
-            <th className="w-[75px]">action</th>
+            <tr className="bg-dark text-light">
+            <th>action</th>
                 {props.columns.map(e =>
                     <th key={e.name} onClick={() => props.sort(e.name)}>
                         <div className="flex justify-between pr-5 cursor-pointer items-center">

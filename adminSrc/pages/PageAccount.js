@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import FormInput from "../components/FormInput"
 import Loading from "../components/Loading"
 
@@ -69,7 +69,7 @@ export default function PageAccount(props) {
 
     return (
         <>
-            <h1 className="text-2xl text-center mb-6">Mon compte</h1>
+            <h1>Mon compte</h1>
             <form onSubmit={submit} className="max-w-[300px] mx-auto" id="formAccount">
                 <input type="hidden" name="id" value={props.session.id} />
                 {inputs.map(e => {

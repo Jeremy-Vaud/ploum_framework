@@ -26,12 +26,9 @@ export default function PageTable(props) {
         });
     }, [])
 
-
-
-
     return (
         <>
-            <h1 className="text-2xl text-center mb-6">{props.dataTable.title}</h1>
+            <h1>{props.dataTable.title}</h1>
             <Table table={props.dataTable.className} columns={columns} form={form} formUpdate={formUpdate} logOut={props.logOut} setSession={props.setSession}/>
         </>
     )

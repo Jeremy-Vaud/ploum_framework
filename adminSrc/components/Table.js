@@ -176,33 +176,35 @@ export default function Table(props) {
     useEffect(() => {
         props.form.map((e) => {
             if (e.type === "select" || e.type === "selectMulti") {
-                if(typeof e.table !== 'undefined') {
+                if (typeof e.table !== 'undefined') {
                     loadSelect(e.table, e.name, e.key)
-                } else if(typeof e.choices !== 'undefined') {
+                } else if (typeof e.choices !== 'undefined') {
                     let copyDataSelect = dataSelect
                     copyDataSelect[e.name] = []
                     e.choices.map((choice) => {
-                        copyDataSelect[e.name].push({ value: choice, name: choice})
+                        copyDataSelect[e.name].push({ value: choice, name: choice })
                     })
                     setDataSelect(copyDataSelect)
-                }              
+                }
             }
         })
     }, [props.form])
 
     return (
         <>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap justify-between items-center mb-4">
                 <ModalInsert form={props.form} table={props.table} key={uuidv4()} insert={insert} logOut={props.logOut} dataSelect={dataSelect} />
                 <TableSearch search={search} />
             </div>
-            <table className="w-full">
-                <TableHead sort={sort} columns={props.columns} sortState={sortState} deleteRow={deleteRow} />
-                <tbody>
-                    {
-                        data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect} setSession={props.setSession}/>) : null}
-                </tbody>
-            </table>
+            <div className="overflow-x-auto scrollbar-hide">
+                <table className="min-w-full">
+                    <TableHead sort={sort} columns={props.columns} sortState={sortState} deleteRow={deleteRow} />
+                    <tbody>
+                        {
+                            data ? data.map(e => <TableRow key={uuidv4()} table={props.table} data={e} columns={props.columns} deleteRow={deleteRow} formUpdate={props.formUpdate} updateRow={updateRow} hidden={hiddenRows[e.id]} logOut={props.logOut} dataSelect={dataSelect} setSession={props.setSession} />) : null}
+                    </tbody>
+                </table>
+            </div>
             <Loading loading={loading} />
         </>
     )

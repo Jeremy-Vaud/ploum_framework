@@ -4,16 +4,31 @@
 @tailwind utilities;
 
 @layer base {
+    html {
+        @apply text-dark font-mono;
+    }
     input:not([type="checkbox"]):not([type="file"]),
     select,
     textarea {
-        @apply border border-gray-800 w-full py-1 px-2;
+        @apply border border-dark w-full py-1 px-2;
     }
     textarea {
         @apply resize-none;
     }
     input[type="file"] {
         @apply w-full;
+    }
+    h1 {
+        @apply text-2xl text-center my-6;
+    }
+    th, td {
+        @apply px-5;
+    }
+    td {
+        @apply py-2;
+    }
+    tr {
+        @apply border-b border-dark border-opacity-20;
     }
 }
 
@@ -22,46 +37,52 @@
      * Accueil
      */
     .home-card {
-        @apply w-64 h-32 text-center rounded shadow-xl border border-gray-800 mx-auto mb-10 inline-block bg-gray-800 hover:bg-green-500 transition duration-1000 text-gray-300 hover:text-gray-800 text-xl uppercase p-6;
+        @apply w-64 h-32 text-center rounded shadow-xl border border-dark mx-auto mb-10 inline-block bg-dark hover:bg-main transition duration-1000 text-light hover:text-dark text-xl uppercase p-6;
     }
     /*
      * Boutons
      */
     .btn {
-        @apply inline-block px-5 py-2 cursor-pointer rounded transition border-none;
+        @apply inline-block px-6 py-1 cursor-pointer rounded transition border-none w-full xs:w-auto mb-5 xs:mb-0;
     }
     .btn-add {
-        @apply btn bg-green-600 hover:bg-green-500 text-white;
+        @apply btn bg-add hover:bg-add_light text-light;
     }
     .btn-cancel {
-        @apply btn bg-gray-400 hover:bg-gray-300;
+        @apply btn bg-cancel hover:bg-cancel_light;
     }
     .btn-delete {
-        @apply btn bg-red-600 hover:bg-red-500 text-white;
+        @apply btn bg-delete hover:bg-delete_light text-light;
     }
     .btn-update {
-        @apply btn bg-yellow-600 hover:bg-yellow-500;
+        @apply btn bg-update hover:bg-update_light;
     }
     .btn-link {
-        @apply text-green-600;
+        @apply text-main;
     }
     .btn-link:hover {
-        @apply text-green-500;
+        @apply text-main_light;
     }
     /*
      * Navbar
      */
+    .nav-header {
+        @apply px-header_padding fixed top-0 left-0 w-full z-20 flex justify-between items-center bg-dark h-header_height;
+    }
+    .nav-aside {
+        @apply w-[250px] p-3 fixed top-0 h-screen transition-all z-10 pt-header_height bg-dark overflow-x-scroll scrollbar-hide;
+    }
     .nav-bg {
-        @apply bg-gray-800;
+        @apply fixed top-0 left-0 w-screen h-screen opacity-40 bg-dark -z-10;
     }
     .nav-color {
-        @apply text-gray-300;
+        @apply text-light;
     }
     .nav-title {
-        @apply nav-color text-2xl transition;
+        @apply nav-color text-3xl transition;
     }
     .nav-link-active {
-        @apply cursor-pointer text-green-400;
+        @apply cursor-pointer text-main;
     }
     .nav-link-disable {
         @apply cursor-pointer nav-color transition;
@@ -74,7 +95,7 @@
     }
     .nav-link-disable:hover,
     .nav-title:hover {
-        @apply text-green-300;
+        @apply text-main_light;
     }
     /*
      * Formulaire
@@ -83,28 +104,28 @@
         @apply inline-block px-2 py-1 m-2 text-sm cursor-pointer transition;
     }
     .select-multi-switch-active {
-        @apply select-multi-switch bg-green-600 hover:bg-green-500 text-white;
+        @apply select-multi-switch bg-add hover:bg-add_light text-light;
     }
     .select-multi-switch-disable {
-        @apply select-multi-switch bg-gray-400 hover:bg-gray-300;
+        @apply select-multi-switch bg-cancel hover:bg-cancel_light;
     }
     .text-warning {
-        @apply text-red-500;
+        @apply text-delete_light;
     }
     /*
      * Chargement
      */
     .spin {
-        @apply inline w-16 animate-spin text-gray-300 fill-green-600;
+        @apply inline w-16 animate-spin text-light fill-add;
     }
     /*
      * Modal
      */
     .modal {
-        @apply fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] px-10 pb-10 z-30 bg-white w-[600px] max-w-[calc(100%-20px)] max-h-[calc(100%-20px)] overflow-y-scroll scrollbar-hide rounded-xl;
+        @apply fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] px-10 pb-10 z-30 bg-light w-[600px] max-w-[calc(100%-20px)] max-h-[calc(100%-20px)] overflow-y-scroll scrollbar-hide rounded-xl;
     }
     .bg-modal {
-        @apply fixed top-0 left-0 w-screen h-screen opacity-40 bg-black z-20;
+        @apply fixed top-0 left-0 w-screen h-screen opacity-40 bg-dark z-20;
     }
     .close-modal {
         @apply flex flex-row-reverse items-center h-10;

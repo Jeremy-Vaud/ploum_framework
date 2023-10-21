@@ -116,7 +116,7 @@ export default function PageEditArea(props) {
 
     return (
         <>
-            <h1 className="text-2xl text-center mb-6">{props.dataTable.title}</h1>
+            <h1>{props.dataTable.title}</h1>
             <form id={formId} className="max-w-lg mx-auto">
                 {inputs.map(e => {
                     if (e.type === "checkbox") {

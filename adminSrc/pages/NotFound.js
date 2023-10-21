@@ -1,3 +1,9 @@
 export default function NotFound() {
-    return (<h1 className="text-2xl text-center mb-6">Page non trouvée</h1>)
+    return (
+        <div className="text-center">
+            <h1 className="mb-2">404</h1>
+            <p>Page introuvable</p>
+            
+        </div>
+    )
 }
