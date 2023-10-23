@@ -52,7 +52,7 @@ export default function ModalDelete(props) {
                 <div className="text-center">               
                     <p className="mb-3">Attention toutes suppression est définitive</p>
                     <button onClick={deleteById} className="btn-delete mr-5">Suprimer</button>
-                    <button onClick={hide} className="btn-cancel">annuler</button>
+                    <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
             <Loading loading={loading}/>

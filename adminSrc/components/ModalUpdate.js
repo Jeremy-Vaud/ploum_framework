@@ -157,7 +157,7 @@ export default function ModalUpdate(props) {
                 </form>
                 <div className="text-center">
                     <button onClick={submit} className="btn-update mr-5">Modifier</button>
-                    <button onClick={hide} className="btn-cancel">annuler</button>
+                    <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
             <Loading loading={loading} />

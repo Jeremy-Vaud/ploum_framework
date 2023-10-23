@@ -154,7 +154,7 @@ export default function ModalInsert(props) {
                 </form>
                 <div className="text-center">
                     <button onClick={submit} className="btn-add mr-5">Ajouter</button>
-                    <button onClick={hide} className="btn-cancel">annuler</button>
+                    <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
             <Loading loading={loading} />

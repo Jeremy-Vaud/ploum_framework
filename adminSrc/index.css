@@ -5,7 +5,7 @@
 
 @layer base {
     html {
-        @apply text-dark font-mono;
+        @apply text-dark font-sans;
     }
     input:not([type="checkbox"]):not([type="file"]),
     select,
