@@ -115,8 +115,14 @@
     /*
      * Chargement
      */
+    .bg-spin {
+        @apply fixed top-0 left-0 w-screen h-screen opacity-40 bg-dark z-40;
+    }
+    .spin-container {
+        @apply fixed z-50 top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%];
+    }
     .spin {
-        @apply inline w-16 animate-spin text-light fill-add;
+        @apply inline w-16 animate-spin text-light fill-main;
     }
     /*
      * Modal
