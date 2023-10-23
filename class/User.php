@@ -26,6 +26,7 @@ class User extends Table {
         ];
         $this->adminPannel = [
             "title" => "Utilisateurs",
+            "slug" => "utilisateurs",
             "icon" => "faUsers",
             "order" => 1,
         ];

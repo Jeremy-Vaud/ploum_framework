@@ -75,11 +75,11 @@ export function App() {
                             if (e.className !== "App\\User" || session.role === "superAdmin") {
                                 if (e.type === "table") {
                                     return (
-                                        <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
+                                        <Route path={'/admin/' + e.slug} key={uuidv4()} element={isConnect ? <PageTable logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
                                     )
                                 } else if(e.type === "edit_area") {
                                     return (
-                                        <Route path={'/admin/' + e.title} key={uuidv4()} element={isConnect ? <PageEditArea logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
+                                        <Route path={'/admin/' + e.slug} key={uuidv4()} element={isConnect ? <PageEditArea logOut={logOut} dataTable={e} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
                                     )
                                 }
                             }

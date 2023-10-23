@@ -16,7 +16,7 @@ export default function PageHome(props) {
             {props.session ? (props.navigation.map(e => {
                 if (e.className !== "App\\User" || props.session.role === "superAdmin") {
                     return (
-                        <Link to={'/admin/' + e.title} key={uuidv4()} className="home-card">
+                        <Link to={'/admin/' + e.slug} key={uuidv4()} className="home-card">
                             <FontAwesomeIcon icon={icons[e.icon]} />
                             <p>{e.title}</p>
                         </Link>

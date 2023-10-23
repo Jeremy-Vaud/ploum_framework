@@ -55,8 +55,8 @@ export default function Navbar(props) {
                             if (e.className !== "App\\User" || props.session.role === "superAdmin") {
                                 return (
                                     <NavLink
-                                        to={'/admin/' + e.title}
-                                        key={e.title}
+                                        to={'/admin/' + e.slug}
+                                        key={e.slug}
                                         end={true}
                                         onClick={moveNav}
                                         className={({ isActive }) => {
