@@ -6,7 +6,6 @@ namespace App;
  * Représente un champ d' une base de donnée de type file(string en lien avec un fichier)
  * 
  * @author  Jérémy Vaud
- * @final
  */
 class File extends Debug {
     // Attributs
