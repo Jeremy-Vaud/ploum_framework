@@ -40,7 +40,7 @@ final class Api {
                         $this->object = new $_POST["table"];
                         $this->sortFiles();
                     }
-                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser") {
+                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser" || $_POST["action"] === "updatePass") {
                     $this->action = $_POST["action"];
                 } else if ($_POST["action"] === "upsert") {
                     if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
@@ -312,7 +312,7 @@ final class Api {
             }
             if (!$this->isAdmin()) {
                 session_destroy();
-                throw new \Exception("La connection néssecite un compte administrateur");
+                throw new \Exception("Identifiants incorrect");
             } else {
                 http_response_code(200);
                 echo json_encode($_SESSION);
@@ -344,7 +344,7 @@ final class Api {
                 throw new \Exception("Une erreur est survenue");
             }
             http_response_code(200);
-            echo json_encode(["warning" => "Un email de récupération viens de vous être envoyé"]);
+            echo json_encode(["warning" => "Email de récupération envoyé"]);
         } catch (\Exception $e) {
             http_response_code(401);
             echo json_encode(["warning" => $e->getMessage()]);
@@ -361,12 +361,21 @@ final class Api {
     }
 
     /**
-     * Mise à jour du mot de passe
+     * Mise à jour du mot de passe depuis lien de récupération
      *
      * @return void
      */
     private function changePass() {
         echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
+    }
+    
+    /**
+     * Mise à jour du mot de passe depuis "Mon compte"
+     *
+     * @return void
+     */
+    private function updatePass() {
+        echo json_encode((new User)->updatePass($_POST["pass"], $_POST["newPass1"], $_POST["newPass2"]));
     }
     
     /**

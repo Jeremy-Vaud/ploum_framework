@@ -187,7 +187,7 @@ class User extends Table {
     }
 
     /**
-     * Modifie le mot de passe d'un admin
+     * Modifie le mot de passe d'un admin depuis un lien de récupération
      *
      * @param  mixed $code Valeur du param code de l'url du lien de récupération
      * @param  mixed $pass1 Mot de passe
@@ -224,6 +224,40 @@ class User extends Table {
     }
 
     /**
+     * Modifie le mot de passe avec l'ancien mot de passe
+     *
+     * @param  mixed $pass Ancien mot depasse
+     * @param  mixed $newPass1 Nouveu mot de passe
+     * @param  mixed $newPass1 Nouveu mot de passe
+     * @return array Data pour le panneau d'admin
+     */
+    public function updatePass(string $pass, string $newPass1, string $newPass2) {
+        $return = ["status" => "invalid", "warning" => ""];
+        if (!$this->loadFromId($_SESSION["id"])) {
+            $return["warning"] = "Une erreur est survenue";
+        } else if ($pass === "" || $newPass1 === "" || $newPass2 === "") {
+            $return["warning"] = "Veuillez remplir tous les champs";
+        } else if ($newPass1 !== $newPass2) {
+            $return["warning"] = "Les nouveaux mots de passe ne sont pas identiques";
+        } else if (!password_verify($pass, $this->get("password"))) {
+            $return["warning"] = "L'ancien mot de passe n'est pas valide";
+        } else {
+            $check = $this->fields["password"]->isValid($newPass1, true);
+            if ($check !== true) {
+                $return["warning"] = $check;
+            } else {
+                $this->set("password", $newPass1);
+                if (!$this->update()) {
+                    $return["warning"] = "La mise à jour du mot de passe a échoué";
+                } else {
+                    $return["status"] = "success";
+                }
+            }
+        }
+        return $return;
+    }
+
+    /**
      * Envoi d'un lien de récupération de compte
      *
      * @param  mixed $SMTPParams paramètres SMTP
@@ -244,6 +278,7 @@ class User extends Table {
             $mail->addAddress($this->get("email"), $this->get("nom") . " " . $this->get("prenom"));
 
             $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
             $mail->Subject = "Mot de passe oublié";
             $mail->Body    = "<p>Pour réinitialiser votre mot passe cliqué <a href='" . htmlentities($this->get("recoveryLink")) . "'>ici</a>.</p>";
             $mail->AltBody = 'Pour réinitialiser votre mot passe suivez le lien ' . $this->get("recoveryLink");

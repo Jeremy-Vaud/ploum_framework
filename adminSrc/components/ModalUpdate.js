@@ -17,7 +17,7 @@ export default function ModalUpdate(props) {
     const [visibility, setVisibility] = useState(false)
     const formId = useState(uuidv4())
     const [inputs, setInputs] = useState([])
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
 
     function show() {
         setVisibility(true)
@@ -65,7 +65,7 @@ export default function ModalUpdate(props) {
         let formData = new FormData(form)
         formData.append("table", props.table)
         formData.append("action", "update")
-        setLoading("")
+        setLoading(true)
         checkbox.forEach((input) => {
             if (!input.checked) {
                 formData.append(input.name, "0")
@@ -76,7 +76,7 @@ export default function ModalUpdate(props) {
             body: formData
         })
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 401) {
                     props.logOut()
                     throw new Error('Connection requise')
@@ -160,7 +160,7 @@ export default function ModalUpdate(props) {
                     <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
-            <Loading loading={loading} />
+            <Loading visibility={loading} />
         </>
     )
 }

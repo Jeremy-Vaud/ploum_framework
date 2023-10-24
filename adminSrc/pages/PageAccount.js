@@ -1,5 +1,6 @@
 import { useState } from "react"
 import FormInput from "../components/FormInput"
+import ModalPassword from "../components/ModalPassword"
 import Loading from "../components/Loading"
 
 export default function PageAccount(props) {
@@ -9,7 +10,7 @@ export default function PageAccount(props) {
         { name: "email", value: props.session.email, warning: "" }
     ])
     const [warning, setWarning] = useState("")
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
 
     function handleChange(evt) {
         let array = [];
@@ -41,13 +42,13 @@ export default function PageAccount(props) {
         let form = document.getElementById("formAccount")
         let formData = new FormData(form)
         formData.append("action", "updateUser")
-        setLoading("")
+        setLoading(true)
         fetch("/api", {
             method: 'POST',
             body: formData
         })
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 401) {
                     props.logOut()
                     throw new Error('Connection requise')
@@ -70,7 +71,7 @@ export default function PageAccount(props) {
     return (
         <>
             <h1>Mon compte</h1>
-            <form onSubmit={submit} className="max-w-[300px] mx-auto" id="formAccount">
+            <form onSubmit={submit} className="max-w-[300px] mx-auto mb-5" id="formAccount">
                 <input type="hidden" name="id" value={props.session.id} />
                 {inputs.map(e => {
                     return (
@@ -82,7 +83,8 @@ export default function PageAccount(props) {
                     <button type="submit" className="btn-add">Enregistrer</button>
                 </div>
             </form>
-            <Loading loading={loading} />
+            <ModalPassword />
+            <Loading visibility={loading} />
         </>
     )
 }

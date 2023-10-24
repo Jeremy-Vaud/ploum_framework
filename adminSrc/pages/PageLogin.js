@@ -7,7 +7,7 @@ export default function PageLogin(props) {
     const [password, setPassword] = useState("")
     const [warning, setWarning] = useState("")
     const [forgotPass, setForgotPass] = useState(false)
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
 
     function handleChange(e) {
         if (e.target.name === "email") {
@@ -28,13 +28,13 @@ export default function PageLogin(props) {
             formData.append("action", "logIn")
             formData.append("password", password)
         }
-        setLoading("")
+        setLoading(true)
         fetch("/api", {
             method: 'POST',
             body: formData
         })
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 200) {
                     if (formData.get("action") === "logIn") {
                         isLog = true
@@ -84,7 +84,7 @@ export default function PageLogin(props) {
                     </div>
                 </form>
             </div>
-            <Loading loading={loading} />
+            <Loading visibility={loading} />
         </>
     )
 

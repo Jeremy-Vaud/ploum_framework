@@ -2,9 +2,9 @@ import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import TableHead from "./TableHead"
 import TableRow from "./TableRow"
+import TableLoading from "./TableLoading"
 import ModalInsert from "./ModalInsert"
 import TableSearch from "./TableSearch"
-import Loading from "./Loading"
 
 export default function Table(props) {
     const [data, setData] = useState([])
@@ -95,16 +95,16 @@ export default function Table(props) {
 
     function search(e) {
         let json = {}
-        let val = e.target.value
+        let val = e.target.value.toLowerCase()
         data.map((row) => {
             let find = false
             props.columns.map((col) => {
                 let name
                 if (typeof row[col.name] === 'object') {
-                    name = String(row[col.name][col.key])
+                    name = String(row[col.name][col.key]).toLowerCase()
 
                 } else {
-                    name = String(row[col.name])
+                    name = String(row[col.name]).toLowerCase()
                 }
                 if (name.indexOf(val) !== -1) {
                     find = true;
@@ -205,7 +205,7 @@ export default function Table(props) {
                     </tbody>
                 </table>
             </div>
-            <Loading loading={loading} />
+            <TableLoading loading={loading} />
         </>
     )
 }

@@ -14,14 +14,14 @@ import FormRichText from "../components/FormRichText"
 export default function PageEditArea(props) {
     const formId = useState(uuidv4())
     const [inputs, setInputs] = useState([])
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
     const [modalVisibility, setModalVisibility] = useState(false)
 
     useEffect(() => {
-        setLoading("")
+        setLoading(true)
         fetch("/api" + '?edit_area=' + props.dataTable.className)
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 404) {
                     throw new Error('not found')
                 } else if (response.status === 401) {
@@ -76,7 +76,7 @@ export default function PageEditArea(props) {
         let formData = new FormData(form)
         formData.append("edit_area", props.dataTable.className)
         formData.append("action", "upsert")
-        setLoading("")
+        setLoading(true)
         checkbox.forEach((input) => {
             if (!input.checked) {
                 formData.append(input.name, "0")
@@ -87,7 +87,7 @@ export default function PageEditArea(props) {
             body: formData
         })
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 401) {
                     props.logOut()
                     throw new Error('Connection requise')
@@ -111,7 +111,7 @@ export default function PageEditArea(props) {
     }
 
     function hide() {
-        location.reload()
+        setModalVisibility(false)
     }
 
     return (
@@ -171,7 +171,7 @@ export default function PageEditArea(props) {
                     <button onClick={hide} className="btn-cancel">Fermer</button>
                 </div>
             </Modal>
-            <Loading loading={loading} />
+            <Loading visibility={loading} />
         </>
     )
 }

@@ -7,7 +7,7 @@ import Loading from "./Loading"
 
 export default function ModalDelete(props) {
     const [visibility, setVisibility] = useState(false)
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
 
     function show() {
         setVisibility(true)
@@ -22,13 +22,13 @@ export default function ModalDelete(props) {
         formData.append("table", props.table)
         formData.append("id", props.id)
         formData.append("action", "delete")
-        setLoading("")
+        setLoading(true)
         fetch("/api", {
             method: 'POST',
             body: formData
         })
             .then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 404) {
                     throw new Error('not found')
                 } else if (response.status === 401) {
@@ -55,7 +55,7 @@ export default function ModalDelete(props) {
                     <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
-            <Loading loading={loading}/>
+            <Loading visibility={loading}/>
         </>
     )
 }

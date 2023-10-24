@@ -6,14 +6,14 @@ export default function PageRecovery() {
     const code = new URLSearchParams(window.location.search).get('code')
     const [isValidLink, setIsValidLink] = useState(false)
     const [msg, setMsg] = useState("")
-    const [loading, setLoading] = useState("hidden")
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (code) {
-            setLoading("")
+            setLoading(true)
             fetch("/api" + `?isValidRecoveryLink=${code}`)
                 .then((response) => {
-                    setLoading("hidden")
+                    setLoading(false)
                     if (response.status === 200) {
                         return response.json()
                     } else {
@@ -37,12 +37,12 @@ export default function PageRecovery() {
         let formData = new FormData(changePassForm)
         formData.set("action", "changePass")
         if (checkForm(formData)) {
-            setLoading("")
+            setLoading(true)
             fetch("/api", {
                 method: 'POST',
                 body: formData
             }).then((response) => {
-                setLoading("hidden")
+                setLoading(false)
                 if (response.status === 200) {
                     return response.json()
                 } else {
@@ -98,7 +98,7 @@ export default function PageRecovery() {
                     <Link to="/admin" className="btn-add">Se connecter</Link>
                 }
             </div>
-            <Loading loading={loading} />
+            <Loading visibility={loading} />
         </>
     )
 }
