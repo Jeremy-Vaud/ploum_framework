@@ -31,7 +31,8 @@ export default function FormRichText(props) {
                     statusbar: false,
                     plugins: ['link'],
                     toolbar: 'undo redo | bold italic underline | link',
-                    language: "fr_FR"
+                    language: "fr_FR",
+                    link_title: false
                 }}
             />
         </div>

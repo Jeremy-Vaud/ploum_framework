@@ -46,7 +46,7 @@
      * Boutons
      */
     .btn {
-        @apply inline-block px-6 py-1 cursor-pointer rounded transition border-none w-full xs:w-auto mb-5 xs:mb-0;
+        @apply inline-block px-6 py-1 cursor-pointer rounded transition border-none w-full sm:w-auto mb-5 sm:mb-0;
     }
     .btn-add {
         @apply btn bg-add hover:bg-add_light text-light;

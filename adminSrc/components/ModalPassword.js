@@ -73,7 +73,7 @@ export default function ModalPassword() {
                         <input className="mb-3" type="password" name="pass" id="pass" />
                         <label htmlFor="newPass1">Nouveau Mot de passe</label>
                         <input className="mb-3" type="password" name="newPass1" id="newPass1" />
-                        <label htmlFor="newPass2">Nouveau Mot de passe</label>
+                        <label htmlFor="newPass2">Confirmer le nouveau Mot de passe</label>
                         <input className="mb-3" type="password" name="newPass2" id="newPass2" />
                         <div className="text-center">
                             <p className="text-warning h-8">{warning}</p>

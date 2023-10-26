@@ -50,8 +50,8 @@ export default function ModalDelete(props) {
             <button onClick={show}><FontAwesomeIcon icon={faTrashCan} className='w-[15px]'/></button>
             <Modal visibility={visibility} hide={hide}>
                 <div className="text-center">               
-                    <p className="mb-3">Attention toutes suppression est définitive</p>
-                    <button onClick={deleteById} className="btn-delete mr-5">Suprimer</button>
+                    <p className="mb-3">Attention toute suppression est définitive</p>
+                    <button onClick={deleteById} className="btn-delete mr-5">Supprimer</button>
                     <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
