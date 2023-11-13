@@ -263,7 +263,7 @@ abstract class EditArea extends Debug {
     /**
      * Suprimer des fichiers
      *
-     * @param  mixed $list des champs files ou images a suprimer
+     * @param  array $list des champs files ou images a suprimer
      * @return void
      */
     public function deleteFiles(array $list) {
