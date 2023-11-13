@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { v4 as uuidv4 } from 'uuid'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faCloud } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import icons from '../icons'
 
@@ -23,6 +23,12 @@ export default function PageHome(props) {
                     )
                 }
             })) : null}
+            {props.cloud ?
+                <Link to={'/admin/cloud'} key={uuidv4()} className="home-card">
+                    <FontAwesomeIcon icon={faCloud} />
+                    <p>Cloud</p>
+                </Link>
+                : null}
         </div>
     </>
     )

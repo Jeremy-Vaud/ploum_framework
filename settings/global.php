@@ -6,6 +6,9 @@ $DEBUG = true;
 // Redirection https
 $HTTPS = false;
 
+// Cloud
+$CLOUD = true;
+
 // Pour la balise head
 $TITLE = "Ploum";
 $LANG = "fr";
@@ -31,7 +34,7 @@ $HEADER = "view/header.php";
 $FOOTER = "view/footer.php";
 
 // Email admin
-$adminMail = [
+$ADMIN_MAIL = [
     "Host" => "localhost",
     "SMTPAuth" => false,
     "Username" => null,

@@ -41,6 +41,8 @@
         "@fortawesome/react-fontawesome": "^0.2.0",
         "@tinymce/tinymce-react": "^4.3.0",
         "browser-sync": "^2.29.3",
+        "chonky": "^2.3.2",
+        "chonky-icon-fontawesome": "^2.3.2",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.6.2",

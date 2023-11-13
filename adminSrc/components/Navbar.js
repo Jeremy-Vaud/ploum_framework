@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faBars, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faBars, faRightFromBracket, faUser, faCloud } from '@fortawesome/free-solid-svg-icons'
 import icons from '../icons'
 import { useState } from 'react'
 
@@ -68,6 +68,19 @@ export default function Navbar(props) {
                                 )
                             }
                         })}
+                        {props.cloud ?
+                        <NavLink
+                            to='/admin/cloud'
+                            key='cloud'
+                            end={true}
+                            onClick={moveNav}
+                            className={({ isActive }) => {
+                                return 'block no-underline ' + (isActive ? 'pannel-link-active' : 'pannel-link-disable')
+                            }}>
+                            <FontAwesomeIcon icon={faCloud} className="mr-3" />
+                            Cloud
+                        </NavLink>
+                        : null}
                     </nav>
                     <div onClick={moveNav} className={showNav ? 'nav-bg' : 'hidden'}></div>
                 </aside>

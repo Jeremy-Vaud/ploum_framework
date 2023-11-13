@@ -1,4 +1,4 @@
 <?php
 
-$api = new App\Api($adminMail);
+$api = new App\Api($CLOUD, $ADMIN_MAIL);
 $api->run();

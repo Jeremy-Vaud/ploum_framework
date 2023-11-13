@@ -8,16 +8,18 @@ namespace App;
 final class Api {
     private string | null $action = null;
     private $object = null;
+    private bool $cloud = false;
     private array $adminMail = [];
     private $files = ["add" => [], "del" => []];
 
     /**
-     * __construct
+     * Constructeur
      *
-     * @param  mixed $adminMail Paramètres SMTP
+     * @param  array $adminMail Paramètres SMTP
      * @return void
      */
-    public function __construct(array $adminMail) {
+    public function __construct(bool $cloud, array $adminMail) {
+        $this->cloud = $cloud;
         $this->adminMail = $adminMail;
         session_start();
         if ($_SERVER['REQUEST_METHOD'] === "GET") {
@@ -49,6 +51,8 @@ final class Api {
                         $this->object->load();
                         $this->sortFiles();
                     }
+                } else if ($_POST["action"] === "getDir" || $_POST["action"] === "createFolder" || $_POST["action"] === "deleteFiles" || $_POST["action"] === "uploadFiles" || $_POST["action"] === "moveFiles" || $_POST["action"] === "downloadFile" || $_POST["action"] === "renameFile") {
+                    $this->action = $_POST["action"];
                 }
             }
         }
@@ -368,7 +372,7 @@ final class Api {
     private function changePass() {
         echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
     }
-    
+
     /**
      * Mise à jour du mot de passe depuis "Mon compte"
      *
@@ -377,7 +381,7 @@ final class Api {
     private function updatePass() {
         echo json_encode((new User)->updatePass($_POST["pass"], $_POST["newPass1"], $_POST["newPass2"]));
     }
-    
+
     /**
      * Trie les fichiers à supprimer et à ajouter
      *
@@ -390,6 +394,136 @@ final class Api {
             } else {
                 $this->files["del"][] = $key;
             }
+        }
+    }
+
+    /**
+     * Liste les fichier d'un répertoire
+     *
+     * @return void
+     */
+    private function getDir() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud($_POST["path"]);
+                $folderChain = $cloud->getDir();
+                echo json_encode($folderChain);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Crée un nouveau dossier
+     *
+     * @return void
+     */
+    private function createFolder() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud($_POST["path"]);
+                if ($cloud->createFolder($_POST["name"])) {
+                    http_response_code(200);
+                }
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Supprimer des fichiers ou des dossiers
+     *
+     * @return void
+     */
+    private function deleteFiles() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud($_POST["path"]);
+                $files = explode(",", $_POST["files"]);
+                $cloud->deleteFiles($files);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Upload de plusieur fichiers
+     *
+     * @return void
+     */
+    private function uploadFiles() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud($_POST["path"]);
+                $cloud->uploadFiles($_FILES["files"]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Déplacer des fichiers ou des dossiers
+     *
+     * @return void
+     */
+    private function moveFiles() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud;
+                $cloud->moveFiles($_POST["destination"], $_POST["files"]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Télécharger des fichier ou des dossiers(zip)
+     *
+     * @return void
+     */
+    private function downLoadFile() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud;
+                $cloud->downloadFile($_POST["file"]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+
+    /**
+     * Renomer un fichier ou un dossier
+     *
+     * @return void
+     */
+    private function renameFile() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud($_POST["path"]);
+                $cloud->renameFile($_POST["newName"], $_POST["oldName"]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
         }
     }
 }
