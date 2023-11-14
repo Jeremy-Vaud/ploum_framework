@@ -130,8 +130,11 @@
     .spin-table-container {
         @apply text-center py-7;
     }
-    .spin-table  {
-        @apply inline w-16 animate-spin fill-light;
+    .spin-page-container {
+        @apply fixed w-screen h-screen flex items-center justify-center z-[-1] top-0 left-0
+    }
+    .spin-table, .spin-page  {
+        @apply inline w-16 animate-spin fill-light
     }
     /*
      * Modal

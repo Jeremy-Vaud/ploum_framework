@@ -44,11 +44,12 @@ final class Cloud {
                         $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => true, "modDate" => filemtime("$this->path/$elt") * 1000];
                     } else {
                         $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => false, "size" => filesize("$this->path/$elt"), "modDate" => filemtime("$this->path/$elt") * 1000];
-                        if (@exif_imagetype("$this->path/$elt")) {
+                        //! Thumbmail trop lent
+                        /*if (@exif_imagetype("$this->path/$elt")) {
                             $img = file_get_contents("$this->path/$elt");
                             $data = "data:image;base64," . base64_encode($img);
                             $files[array_key_last($files)]["thumbnailUrl"] = $data;
-                        }
+                        }*/
                     }
                     if ($elt[0] === ".") {
                         $files[array_key_last($files)]["isHidden"] = true;

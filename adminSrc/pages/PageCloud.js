@@ -151,7 +151,7 @@ export default function PageCloud(props) {
             })
             .then((result) => {
                 setLoading(false)
-                setFiles(result)
+                setFiles(result)   
             })
             .catch((e) => {
                 console.log(e)
@@ -284,7 +284,7 @@ export default function PageCloud(props) {
                     throw new Error("Status : " + response.status)
                 }
             })
-            .then((res) => {
+            .then(() => {
                 getDir()
             })
             .catch((e) => {
