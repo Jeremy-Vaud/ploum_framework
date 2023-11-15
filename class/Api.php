@@ -51,7 +51,7 @@ final class Api {
                         $this->object->load();
                         $this->sortFiles();
                     }
-                } else if ($_POST["action"] === "getDir" || $_POST["action"] === "createFolder" || $_POST["action"] === "deleteFiles" || $_POST["action"] === "uploadFiles" || $_POST["action"] === "moveFiles" || $_POST["action"] === "downloadFile" || $_POST["action"] === "renameFile") {
+                } else if ($_POST["action"] === "getDir" || $_POST["action"] === "createFolder" || $_POST["action"] === "deleteFiles" || $_POST["action"] === "uploadFiles" || $_POST["action"] === "moveFiles" || $_POST["action"] === "downloadFile" || $_POST["action"] === "renameFile" || $_POST["action"] === "getThumbmail") {
                     $this->action = $_POST["action"];
                 }
             }
@@ -519,6 +519,24 @@ final class Api {
             if ($this->cloud) {
                 $cloud = new Cloud($_POST["path"]);
                 $cloud->renameFile($_POST["newName"], $_POST["oldName"]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            http_response_code(401);
+        }
+    }
+    
+    /**
+     * Thumbmail d'un fichier
+     *
+     * @return void
+     */
+    private function getThumbmail() {
+        if ($this->isAdmin()) {
+            if ($this->cloud) {
+                $cloud = new Cloud;
+                echo json_encode($cloud->getThumbmail($_POST["file"]));
             } else {
                 http_response_code(400);
             }

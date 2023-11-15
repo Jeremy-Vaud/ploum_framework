@@ -293,6 +293,33 @@ export default function PageCloud(props) {
             })
     }
 
+    async function getThumbmail(file) {
+        let form = new FormData
+        form.append("action", "getThumbmail")
+        form.append("file", file.id)
+        let thumbmail = null
+        await fetch("/api", {
+            method: 'POST',
+            body: form
+        })
+            .then((response) => {
+                if (response.status === 401) {
+                    props.logOut()
+                    throw new Error('Connection requise')
+                } else if (response.status !== 200) {
+                    throw new Error("Status : " + response.status)
+                }
+                return response.json()
+            })
+            .then((result) => {
+                thumbmail = result
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+            return thumbmail
+    }
+
     return (
         <>
             <h1>Cloud</h1>
@@ -305,6 +332,7 @@ export default function PageCloud(props) {
                     clearSelectionOnOutsideClick={true}
                     disableDefaultFileActions={true}
                     i18n={frenchI18n}
+                    thumbnailGenerator={getThumbmail}
                 >
                     <FileNavbar />
                     <FileToolbar />

@@ -12,7 +12,7 @@ final class Cloud {
     // Attributs
     protected $path = "cloud";
     protected $limitFileSize = 5000000;
-    
+
     /**
      * Initialisation
      *
@@ -29,7 +29,7 @@ final class Cloud {
             $this->path = "$this->path/$path";
         }
     }
-    
+
     /**
      * Lister les fichiers et répertoires d'un dossier
      *
@@ -44,12 +44,6 @@ final class Cloud {
                         $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => true, "modDate" => filemtime("$this->path/$elt") * 1000];
                     } else {
                         $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => false, "size" => filesize("$this->path/$elt"), "modDate" => filemtime("$this->path/$elt") * 1000];
-                        //! Thumbmail trop lent
-                        /*if (@exif_imagetype("$this->path/$elt")) {
-                            $img = file_get_contents("$this->path/$elt");
-                            $data = "data:image;base64," . base64_encode($img);
-                            $files[array_key_last($files)]["thumbnailUrl"] = $data;
-                        }*/
                     }
                     if ($elt[0] === ".") {
                         $files[array_key_last($files)]["isHidden"] = true;
@@ -60,6 +54,24 @@ final class Cloud {
         return $files;
     }
     
+    /**
+     * Return une image en base64
+     *
+     * @param  string $file le chemin du fichier
+     * @return string
+     */
+    public function getThumbmail(string $file) {
+        $res = null;
+        $file = str_replace("..", "", $file);
+        if (preg_match("/^cloud\/.+$/", $file)) {
+            if (@exif_imagetype($file)) {
+                $img = file_get_contents($file);
+                $res = "data:image;base64," . base64_encode($img);
+            }
+        }
+        return $res;
+    }
+
     /**
      * Créer un nouveau dossier
      *
@@ -74,7 +86,7 @@ final class Cloud {
         }
         return false;
     }
-    
+
     /**
      * Supprimer un ou plusieurs fichiers ou dossiers
      *
@@ -92,7 +104,7 @@ final class Cloud {
             }
         }
     }
-    
+
     /**
      * Supprimer un dossier
      *
@@ -112,7 +124,7 @@ final class Cloud {
         }
         rmdir("$path/$dir");
     }
-    
+
     /**
      * Enregistrer des fichiers
      *
@@ -126,7 +138,7 @@ final class Cloud {
             }
         }
     }
-    
+
     /**
      * Déplacer un ou plusieur fichiers ou dossiers
      *
@@ -145,7 +157,7 @@ final class Cloud {
             }
         }
     }
-    
+
     /**
      * Envoi un fichier ou un dossier(zip) à l'utilisateur
      *
@@ -160,13 +172,12 @@ final class Cloud {
                 $filename = basename($file) . ".zip";
                 $zip->open($filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
                 $listFiles = $this->listFiles($file);
-                foreach($listFiles as $elt) {
-                    if($elt["path"] === "") {
+                foreach ($listFiles as $elt) {
+                    if ($elt["path"] === "") {
                         $zip->addFile("$file/" . $elt["file"], $elt["file"]);
                     } else {
-                        $zip->addFile("$file/" . $elt["path"] ."/" . $elt["file"], $elt["path"] . "/" . $elt["file"]);
+                        $zip->addFile("$file/" . $elt["path"] . "/" . $elt["file"], $elt["path"] . "/" . $elt["file"]);
                     }
-                    
                 }
                 $zip->close();
                 header('Content-Description: File Transfer');
@@ -192,7 +203,7 @@ final class Cloud {
             }
         }
     }
-    
+
     /**
      * Liste les fichier d'un dossier et de ses sous dossiers
      *
@@ -200,12 +211,12 @@ final class Cloud {
      * @param  mixed $path Chemin du dossier
      * @return array $structure Liste de fichiers
      */
-    private function listFiles($dir, $path ="") {
+    private function listFiles($dir, $path = "") {
         $structure = [];
         foreach (scandir($dir) as $elt) {
             if (!($elt === "." || $elt === "..")) {
                 if (is_dir("$dir/$elt")) {
-                    $structure = array_merge($structure,$this->listFiles("$dir/$elt", $path === "" ? $elt : "$path/$elt"));
+                    $structure = array_merge($structure, $this->listFiles("$dir/$elt", $path === "" ? $elt : "$path/$elt"));
                 } else {
                     $structure[] = ["file" => $elt, "path" => $path];
                 }
@@ -213,7 +224,7 @@ final class Cloud {
         }
         return $structure;
     }
-    
+
     /**
      * Renomer un fichier ou un dossier
      *
@@ -222,9 +233,9 @@ final class Cloud {
      * @return void
      */
     public function renameFile(string $newName, string $oldName) {
-        $newName = str_replace(["..","/"], "", $newName);
-        $oldName = str_replace(["..","/"], "", $oldName);
-        if(file_exists("$this->path/$oldName")) {
+        $newName = str_replace(["..", "/"], "", $newName);
+        $oldName = str_replace(["..", "/"], "", $oldName);
+        if (file_exists("$this->path/$oldName")) {
             rename("$this->path/$oldName", "$this->path/$newName");
         }
     }
