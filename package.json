@@ -8,6 +8,7 @@
         "createSuperAdmin": "php manage.php create-superAdmin",
         "createAdminPannel": "php manage.php create-admin-pannel",
         "downloadFonts": "php manage.php download-fonts",
+        "devBuildAdmin": "npx parcel watch adminSrc/index.html --dist-dir admin --public-url /admin",
         "buildAdmin": "npx parcel build adminSrc/index.html --dist-dir admin --public-url /admin",
         "importIcons": "node --experimental-json-modules AdminSrc/importIcons.mjs",
         "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
