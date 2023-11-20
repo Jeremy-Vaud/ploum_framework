@@ -13,11 +13,11 @@ export default function PageTable(props) {
         Object.entries(props.dataTable.fields).forEach(([name, obj]) => {
             obj.table.forEach((e) => {
                 if (e === "columns") {
-                    array1.push({ name: name })
+                    array1.push({ name: name, key: obj.key })
                 } else if (e === "insert") {
                     array2.push({ name: name, type: obj.type, table: obj.foreignTable, key: obj.key, choices: obj.choices })
                 } else if (e === "update") {
-                    array3.push({ name: name, type: obj.type, table: obj.foreignTable, key: obj.key, choices: obj.choices  })
+                    array3.push({ name: name, type: obj.type, table: obj.foreignTable, key: obj.key, choices: obj.choices })
                 }
             });
             setColumns(array1)
@@ -29,7 +29,7 @@ export default function PageTable(props) {
     return (
         <>
             <h1>{props.dataTable.title}</h1>
-            <Table table={props.dataTable.className} columns={columns} form={form} formUpdate={formUpdate} logOut={props.logOut} setSession={props.setSession}/>
+            <Table table={props.dataTable.className} columns={columns} form={form} formUpdate={formUpdate} logOut={props.logOut} setSession={props.setSession} />
         </>
     )
 }
