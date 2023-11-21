@@ -202,7 +202,8 @@ final class View extends Debug {
     private function renderStyles() {
         $styles = "";
         foreach ($this->styles as $style) {
-            $styles .= "<link href='" . $this->root . htmlentities($style) . "' rel='stylesheet'></link>";
+            if($styles !== "") $styles .= "\t";
+            $styles .= "<link href='" . $this->root . htmlentities($style) . "' rel='stylesheet'/>\n";
         }
         return $styles;
     }
@@ -215,7 +216,8 @@ final class View extends Debug {
     private function renderScripts() {
         $scripts = "";
         foreach ($this->scripts as $script) {
-            $scripts .= "<script type='text/javascript' src='" . $this->root . htmlentities($script) . "'></script>";
+            if($scripts !== "") $scripts .= "\t";
+            $scripts .= "<script type='text/javascript' src='" . $this->root . htmlentities($script) . "'></script>\n";
         }
         return $scripts;
     }
