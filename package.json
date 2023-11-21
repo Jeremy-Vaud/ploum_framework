@@ -14,7 +14,7 @@
         "watchCss": "npx tailwindcss -i src/style.css -o dist/style.css --watch --minify",
         "watchJs": "npx parcel watch src/*.js src/*.ts --dist-dir dist",
         "buildJs": "npx parcel build src/*.js src/*.ts --dist-dir dist",
-        "browserSync": "browser-sync start --proxy localhost --files dist/* view/* admin/*",
+        "browserSync": "browser-sync start --proxy localhost --files dist/* view/* view/*/* controller/* admin/*",
         "maildev": "npx maildev"
     },
     "repository": {
