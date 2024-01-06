@@ -260,21 +260,20 @@ class User extends Table {
     /**
      * Envoi d'un lien de récupération de compte
      *
-     * @param  mixed $SMTPParams paramètres SMTP
      * @return bool
      */
-    public function sendRecoveryLink(array $SMTPParams) {
+    public function sendRecoveryLink() {
         $mail = new \PHPMailer\PHPMailer\PHPMailer();
         try {
             $mail->isSMTP();
-            $mail->Host       = $SMTPParams["Host"];
-            $mail->SMTPAuth   = $SMTPParams["SMTPAuth"];
-            $mail->Username   = $SMTPParams["Username"];
-            $mail->Password   = $SMTPParams["Password"];
-            $mail->SMTPSecure = $SMTPParams["SMTPSecure"];
-            $mail->Port       = $SMTPParams["Port"];
+            $mail->Host       = $_ENV["MAIL_HOST"];
+            $mail->SMTPAuth   = $_ENV["MAIL_SMTPAuth"];
+            $mail->Username   = $_ENV["MAIL_USERNAME"];
+            $mail->Password   = $_ENV["MAIL_PASSWORD"];
+            $mail->SMTPSecure = $_ENV["MAIL_SMTPSecure"];
+            $mail->Port       = $_ENV["MAIL_PORT"];
 
-            $mail->setFrom($SMTPParams["From"][0], $SMTPParams["From"][1]);
+            $mail->setFrom($_ENV["MAIL_FROM_ADDRESS"], $_ENV["MAIL_FROM_NAME"]);
             $mail->addAddress($this->get("email"), $this->get("nom") . " " . $this->get("prenom"));
 
             $mail->isHTML(true);

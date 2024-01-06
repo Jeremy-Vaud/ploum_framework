@@ -19,8 +19,7 @@ abstract class Debug {
      */
     public function alertDebug($e) {
         // Message d'erreur
-        global $DEBUG;
-        if ($DEBUG) {
+        if ($_ENV["DEBUG"]) {
             echo "<br>";
             echo "Exeption reçue : ", $e->getMessage();
             echo "<br>";
@@ -37,8 +36,7 @@ abstract class Debug {
      */
     public function print() {
         // Affiche l'objet
-        global $DEBUG;
-        if ($DEBUG) {
+        if ($_ENV["DEBUG"]) {
             echo "<pre>";
             print_r($this);
             echo "</pre>";

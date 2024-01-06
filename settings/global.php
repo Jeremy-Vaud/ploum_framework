@@ -1,11 +1,4 @@
 <?php
-
-// Afficher les messages d'erreur
-$DEBUG = true;
-
-// Redirection https
-$HTTPS = false;
-
 // Cloud
 $CLOUD = true;
 
@@ -32,14 +25,3 @@ date_default_timezone_set('Europe/Paris');
 $BASE = "view/base.php";
 $HEADER = "view/header.php";
 $FOOTER = "view/footer.php";
-
-// Email admin
-$ADMIN_MAIL = [
-    "Host" => "localhost",
-    "SMTPAuth" => false,
-    "Username" => null,
-    "Password" => null,
-    "SMTPSecure" => "",
-    "Port" => 1025,
-    "From" => ["admin@ploum.fr", "admin"]
-];

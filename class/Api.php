@@ -9,18 +9,16 @@ final class Api {
     private string | null $action = null;
     private $object = null;
     private bool $cloud = false;
-    private array $adminMail = [];
     private $files = ["add" => [], "del" => []];
 
     /**
      * Constructeur
      *
-     * @param  array $adminMail Paramètres SMTP
+     * @param  bool $cloud
      * @return void
      */
-    public function __construct(bool $cloud, array $adminMail) {
+    public function __construct(bool $cloud) {
         $this->cloud = $cloud;
-        $this->adminMail = $adminMail;
         session_start();
         if ($_SERVER['REQUEST_METHOD'] === "GET") {
             if (isset($_GET["isLog"])) {
@@ -344,7 +342,7 @@ final class Api {
             if (!$user->createAdminRecoveryLink()) {
                 throw new \Exception("Une erreur est survenue");
             }
-            if (!$user->sendRecoveryLink($this->adminMail)) {
+            if (!$user->sendRecoveryLink()) {
                 throw new \Exception("Une erreur est survenue");
             }
             http_response_code(200);
@@ -526,7 +524,7 @@ final class Api {
             http_response_code(401);
         }
     }
-    
+
     /**
      * Thumbmail d'un fichier
      *
