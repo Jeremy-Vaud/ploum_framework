@@ -9,7 +9,6 @@ namespace App;
  */
 class Router extends Debug{
     // Attributs
-    protected $root;
     protected $home;
     protected $not_found;
     protected $routes;
@@ -21,7 +20,7 @@ class Router extends Debug{
      * Constructeur
      *
      * @return void
-     * @throws Exeption Si le fichier de configuration des routes n'existe pas, si les varibles $ROOT, $HOME, $NOT_FOND, $ROUTES n'existent pas dans ce fichier ou si $_SERVER["REDIRECT_URL"] n'existe pas
+     * @throws Exeption Si le fichier de configuration des routes n'existe pas, si les varibles $HOME, $NOT_FOND, $ROUTES n'existent pas dans ce fichier ou si $_SERVER["REDIRECT_URL"] n'existe pas
      */
     public function __construct() {
         try {
@@ -29,10 +28,6 @@ class Router extends Debug{
                 throw new \Exception("Le fichier settings/routes.php n'existe pas");
             }
             require "settings/routes.php";
-            if(!isset($ROOT)) {
-                throw new \Exception('La variable $ROOT du fichier settings/routes.php n\'existe pas');
-            }
-            $this->root = $ROOT;
             if(!isset($HOME)) {
                 throw new \Exception('La variable $HOME du fichier settings/routes.php n\'existe pas');
             }
@@ -67,9 +62,6 @@ class Router extends Debug{
     private function setUrl(string $url) {
         $url = explode("?", $url)[0];
         $url = trim($url,"/");
-        if($this->root !== ""){
-            $url = substr(preg_replace("/^".$this->root."/","",$url),1);
-        }
         $this->url = $url;
     }
             

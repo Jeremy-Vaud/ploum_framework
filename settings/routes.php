@@ -1,8 +1,5 @@
 <?php
 
-// Repertoire d'installation
-$ROOT = "";
-
 // Accueil
 $HOME = "accueil.php";
 

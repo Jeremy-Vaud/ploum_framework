@@ -28,8 +28,6 @@ final class View extends Debug {
     protected $styles;
     // Attribut variables
     protected $variables = [];
-    // Racine du site
-    protected $root = "/";
 
     /**
      * Contructeur
@@ -55,9 +53,6 @@ final class View extends Debug {
         $this->footer = isset($FAVICON) ? $FOOTER : "";
         $this->scripts = isset($SCRIPTS) ? $SCRIPTS : [];
         $this->styles = isset($STYLES) ? $STYLES : [];
-        if (isset($ROOT) && $ROOT !== "") {
-            $this->root = "/" . htmlentities($ROOT) . "/";
-        }
         try {
             foreach (["title", "tag", "lang", "meta", "favicon", "base", "header", "footer"] as $attr) {
                 if (isset($params[$attr])) {
@@ -203,7 +198,7 @@ final class View extends Debug {
         $styles = "";
         foreach ($this->styles as $style) {
             if($styles !== "") $styles .= "\t";
-            $styles .= "<link href='" . $this->root . htmlentities($style) . "' rel='stylesheet'/>\n";
+            $styles .= "<link href='" . htmlentities($style) . "' rel='stylesheet'/>\n";
         }
         return $styles;
     }
@@ -217,17 +212,8 @@ final class View extends Debug {
         $scripts = "";
         foreach ($this->scripts as $script) {
             if($scripts !== "") $scripts .= "\t";
-            $scripts .= "<script type='text/javascript' src='" . $this->root . htmlentities($script) . "'></script>\n";
+            $scripts .= "<script type='text/javascript' src='" . htmlentities($script) . "'></script>\n";
         }
         return $scripts;
-    }
-
-    /**
-     * Retourne la racine
-     *
-     * @return string Racine
-     */
-    public function getRoot() {
-        return $this->root;
     }
 }
