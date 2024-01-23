@@ -5,6 +5,8 @@
 require 'vendor/autoload.php';
 require "settings/global.php";
 
+App\DotEnv::load();
+
 echo "\n";
 if (isset($argv[1])) {
     switch ($argv[1]) {
