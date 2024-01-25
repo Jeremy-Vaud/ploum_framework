@@ -2,8 +2,6 @@
 
 namespace App;
 
-use Exception;
-
 /**
  * Classe View
  * 
@@ -42,17 +40,16 @@ final class View extends Debug {
      * @return void
      */
     public function __construct(array $params = []) {
-        include "settings/global.php";
-        include "settings/routes.php";
-        $this->title = isset($TITLE) ? $TITLE : "";
-        $this->meta = isset($META) ? $META : "";
-        $this->lang = isset($LANG) ? $LANG : "fr";
-        $this->favicon = isset($FAVICON) ? $FAVICON : "";
-        $this->base = isset($BASE) ? $BASE : "";
-        $this->header = isset($HEADER) ? $HEADER : "";
-        $this->footer = isset($FAVICON) ? $FOOTER : "";
-        $this->scripts = isset($SCRIPTS) ? $SCRIPTS : [];
-        $this->styles = isset($STYLES) ? $STYLES : [];
+        $this->title = isset($GLOBALS["TITLE"]) ? $GLOBALS["TITLE"] : "";
+        $this->tag = isset($GLOBALS["TAG"]) ? $GLOBALS["TAG"] : null;
+        $this->meta = isset($GLOBALS["META"]) ? $GLOBALS["META"] : "";
+        $this->lang = isset($GLOBALS["LANG"]) ? $GLOBALS["LANG"] : "fr";
+        $this->favicon = isset($GLOBALS["FAVICON"]) ? $GLOBALS["FAVICON"] : "";
+        $this->base = isset($GLOBALS["BASE"]) ? __DIR__ . "/../view/" . $GLOBALS["BASE"] : null;
+        $this->header = isset($GLOBALS["HEADER"]) ? __DIR__ . "/../view/" . $GLOBALS["HEADER"] : null;
+        $this->footer = isset($GLOBALS["FOOTER"]) ? __DIR__ . "/../view/" . $GLOBALS["FOOTER"] : null;
+        $this->scripts = isset($GLOBALS["SCRIPTS"]) ? $GLOBALS["SCRIPTS"] : [];
+        $this->styles = isset($GLOBALS["STYLES"]) ? $GLOBALS["STYLES"] : [];
         try {
             foreach (["title", "tag", "lang", "meta", "favicon", "base", "header", "footer"] as $attr) {
                 if (isset($params[$attr])) {
@@ -61,10 +58,13 @@ final class View extends Debug {
                     }
                     $this->$attr = $params[$attr];
                 }
-                if ($attr === "favicon" || $attr === "base" || $attr === "header" || $attr === "footer") {
-                    if (!file_exists($this->$attr) && $this->$attr !== "") {
-                        throw new \Exception("Le fichier " . htmlentities($this->$attr) . " est introuvable");
-                    }
+            }
+            foreach(["base", "header", "footer"] as $attr) {
+                if (isset($params[$attr])) {
+                    $this->$attr = __DIR__ . "/../view/" . $params[$attr];
+                }
+                if ($this->$attr && !file_exists($this->$attr)) {
+                    throw new \Exception("Le fichier $attr est introuvable dans le dossier view");
                 }
             }
             foreach (["scripts", "styles"] as $attr) {
@@ -135,7 +135,7 @@ final class View extends Debug {
             } else {
                 throw new \Exception("Le nom du paramètre " . htmlentities($attr) . " n'est pas valide");
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->alertDebug($e);
         }
     }
@@ -147,7 +147,7 @@ final class View extends Debug {
                     throw new \Exception("Le nom de variable $key n'est pas valide.");
                 }
                 $this->variables[$key] = $val;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->alertDebug($e);
             }
         }
@@ -162,10 +162,11 @@ final class View extends Debug {
      */
     public function addTemplate(string $template) {
         try {
-            if (!file_exists($template)) {
+            $path = __DIR__ . "/../view/" . $template;
+            if (!file_exists($path)) {
                 throw new \Exception("Le fichier " . htmlentities($template) . " est introuvable");
             }
-            $this->main = $template;
+            $this->main = $path;
         } catch (\Exception $e) {
             $this->alertDebug($e);
         }
@@ -178,7 +179,7 @@ final class View extends Debug {
      */
     public function render() {
         $title = $this->title;
-        if ($this->tag !== "") {
+        if ($this->tag && $this->tag !== "") {
             $title .= " - " . $this->tag;
         }
         foreach ($this->variables as $key => $var) {

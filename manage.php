@@ -61,7 +61,7 @@ if (isset($argv[1])) {
             break;
 
         case 'download-fonts':
-            $gfd = new GFontsDownloader\GFontsDownloader\GFontsDownloader($FONTS);
+            $gfd = new GFontsDownloader\GFontsDownloader\GFontsDownloader($FONTS, "public/assets/fonts");
             $gfd->download();
             break;
 

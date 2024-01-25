@@ -15,37 +15,46 @@ class DotEnv {
      * @return void
      */
     public static function load() {
-        if ($_ENV === []) {
-            try {
-                if (!is_readable(".env")) {
-                    throw new \Exception("Fichier des variables d'environnement introuvable ou illisible");
-                }
-                $lines = file(".env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                foreach ($lines as $line) {
-                    if (strpos(trim($line), '#') === 0) {
-                        continue;
-                    }
-                    list($name, $value) = explode('=', $line, 2);
-                    $name = trim($name);
-                    $value = trim($value);
-                    if (ctype_digit($value)) {
-                        $value = intval($value);
-                    } elseif ($value === "false") {
-                        $value = false;
-                    } elseif ($value === "true") {
-                        $value = true;
-                    } elseif ($value === "null") {
-                        $value = null;
-                    }
-                    $_ENV[$name] = $value;
-                }
-            } catch (\Exception $e) {
-                echo "<br>";
-                echo "Exeption reçue : ", $e->getMessage();
-                echo "<br>";
-                echo "Ligne ", $e->getLine(), " ", $e->getFile();
-                die();
+        $missingFiles = "";
+        if (!is_readable(__DIR__ . "/../.env")) {
+            $missingFiles .= "<p>Fichier des variables d'environnement introuvable ou illisible.</p>";
+        }
+        if (!file_exists(__DIR__ . "/../settings/global.php")) {
+            $missingFiles .= "<p>Fichier des paramètres globaux introuvable.</p>";
+        }
+        if (!file_exists(__DIR__ . "/../settings/routes.php")) {
+            $missingFiles .= "<p>Fichier des paramètres du routeur introuvable.</p>";
+        }
+        if ($missingFiles === "") {
+            self::loadEnvFile();
+            require_once __DIR__ . "/../settings/global.php";
+            require_once __DIR__ . "/../settings/routes.php";
+        } else {
+            echo "<h1>Fichier(s) de paramétrage manquant(s)</h1>";
+            echo $missingFiles;
+            die();
+        }
+    }
+
+    private static function loadEnvFile() {
+        $lines = file(__DIR__ . "/../.env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos(trim($line), '#') === 0) {
+                continue;
             }
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+            if (ctype_digit($value)) {
+                $value = intval($value);
+            } elseif ($value === "false") {
+                $value = false;
+            } elseif ($value === "true") {
+                $value = true;
+            } elseif ($value === "null") {
+                $value = null;
+            }
+            $_ENV[$name] = $value;
         }
     }
 }

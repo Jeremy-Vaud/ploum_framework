@@ -1,14 +1,12 @@
-<filesMatch ".(css|jpg|jpeg|png|gif|js|ico|webp|svg|lottie)$">
+<filesMatch ".(js|css|jpg|jpeg|png|gif|ico|webp|svg|lottie|woff2)$">
 #Header set Cache-Control "max-age=15768000, public"
 </filesMatch>
 
 Options +SymLinksIfOwnerMatch
 RewriteEngine on
 RewriteCond %{REQUEST_URI} !=/index.php
-RewriteCond %{REQUEST_URI} !^/admin/.*\.(js|css)$ [NC]
-RewriteCond %{REQUEST_URI} !^/dist/.*\..* [NC]
-RewriteCond %{REQUEST_URI} !^/img/.*\..* [NC]
+RewriteCond %{REQUEST_URI} !^/(assets|admin)/.*\.(js|css|woff2)$ [NC]
+RewriteCond %{REQUEST_URI} !^/img/.*\.(jpg|jpeg|png|gif|ico|webp|svg|lottie)$ [NC]
 RewriteCond %{REQUEST_URI} !^/lib/.*\..* [NC]
-RewriteCond %{REQUEST_URI} !^/fonts/.*\..* [NC]
 RewriteCond %{REQUEST_URI} !^/files/.*\..* [NC]
 RewriteRule .* /index.php [L]

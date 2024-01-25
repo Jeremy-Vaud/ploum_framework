@@ -11,7 +11,7 @@ namespace App;
 final class AdminPannel {
     // Attributs
     protected $data = []; // Données du fichier 'adminSrc/data.json'
-    
+
     /**
      * Initialistion
      *
@@ -22,7 +22,7 @@ final class AdminPannel {
         $CLOUD ? $this->data["cloud"] = true :  $this->data["cloud"] = false;
         $this->findTables();
     }
-    
+
     /**
      * Recherche dans les classes qui doivent aparaitre dans le panneau d'administration
      *
@@ -50,7 +50,7 @@ final class AdminPannel {
             }
         }
     }
-    
+
     /**
      * générer le fichier 'adminSrc/data.json'
      *

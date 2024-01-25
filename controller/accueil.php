@@ -8,5 +8,5 @@ $view = new App\View([
     "tag" => "Accueil",
 ]);
 $view->setVariables(["example" => "Example", "articles" => [$article1, $article2]]);
-$view->addTemplate("view/accueil.php");
+$view->addTemplate("accueil.php");
 $view->render();

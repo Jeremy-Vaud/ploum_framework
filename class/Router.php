@@ -7,52 +7,42 @@ namespace App;
  * 
  * @author  Jérémy Vaud
  */
-class Router extends Debug{
+class Router extends Debug {
     // Attributs
-    protected $home;
-    protected $not_found;
-    protected $routes;
     protected $url;
     protected $params = [];
     protected $controller;
-    
+
     /**
      * Constructeur
      *
      * @return void
-     * @throws Exeption Si le fichier de configuration des routes n'existe pas, si les varibles $HOME, $NOT_FOND, $ROUTES n'existent pas dans ce fichier ou si $_SERVER["REDIRECT_URL"] n'existe pas
+     * @throws Exeption Si les varibles globales HOME, NOT_FOND, ROUTES n'existent pas ou si $_SERVER["REDIRECT_URL"] n'existe pas
      */
     public function __construct() {
         try {
-            if(!file_exists("settings/routes.php")) {
-                throw new \Exception("Le fichier settings/routes.php n'existe pas");
+            if (!isset($GLOBALS["HOME"])) {
+                throw new \Exception('La variable globale HOME n\'existe pas');
             }
-            require "settings/routes.php";
-            if(!isset($HOME)) {
-                throw new \Exception('La variable $HOME du fichier settings/routes.php n\'existe pas');
+            if (!isset($GLOBALS["NOT_FOUND"])) {
+                throw new \Exception('La variable globale NOT_FOUND n\'existe pas');
             }
-            $this->home = $HOME;
-            if(!isset($NOT_FOUND)) {
-                throw new \Exception('La variable $NOT_FOUND du fichier settings/routes.php n\'existe pas');
+            if (!isset($GLOBALS["ROUTES"])) {
+                throw new \Exception('La variable globale ROUTES n\'existe pas');
             }
-            $this->not_found = $NOT_FOUND;
-            if(!isset($ROUTES)) {
-                throw new \Exception('La variable $ROUTES du fichier settings/routes.php n\'existe pas');
-            }
-            $this->routes = $ROUTES;
-            if(!$_SERVER["REQUEST_URI"]) {
+            if (!$_SERVER["REQUEST_URI"]) {
                 throw new \Exception('La variable $_SERVER["REQUEST_URI"] n\'existe pas');
-            }       
+            }
             $this->setUrl($_SERVER["REQUEST_URI"]);
             $this->match();
         } catch (\Exception $e) {
             $this->alertDebug($e);
             die();
-        }           
+        }
     }
 
 
-    
+
     /**
      * Attribuer une valeur à l'url
      *
@@ -61,38 +51,38 @@ class Router extends Debug{
      */
     private function setUrl(string $url) {
         $url = explode("?", $url)[0];
-        $url = trim($url,"/");
+        $url = trim($url, "/");
         $this->url = $url;
     }
-            
+
     /**
      * Trouver le contrôleur correspondant à l'attribut $url et le passer à l'attribut $controller
      *
      * @return void
      */
     private function match() {
-        if($this->url === "" || $this->url === false) {
-            $this->controller = "controller/" . $this->home;
+        if ($this->url === "" || $this->url === false) {
+            $this->controller = __DIR__ . "/../controller/" . $GLOBALS["HOME"];
             return;
         }
-        if(preg_match("#^admin(\/[\w]+)*$#i", $this->url)) {
+        if (preg_match("#^admin(\/[\w]+)*$#i", $this->url)) {
             $this->controller = "admin/index.html";
             return;
         }
-        foreach($this->routes as $path => $controller) {
-            $regex =  "#^".preg_replace('#:([\w]+)#', '([^/]+)', $path)."$#i";
-            if(preg_match($regex, $this->url, $matches)) {
-                $this->controller = "controller/" . $controller;
+        foreach ($GLOBALS["ROUTES"] as $path => $controller) {
+            $regex =  "#^" . preg_replace('#:([\w]+)#', '([^/]+)', $path) . "$#i";
+            if (preg_match($regex, $this->url, $matches)) {
+                $this->controller = __DIR__ . "/../controller/" . $controller;
                 array_shift($matches);
-                if($matches !== []) {
+                if ($matches !== []) {
                     $this->setParams($path, $matches);
                 }
                 return;
             }
         }
-        $this->controller = "controller/" . $this->not_found;
+        $this->controller = __DIR__ . "/../controller/" . $GLOBALS["NOT_FOUND"];
     }
-    
+
     /**
      * Passer un tableau contenant les valeurs des paramètres de l'url à l'attribut $params
      *
@@ -100,17 +90,17 @@ class Router extends Debug{
      * @param  array $matches Contient les valeurs à attribuer
      * @return void
      */
-    private function setParams(string $path ,array $matches) {
+    private function setParams(string $path, array $matches) {
         $arrayPath = explode("/", $path);
         $i = 0;
-        foreach($arrayPath as $val) {
-            if(preg_match('#:([\w]+)#', $val)) {
-                $this->params[substr($val,1)] = $matches[$i];
+        foreach ($arrayPath as $val) {
+            if (preg_match('#:([\w]+)#', $val)) {
+                $this->params[substr($val, 1)] = $matches[$i];
                 $i++;
-            }     
+            }
         }
     }
-    
+
     /**
      * Lire la valeur de l'attribut $controller 
      * 
@@ -119,10 +109,10 @@ class Router extends Debug{
      */
     public function getController() {
         try {
-            if(!file_exists($this->controller)) {
-                throw new \Exception("Fichier ".$this->controller." introuvable");
+            if (!file_exists($this->controller)) {
+                throw new \Exception("Fichier " . $this->controller . " introuvable");
             }
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->alertDebug($e);
             die();
         }
@@ -132,5 +122,4 @@ class Router extends Debug{
     public function getParams() {
         return $this->params;
     }
-
 }
