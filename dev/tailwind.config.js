@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        "./view/*.php",
-        "./view/*/*.php"
+        "./app/view/*.php",
+        "./app/view/*/*.php"
     ],
     safelist: [
 
@@ -25,8 +25,8 @@ module.exports = {
                 md: '768px',
                 lg: '1024px',
                 xl: '1280px'
-              },
-              padding: '10px'
+            },
+            padding: '10px'
         }
     },
     plugins: [],

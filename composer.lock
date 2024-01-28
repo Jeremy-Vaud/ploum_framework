@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d6ce0ab7201267692a905bf2a1cdf391",
+    "content-hash": "f99e3884d0ffb0cb16fd45c259167cc1",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -66,45 +66,6 @@
                 "source": "https://github.com/ezyang/htmlpurifier/tree/v4.17.0"
             },
             "time": "2023-11-17T15:01:25+00:00"
-        },
-        {
-            "name": "gfontsdownloader/gfontsdownloader",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Jeremy-Vaud/gfonts-downloader.git",
-                "reference": "04a00f280f5ed78489ec87332ba682992b6eef52"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Jeremy-Vaud/gfonts-downloader/zipball/04a00f280f5ed78489ec87332ba682992b6eef52",
-                "reference": "04a00f280f5ed78489ec87332ba682992b6eef52",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "GFontsDownloader\\GFontsDownloader\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jeremy Vaud <jeremy.vaud@protonmail.com>"
-                }
-            ],
-            "description": "PHP class to download google fonts in woff2 format",
-            "support": {
-                "issues": "https://github.com/Jeremy-Vaud/gfonts-downloader/issues",
-                "source": "https://github.com/Jeremy-Vaud/gfonts-downloader/tree/v1.0.2"
-            },
-            "time": "2023-07-08T09:17:52+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -188,7 +149,47 @@
             "time": "2023-11-25T22:23:28+00:00"
         }
     ],
-    "packages-dev": [],
+    "packages-dev": [
+        {
+            "name": "gfontsdownloader/gfontsdownloader",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jeremy-Vaud/gfonts-downloader.git",
+                "reference": "04a00f280f5ed78489ec87332ba682992b6eef52"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jeremy-Vaud/gfonts-downloader/zipball/04a00f280f5ed78489ec87332ba682992b6eef52",
+                "reference": "04a00f280f5ed78489ec87332ba682992b6eef52",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GFontsDownloader\\GFontsDownloader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Vaud <jeremy.vaud@protonmail.com>"
+                }
+            ],
+            "description": "PHP class to download google fonts in woff2 format",
+            "support": {
+                "issues": "https://github.com/Jeremy-Vaud/gfonts-downloader/issues",
+                "source": "https://github.com/Jeremy-Vaud/gfonts-downloader/tree/v1.0.2"
+            },
+            "time": "2023-07-08T09:17:52+00:00"
+        }
+    ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

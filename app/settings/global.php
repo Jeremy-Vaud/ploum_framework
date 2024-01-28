@@ -16,9 +16,7 @@ $FONTS = "https://fonts.googleapis.com/css2?family=Langar&family=Niramit:wght@30
 
 // Scripts et styles
 global $SCRIPTS, $STYLES;
-$SCRIPTS = [
-    //"assets/js/main.js"
-];
+$SCRIPTS = [];
 $STYLES = [
     "assets/fonts/font-face.css",
     "assets/css/style.css"

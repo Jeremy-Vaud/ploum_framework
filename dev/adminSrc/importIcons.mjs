@@ -1,14 +1,15 @@
 import data from './data.json' assert { type: "json" }
 import { writeFile } from 'fs'
+
 let part1 = ""
 let part2 =  "\nexport default {"
-data.forEach((e) => {
+data.pages.forEach((e) => {
     part1 += `import { ${e.icon} } from '@fortawesome/free-solid-svg-icons'\n`
     part2 += `'${e.icon}':${e.icon},`
 })
 part2 = part2.slice(0,-1) + "}"
 
-writeFile('./adminSrc/icons.js', part1+part2, err => {
+writeFile('./dev/adminSrc/icons.js', part1+part2, err => {
     if (err) {
         console.error(err)
     } else {

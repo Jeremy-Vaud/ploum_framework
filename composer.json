@@ -4,8 +4,9 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "App\\": "class/",
-            "Model\\": "model/"
+            "App\\": "app/class/",
+            "Model\\": "app/model/",
+            "Dev\\": "dev/class"
         }
     },
     "authors": [
@@ -15,7 +16,12 @@
     ],
     "require": {
         "phpmailer/phpmailer": "^6.7",
-        "gfontsdownloader/gfontsdownloader": "^1.0",
         "ezyang/htmlpurifier": "^4.16"
+    },
+    "require-dev": {
+        "gfontsdownloader/gfontsdownloader": "^1.0"
+    },
+    "config": {
+        "vendor-dir": "app/vendor"
     }
 }

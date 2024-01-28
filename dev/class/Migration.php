@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Dev;
 
 /**
  * Classe permettant de mettre à jour la structure de la BDD
@@ -24,14 +24,14 @@ final class Migration {
      * @return void
      */
     private function findTables() {
-        foreach (scandir('class') as $file) {
+        foreach (scandir(__DIR__ . '/../../app/class') as $file) {
             if ($file !== "." && $file !== "..") {
-                require_once "class/" . $file;
+                require_once __DIR__ . '/../../app/class/' . $file;
             }
         }
-        foreach (scandir('model') as $file) {
+        foreach (scandir(__DIR__ . '/../../app/model') as $file) {
             if ($file !== "." && $file !== "..") {
-                require_once "model/" . $file;
+                require_once __DIR__ . '/../../app/model/' . $file;
             }
         }
         foreach (get_declared_classes() as $class) {
@@ -51,12 +51,12 @@ final class Migration {
      * @return void
      */
     private function loadCurrent() {
-        BDD::Execute("SHOW TABLES", []);
-        foreach (BDD::FetchAll() as $array) {
+        \App\BDD::Execute("SHOW TABLES", []);
+        foreach (\App\BDD::FetchAll() as $array) {
             $table = reset($array);
             $this->current[$table] = [];
-            BDD::Execute("DESCRIBE " . $table);
-            foreach (BDD::FetchAll() as $describe) {
+            \App\BDD::Execute("DESCRIBE " . $table);
+            foreach (\App\BDD::FetchAll() as $describe) {
                 $string = $describe["Type"];
                 if ($describe["Null"] === "NO") {
                     $string .= " NOT NULL";
@@ -131,7 +131,7 @@ final class Migration {
             $sql .= $nameField . " " . $type . ",";
         }
         $sql .= "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8";
-        if (BDD::Execute($sql)) {
+        if (\App\BDD::Execute($sql)) {
             echo "La table $name a été crée\n";
         }
     }
@@ -158,7 +158,7 @@ final class Migration {
             }
         }
         $sql = substr($sql, 0, -1);
-        if (BDD::Execute($sql)) {
+        if (\App\BDD::Execute($sql)) {
             echo "La table $name a été modifié\n";
         }
     }
@@ -171,7 +171,7 @@ final class Migration {
      */
     private function drop(string $name) {
         $sql = "DROP TABLE `$name`";
-        if (BDD::Execute($sql)) {
+        if (\App\BDD::Execute($sql)) {
             echo "La table $name a été suprimé\n";
         }
     }
@@ -190,9 +190,9 @@ final class Migration {
             }
             $string .= "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
             $sql = "SELECT * from `$name`";
-            if (BDD::Execute($sql)) {
-                if (BDD::RowCount() > 0) {
-                    $result = BDD::FetchAll();
+            if (\App\BDD::Execute($sql)) {
+                if (\App\BDD::RowCount() > 0) {
+                    $result = \App\BDD::FetchAll();
                     $string .= "INSERT INTO `$name` (";
                     foreach (array_keys($result[0]) as $key) {
                         $string .= "`$key`,";

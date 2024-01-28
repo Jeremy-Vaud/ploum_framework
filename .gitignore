@@ -1,14 +1,20 @@
+# Public
 public/assets/
 public/lib/
 public/admin/
 public/files/
+
+# Dev
+dev/adminSrc/data.json
+dev/adminSrc/icons.js
+
+# Autres
 vendor/
 node_modules/
 .DS_Store
 .vscode/
 .parcel-cache/
-adminSrc/data.json
-adminSrc/icons.js
+.env
+
 migrations/
 cloud/
-.env

@@ -2,8 +2,8 @@
 /*
  * CLI
  */
-require 'vendor/autoload.php';
-require "settings/global.php";
+require __DIR__ ."/../app/vendor/autoload.php";
+require __DIR__ ."/../app/settings/global.php";
 
 App\DotEnv::load();
 
@@ -20,12 +20,12 @@ if (isset($argv[1])) {
             break;
 
         case 'migrate':
-            $migration = new App\Migration;
+            $migration = new Dev\Migration;
             $migration->migrate();
             break;
 
         case 'export-DB':
-            $migration = new App\Migration;
+            $migration = new Dev\Migration;
             $migration->export();
             break;
 
@@ -56,7 +56,7 @@ if (isset($argv[1])) {
             break;
 
         case 'create-admin-pannel':
-            $adminPannel = new App\AdminPannel;
+            $adminPannel = new Dev\AdminPannel;
             $adminPannel->generate();
             break;
 

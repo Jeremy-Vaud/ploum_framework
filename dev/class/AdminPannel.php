@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Dev;
 
 /**
  * Class permetant de générer le fichier 'adminSrc/data.json' qui sert à la génération du panneau d'administration
@@ -18,8 +18,7 @@ final class AdminPannel {
      * @return void
      */
     public function __construct() {
-        require("settings/global.php");
-        $CLOUD ? $this->data["cloud"] = true :  $this->data["cloud"] = false;
+        $GLOBALS["CLOUD"] ? $this->data["cloud"] = true :  $this->data["cloud"] = false;
         $this->findTables();
     }
 
@@ -30,14 +29,14 @@ final class AdminPannel {
      */
     private function findTables() {
         $this->data["pages"] = [];
-        foreach (scandir('class') as $file) {
+        foreach (scandir(__DIR__ . '/../../app/class') as $file) {
             if ($file !== "." && $file !== "..") {
-                require_once "class/" . $file;
+                require_once __DIR__ . '/../../app/class/' . $file;
             }
         }
-        foreach (scandir('model') as $file) {
+        foreach (scandir(__DIR__ . '/../../app/model') as $file) {
             if ($file !== "." && $file !== "..") {
-                require_once "model/" . $file;
+                require_once __DIR__ . '/../../app/model/' . $file;
             }
         }
         foreach (get_declared_classes() as $class) {
@@ -57,7 +56,7 @@ final class AdminPannel {
      * @return void
      */
     public function generate() {
-        if ($file = fopen("adminSrc/data.json", "w")) {
+        if ($file = fopen(__DIR__ . "/../adminSrc/data.json", "w")) {
             if (fwrite($file, json_encode($this->data))) {
                 echo "Le fichier adminSrc/data.json a été modifié";
             } else {
