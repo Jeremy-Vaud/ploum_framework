@@ -213,13 +213,13 @@ final class Migration {
             }
         }
         if ($string !== "") {
-            if (!is_dir("migrations")) {
-                mkdir("migrations", 0777, true);
+            if (!is_dir("dev/migrations")) {
+                mkdir("dev/migrations", 0777, true);
             }
-            $path = "migrations/" . date("Y-m-d_H-i-s") . ".sql";
+            $path = "dev/migrations/" . date("Y-m-d_H-i-s") . ".sql";
             $file = fopen($path, "w");
             if (fwrite($file, $string)) {
-                echo "BDD exportée\n";
+                echo "BDD exportée dans le fichier $path\n";
             } else {
                 echo "Une erreur est survenu\n";
             }

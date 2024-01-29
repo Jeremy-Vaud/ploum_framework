@@ -6,10 +6,12 @@ public/files/
 
 # App
 app/cloud/
+app/.env
 
 # Dev
 dev/adminSrc/data.json
 dev/adminSrc/icons.js
+dev/migrations/
 
 # Autres
 vendor/
@@ -17,6 +19,3 @@ node_modules/
 .DS_Store
 .vscode/
 .parcel-cache/
-.env
-
-migrations/
