@@ -4,6 +4,9 @@ public/lib/
 public/admin/
 public/files/
 
+# App
+app/cloud/
+
 # Dev
 dev/adminSrc/data.json
 dev/adminSrc/icons.js
@@ -17,4 +20,3 @@ node_modules/
 .env
 
 migrations/
-cloud/

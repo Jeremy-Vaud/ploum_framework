@@ -9,25 +9,24 @@ namespace App;
  * @final
  */
 final class Cloud {
-    // Attributs
-    protected $path = "cloud";
+    // Attributs  
+    protected $path = "../app/cloud/";
+    protected $dir = "";
     protected $limitFileSize = 5000000;
 
     /**
      * Initialisation
      *
-     * @param  string $path Chemin vers un sous dossier du dossier 'cloud' 
+     * @param  string $dir Chemin vers un sous dossier du dossier 'cloud' 
      * @return void
      */
-    public function __construct(string $path = "") {
+    public function __construct(string $dir = "") {
         if (!is_dir($this->path)) {
             mkdir($this->path, 0777, true);
         }
-        $path = str_replace("..", "", $path);
-        $path = trim($path, "/");
-        if ($path !== "") {
-            $this->path = "$this->path/$path";
-        }
+        $dir = str_replace("..", "", $dir);
+        $dir = trim($dir, "/");
+        $this->dir = $dir;
     }
 
     /**
@@ -37,13 +36,14 @@ final class Cloud {
      */
     public function getDir() {
         $files = [];
-        if (is_dir($this->path)) {
-            foreach (scandir($this->path) as $elt) {
+        $path = $this->path . $this->dir;
+        if (is_dir($path)) {
+            foreach (scandir($path) as $elt) {
                 if (!($elt === "." || $elt === "..")) {
-                    if (is_dir("$this->path/$elt")) {
-                        $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => true, "modDate" => filemtime("$this->path/$elt") * 1000];
+                    if (is_dir("$path/$elt")) {
+                        $files[] = ["id" => "$this->dir/$elt", "name" => $elt, "isDir" => true, "modDate" => filemtime("$path/$elt") * 1000];
                     } else {
-                        $files[] = ["id" => "$this->path/$elt", "name" => $elt, "isDir" => false, "size" => filesize("$this->path/$elt"), "modDate" => filemtime("$this->path/$elt") * 1000];
+                        $files[] = ["id" => "$this->dir/$elt", "name" => $elt, "isDir" => false, "size" => filesize("$path/$elt"), "modDate" => filemtime("$path/$elt") * 1000];
                     }
                     if ($elt[0] === ".") {
                         $files[array_key_last($files)]["isHidden"] = true;
@@ -53,7 +53,7 @@ final class Cloud {
         }
         return $files;
     }
-    
+
     /**
      * Return une image en base64
      *
@@ -63,11 +63,10 @@ final class Cloud {
     public function getThumbmail(string $file) {
         $res = null;
         $file = str_replace("..", "", $file);
-        if (preg_match("/^cloud\/.+$/", $file)) {
-            if (@exif_imagetype($file)) {
-                $img = file_get_contents($file);
-                $res = "data:image;base64," . base64_encode($img);
-            }
+        $file = $this->path . $file;
+        if (@exif_imagetype($file)) {
+            $img = file_get_contents($file);
+            $res = "data:image;base64," . base64_encode($img);
         }
         return $res;
     }
@@ -79,8 +78,9 @@ final class Cloud {
      * @return bool
      */
     public function createFolder(string $name) {
+        $path = $this->path . $this->dir;
         if (preg_match('/^.{0,1}[0-9a-zàâçéèêëîïôûùüÿñæœ-]*$/i', $name)) {
-            if (mkdir("$this->path/$name", 0777, true)) {
+            if (mkdir("$path/$name", 0777, true)) {
                 return true;
             }
         }
@@ -94,13 +94,14 @@ final class Cloud {
      * @return void
      */
     public function deleteFiles(array $files) {
+        $path = $this->path . $this->dir;
         foreach ($files as $file) {
             $file = str_replace("..", "", $file);
             $file = str_replace("/", "", $file);
-            if (is_dir("$this->path/$file")) {
-                $this->removeDir($file, $this->path);
-            } else if (file_exists("$this->path/$file")) {
-                unlink("$this->path/$file");
+            if (is_dir("$path/$file")) {
+                $this->removeDir($file, $path);
+            } else if (file_exists("$path/$file")) {
+                unlink("$path/$file");
             }
         }
     }
@@ -132,9 +133,10 @@ final class Cloud {
      * @return void
      */
     public function uploadFiles(array $files) {
+        $path = $this->path . $this->dir;
         foreach ($files["name"] as $key => $name) {
             if ($files["error"][$key] == 0 && $files["size"][$key] < $this->limitFileSize) {
-                move_uploaded_file($files["tmp_name"][$key], "$this->path/$name");
+                move_uploaded_file($files["tmp_name"][$key], "$path/$name");
             }
         }
     }
@@ -148,13 +150,9 @@ final class Cloud {
      */
     public function moveFiles(string $destination, array $files) {
         $destination = str_replace("..", "", $destination);
-        if (preg_match("/^cloud\/.+$/", $destination)) {
-            foreach ($files as $file) {
-                $file = str_replace("..", "", $file);
-                if (preg_match("/^cloud\/.+$/", $file)) {
-                    rename($file, $destination . "/" . basename($file));
-                }
-            }
+        foreach ($files as $file) {
+            $file = str_replace("..", "", $file);
+            rename($this->path . $file, $this->path . $destination . "/" . basename($file));
         }
     }
 
@@ -165,42 +163,40 @@ final class Cloud {
      * @return void
      */
     public function downloadFile(string $file) {
-        $file = str_replace("..", "", $file);
-        if (preg_match("/^cloud\/.+$/", $file)) {
-            if (is_dir($file)) {
-                $zip = new \ZipArchive();
-                $filename = basename($file) . ".zip";
-                $zip->open($filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-                $listFiles = $this->listFiles($file);
-                foreach ($listFiles as $elt) {
-                    if ($elt["path"] === "") {
-                        $zip->addFile("$file/" . $elt["file"], $elt["file"]);
-                    } else {
-                        $zip->addFile("$file/" . $elt["path"] . "/" . $elt["file"], $elt["path"] . "/" . $elt["file"]);
-                    }
+        $file = $this->path . str_replace("..", "", $file);
+        if (is_dir($file)) {
+            $zip = new \ZipArchive();
+            $filename = basename($file) . ".zip";
+            $zip->open($filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+            $listFiles = $this->listFiles($file);
+            foreach ($listFiles as $elt) {
+                if ($elt["path"] === "") {
+                    $zip->addFile("$file/" . $elt["file"], $elt["file"]);
+                } else {
+                    $zip->addFile("$file/" . $elt["path"] . "/" . $elt["file"], $elt["path"] . "/" . $elt["file"]);
                 }
-                $zip->close();
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/zip');
-                header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-                header('Expires: 0');
-                header('Cache-Control: must-revalidate');
-                header('Pragma: public');
-                header('Content-Length: ' . filesize($filename));
-                readfile($filename);
-                unlink($filename);
-                exit;
-            } else if (file_exists($file)) {
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-                header('Expires: 0');
-                header('Cache-Control: must-revalidate');
-                header('Pragma: public');
-                header('Content-Length: ' . filesize($file));
-                readfile($file);
-                exit;
             }
+            $zip->close();
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($filename));
+            readfile($filename);
+            unlink($filename);
+            exit;
+        } else if (file_exists($file)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
         }
     }
 
@@ -233,10 +229,11 @@ final class Cloud {
      * @return void
      */
     public function renameFile(string $newName, string $oldName) {
+        $path = $this->path . $this->dir;
         $newName = str_replace(["..", "/"], "", $newName);
         $oldName = str_replace(["..", "/"], "", $oldName);
-        if (file_exists("$this->path/$oldName")) {
-            rename("$this->path/$oldName", "$this->path/$newName");
+        if (file_exists("$path/$oldName")) {
+            rename("$path/$oldName", "$path/$newName");
         }
     }
 }
