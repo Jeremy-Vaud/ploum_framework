@@ -5,7 +5,7 @@
 Options +SymLinksIfOwnerMatch
 RewriteEngine on
 RewriteCond %{REQUEST_URI} !=/index.php
-RewriteCond %{REQUEST_URI} !^/(assets|admin)/.*\.(js|css|woff2)$ [NC]
+RewriteCond %{REQUEST_URI} !^/(assets|admin)/.*\.(js|css|woff2|ico)$ [NC]
 RewriteCond %{REQUEST_URI} !^/img/.*\.(jpg|jpeg|png|gif|ico|webp|svg|lottie)$ [NC]
 RewriteCond %{REQUEST_URI} !^/lib/.*\..* [NC]
 RewriteCond %{REQUEST_URI} !^/files/.*\..* [NC]
