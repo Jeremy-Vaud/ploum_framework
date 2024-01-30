@@ -124,7 +124,7 @@ abstract class Table extends Debug {
         $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
         foreach ($this->fields as $name => $val) {
             if (is_a($val, "App\File")) {
-                $val->setPath("files/" . $class . "/" . $this->id . "/" . $name . "/");
+                $val->setPath($class . "/" . $this->id . "/" . $name . "/");
             }
         }
     }
@@ -220,8 +220,11 @@ abstract class Table extends Debug {
                     $field->delete();
                 }
             }
-            if (is_dir("files/" . $class . "/" . $this->id)) {
-                rmdir("files/" . $class . "/" . $this->id);
+            if (is_dir("files/$class/$this->id")) {
+                rmdir("files/$class/$this->id");
+            }
+            if (is_dir(__DIR__ . "/../files/$class/$this->id")) {
+                rmdir(__DIR__ . "/../files/$class/$this->id");
             }
         } catch (\Exception $e) {
             $this->alertDebug($e);
@@ -479,7 +482,7 @@ abstract class Table extends Debug {
         }
         return false;
     }
-    
+
     /**
      * Suprimer des fichiers
      *

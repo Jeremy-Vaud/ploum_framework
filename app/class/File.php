@@ -15,11 +15,12 @@ class File extends Debug {
     protected $maxSize = null; // Taille maximum du fichier
     protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
     protected $default = null; // Chemin du fichier par défaut
+    protected $public = true; // Fichier public ou privé
 
     /**
      * Constructeur
      *
-     * @param  array $params Tableau de paramètres : type, maxSize, admin
+     * @param  array $params Tableau de paramètres : type, maxSize, admin, default, public
      * @return void
      */
     public function __construct(array $params) {
@@ -53,6 +54,14 @@ class File extends Debug {
             // Default
             if (isset($params["default"])) {
                 $this->default = $param["default"];
+            }
+            // Public
+            if (isset($params["public"])) {
+                if(is_bool($params["public"])) {
+                    $this->public = $params["public"];
+                } else {
+                    throw new \Exception("Le paramètre public n'est pas un booléen");
+                }
             }
         } catch (\Exception $e) {
             $this->alertDebug($e);
@@ -105,7 +114,12 @@ class File extends Debug {
      * @return void
      */
     public function setPath(string $path) {
-        $this->path = $path;
+        if($this->public) {
+            $this->path = "files/";
+        } else {
+            $this->path = __DIR__ . "/../files/";
+        }
+        $this->path .= str_replace("..", "", $path);
     }
 
     /**
