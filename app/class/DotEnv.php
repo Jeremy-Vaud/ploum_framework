@@ -10,7 +10,7 @@ namespace App;
 class DotEnv {
 
     /**
-     * Charge les variables dans le tableau $_ENV depuis le fichier .env
+     * Charge les variables dans le tableau $_ENV depuis le fichier .env et charge les fichiers de paramètres du dossier app/settings/
      *
      * @return void
      */
@@ -35,7 +35,12 @@ class DotEnv {
             die();
         }
     }
-
+    
+    /**
+     * Charge les variables dans le tableau $_ENV depuis le fichier .env
+     *
+     * @return void
+     */
     private static function loadEnvFile() {
         $lines = file(__DIR__ . "/../.env", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($lines as $line) {
