@@ -40,7 +40,7 @@ final class Api {
                         $this->object = new $_POST["table"];
                         $this->sortFiles();
                     }
-                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser" || $_POST["action"] === "updatePass") {
+                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser" || $_POST["action"] === "updatePass" || $_POST["action"] === "download") {
                     $this->action = $_POST["action"];
                 } else if ($_POST["action"] === "upsert") {
                     if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
@@ -538,6 +538,31 @@ final class Api {
             } else {
                 http_response_code(400);
             }
+        } else {
+            http_response_code(401);
+        }
+    }
+    
+    /**
+     * Télécharger un fichier correspondant au champ d'une class table
+     *
+     * @return void
+     */
+    private function download() {
+        if ($this->isAdmin()) {
+            //! conditions à faire
+            $this->object = new $_POST["table"];
+            $this->object->loadFromId($_POST["id"]);
+            $file = $this->object->get($_POST["field"]);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
         } else {
             http_response_code(401);
         }

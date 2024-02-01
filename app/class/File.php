@@ -83,8 +83,9 @@ class File extends Debug {
      * @return string Chemin du fichier
      */
     public function get() {
-        if (file_exists($this->path . $this->name)) {
-            return $this->path . $this->name;
+        $file = $this->path . str_replace("..", "",$this->name ?? "");
+        if (file_exists($file)) {
+            return $file;
         }
         return $this->default;
     }
@@ -129,7 +130,7 @@ class File extends Debug {
      * @return void
      */
     public function set(string $name) {
-        $this->name = $name;
+        $this->name = str_replace("..", "", $name);
     }
 
     /**
@@ -244,8 +245,9 @@ class File extends Debug {
      * @return void
      */
     public function deleteFile() {
-        if (is_file($this->path . $this->name)) {
-            unlink($this->path . $this->name);
+        $name = str_replace("..", "", $this->name);
+        if (is_file($this->path . $name)) {
+            unlink($this->path . $name);
             rmdir($this->path);
         }
     }

@@ -10,6 +10,7 @@ import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
 import FormDateTime from "./FormDateTime"
 import FormRichText from "./FormRichText"
+import FormFile from "./FormFile"
 
 
 
@@ -143,6 +144,10 @@ export default function ModalInsert(props) {
                         } else if (e.type === "richText") {
                             return (
                                 <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
+                            )
+                        } else if (e.type === "file") {
+                            return (
+                                <FormFile key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} table={props.table}/>
                             )
                         } else {
                             return (
