@@ -82,6 +82,9 @@ export default function ModalUpdate(props) {
                     props.logOut()
                     throw new Error('Connection requise')
                 }
+                if (response.status !== 200) {
+                    throw new Error('Une erreur est survenue')
+                }
                 return response.json()
             })
             .then((result) => {

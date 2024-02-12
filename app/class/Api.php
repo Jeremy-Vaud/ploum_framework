@@ -6,51 +6,65 @@ namespace App;
  * Api du panneau d'administration
  */
 final class Api {
-    private string | null $action = null;
-    private $object = null;
-    private bool $cloud = false;
-    private $files = ["add" => [], "del" => []];
+    private string | null $action = null; // Nom de la méthode à exécuter
+    private string | null $role = null; // Role requis : null | "admin" | "superAdmin"
+    private $object = null; // Objet sur lequel la méthode s'applique
+    private array $files = ["add" => [], "del" => []]; // Liste des fichiers à ajouter ou à suprimer
+    private array $methods = [ // Liste des différente méthodes utilisables triées par catégorie
+        "TABLE" => [
+            "getTable",
+            "insert",
+            "update",
+            "delete",
+            "download"
+        ],
+        "EDIT_AREA" => [
+            "getEditArea",
+            "upsert"
+        ],
+        "SESSION" => [
+            "isLog",
+            "logIn",
+            "logOut",
+            "isValidRecoveryLink",
+            "forgotPass",
+            "changePass"
+        ],
+        "USER" => [
+            "updateUser",
+            "updatePass"
+        ],
+        "CLOUD" => [
+            "getDir",
+            "createFolder",
+            "deleteFiles",
+            "uploadFiles",
+            "moveFiles",
+            "downloadFile",
+            "renameFile",
+            "getThumbmail"
+        ]
+    ];
 
     /**
      * Constructeur
      *
-     * @param  bool $cloud
      * @return void
      */
-    public function __construct(bool $cloud) {
-        $this->cloud = $cloud;
+    public function __construct() {
         session_start();
-        if ($_SERVER['REQUEST_METHOD'] === "GET") {
-            if (isset($_GET["isLog"])) {
-                $this->action = "isLog";
-            } else if (isset($_GET["logOut"])) {
-                $this->action = "logOut";
-            } else if (isset($_GET["table"])) {
-                $this->action = "getTable";
-            } else if (isset($_GET["isValidRecoveryLink"])) {
-                $this->action = "isValidRecoveryLink";
-            } else if (isset($_GET["edit_area"])) {
-                $this->action = "getEditArea";
-            }
-        } elseif ($_SERVER['REQUEST_METHOD'] === "POST") {
-            if (isset($_POST["action"])) {
-                if ($_POST["action"] === "insert" || $_POST["action"] === "update" || $_POST["action"] === "delete") {
-                    if (isset($_POST["table"]) && class_exists($_POST["table"])) {
-                        $this->action = $_POST["action"];
-                        $this->object = new $_POST["table"];
-                        $this->sortFiles();
-                    }
-                } else if ($_POST["action"] === "logIn" || $_POST["action"] === "forgotPass" || $_POST["action"] === "changePass" || $_POST["action"] === "updateUser" || $_POST["action"] === "updatePass" || $_POST["action"] === "download") {
-                    $this->action = $_POST["action"];
-                } else if ($_POST["action"] === "upsert") {
-                    if (isset($_POST["edit_area"]) && class_exists($_POST["edit_area"])) {
-                        $this->action = $_POST["action"];
-                        $this->object = new $_POST["edit_area"];
-                        $this->object->load();
-                        $this->sortFiles();
-                    }
-                } else if ($_POST["action"] === "getDir" || $_POST["action"] === "createFolder" || $_POST["action"] === "deleteFiles" || $_POST["action"] === "uploadFiles" || $_POST["action"] === "moveFiles" || $_POST["action"] === "downloadFile" || $_POST["action"] === "renameFile" || $_POST["action"] === "getThumbmail") {
-                    $this->action = $_POST["action"];
+        if (isset($_POST["action"])) {
+            if (isset($_POST["table"])) {
+                is_subclass_of($_POST["table"], "App\Table") ? $this->setTableMethod() : null;
+            } elseif (isset($_POST["edit_area"])) {
+                is_subclass_of($_POST["edit_area"], "App\EditArea") ? $this->setEditAreaMethod() : null;
+            } elseif (isset($_POST["method"])) {
+                if ($_POST["method"] === "session") {
+                    $this->setSessionMethod();
+                } elseif ($_POST["method"] === "user") {
+                    $this->setUserMethod();
+                } elseif ($_POST["method"] === "cloud") {
+                    $this->setCloudMethod();
                 }
             }
         }
@@ -62,13 +76,50 @@ final class Api {
      * @return void
      */
     public function run() {
-        if ($this->action) {
-            $action = $this->action;
-            $this->$action();
+        if ($this->checkRole()) {
+            if ($this->action) {
+                $action = $this->action;
+                $this->$action();
+            } else {
+                http_response_code(400);
+            }
         } else {
-            echo json_encode(["warning" => "Une erreur est survenue"]);
-            http_response_code(400);
+            http_response_code(401);
         }
+    }
+
+    /**
+     * Trie les fichiers à supprimer et à ajouter
+     *
+     * @return void
+     */
+    private function sortFiles() {
+        foreach ($_FILES as $key => $file) {
+            if ($file["size"] !== 0) {
+                $this->files["add"][$key] = $file;
+            } else {
+                $this->files["del"][] = $key;
+            }
+        }
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Role
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * Vérifie le role de la personne connecté
+     *
+     * @return bool
+     */
+    private function checkRole() {
+        if ($this->role === "admin") {
+            return $this->isAdmin();
+        }
+        if ($this->role === "superAdmin") {
+            return $this->isSuperAdmin();
+        }
+        return true;
     }
 
     /**
@@ -93,6 +144,204 @@ final class Api {
             return true;
         }
         return false;
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Method table
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * Recherche la variable $_POST["action"] dans le tableau de l'attribut $methods["TABLE"]
+     *
+     * @return void
+     */
+    private function setTableMethod() {
+        foreach ($this->methods["TABLE"] as $method) {
+            if ($_POST["action"] === $method) {
+                $this->action = $method;
+                $this->object = new $_POST["table"];
+                if (is_a($this->object, "App\User")) {
+                    $this->role = "superAdmin";
+                } else {
+                    $this->role = "admin";
+                }
+                $this->sortFiles();
+                break;
+            }
+        }
+    }
+
+    /**
+     * Renvoi des données d'une tables de la BDD
+     * @return void
+     */
+    private function getTable() {
+        echo $this->object->listAllToJson();
+    }
+
+    /**
+     * Insert une nouvelle ligne à la BDD
+     *
+     * @return void
+     */
+    private function insert() {
+        $check = $this->object->checkData($_POST);
+        $checkFiles = $this->object->checkFiles($this->files["add"]);
+        if ($check === [] && $checkFiles === []) {
+            $this->object->setFromArray($_POST);
+            if ($this->object->insert()) {
+                if ($_FILES !== []) {
+                    $this->object->setFromArray($this->files["add"]);
+                    $this->object->update();
+                }
+                echo json_encode(["status" => "success", "data" => $this->object->toArray()]);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
+        }
+    }
+
+    /**
+     * Mise à jour d'une ligne de la BDD
+     *
+     * @return void
+     */
+    private function update() {
+        if (isset($_POST["id"]) && $this->object->loadFromId($_POST["id"])) {
+            $check = $this->object->checkData($_POST);
+            $checkFiles = $this->object->checkFiles($this->files["add"]);
+            if ($check === [] && $checkFiles === []) {
+                $this->object->setFromArray($_POST);
+                $this->object->setFromArray($this->files["add"]);
+                $this->object->deleteFiles($this->files["del"]);
+                if ($this->object->update()) {
+                    $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
+                    if ($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
+                        $this->object->updateSession();
+                        $response["session"] = $_SESSION;
+                    }
+                    echo json_encode($response);
+                } else {
+                    http_response_code(400);
+                }
+            } else {
+                echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
+            }
+        } else {
+            http_response_code(400);
+        }
+    }
+
+    /**
+     * Suprime une ligne de la BDD
+     *
+     * @return void
+     */
+    private function delete() {
+        if (isset($_POST["id"]) && $this->object->loadFromId($_POST["id"])) {
+            $this->object->delete();
+            http_response_code(200);
+        } else {
+            http_response_code(404);
+        }
+    }
+
+    /**
+     * Télécharger un fichier correspondant au champ d'une class table
+     *
+     * @return void
+     */
+    private function download() {
+        if (isset($_POST["id"]) && isset($_POST["field"])) {
+            $this->object->loadFromId($_POST["id"]);
+            $file = $this->object->get($_POST["field"]);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
+        } else {
+            http_response_code(400);
+        }
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Method edit area
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * Recherche la variable $_POST["action"] dans le tableau de l'attribut $methods["EDIT_AREA"]
+     *
+     * @return void
+     */
+    private function setEditAreaMethod() {
+        foreach ($this->methods["EDIT_AREA"] as $method) {
+            if ($_POST["action"] === $method) {
+                $this->action = $_POST["action"];
+                $this->object = new $_POST["edit_area"];
+                $this->object->load();
+                $this->role = "admin";
+                $this->sortFiles();
+                break;
+            }
+        }
+    }
+
+    /**
+     * Renvoi des données d'une 'EditArea' si l'utilisateur est bien connecté avec un compte admin
+     *
+     * @return void
+     */
+    private function getEditArea() {
+        $this->object->load();
+        echo $this->object->valuesToJSON(true);
+    }
+
+    /**
+     * Mise à jour ou création d'une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin 
+     *
+     * @return void
+     */
+    private function upsert() {
+        $check = $this->object->checkData($_POST);
+        $checkFiles = $this->object->checkFiles($this->files["add"]);
+        if ($check === [] && $checkFiles === []) {
+            $this->object->setFromArray($_POST);
+            $this->object->setFromArray($this->files["add"]);
+            $this->object->deleteFiles($this->files["del"]);
+            if ($this->object->upsert()) {
+                $response = ["status" => "success", "session" => null];
+                echo json_encode($response);
+            } else {
+                http_response_code(400);
+            }
+        } else {
+            echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
+        }
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Methods session
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * Recherche la variable $_POST["action"] dans le tableau de l'attribut $methods["SESSION"]
+     *
+     * @return void
+     */
+    private function setSessionMethod() {
+        foreach ($this->methods["SESSION"] as $method) {
+            if ($_POST["action"] === $method) {
+                $this->action = $method;
+                break;
+            }
+        }
     }
 
     /**
@@ -120,192 +369,13 @@ final class Api {
     }
 
     /**
-     * Renvoi des données d'une tables de la BDD si l'utilisateur est bien connecté avec un compte admin
-     *
-     * @return void
-     */
-    private function getTable() {
-        $class = $_GET["table"];
-        if ($this->isAdmin() && $class !== "App\\User" || $this->isSuperAdmin()) {
-            if (class_exists($class) && isset($_GET["id"])) {
-                $object = new $class;
-                if ($_GET["id"] === 'all') {
-                    echo $object->listAllToJson();
-                } else {
-                    if ($object->loadFromId($_GET["id"])) {
-                        echo $object->toJson();
-                    } else {
-                        http_response_code(404);
-                    }
-                }
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Renvoi des données d'une 'EditArea' si l'utilisateur est bien connecté avec un compte admin
-     *
-     * @return void
-     */
-    private function getEditArea() {
-        $class = $_GET["edit_area"];
-        if ($this->isAdmin()) {
-            if (class_exists($class)) {
-                $object = new $class;
-                $object->load();
-                echo $object->valuesToJSON(true);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Insert une nouvelle ligne à la BDD si l'utilisateur est bien connecté avec un compte admin
-     *
-     * @return void
-     */
-    private function insert() {
-        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
-            $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($this->files["add"]);
-            if ($check === [] && $checkFiles === []) {
-                $this->object->setFromArray($_POST);
-                if ($this->object->insert()) {
-                    if ($_FILES !== []) {
-                        $this->object->setFromArray($this->files["add"]);
-                        $this->object->update();
-                    }
-                    echo json_encode(["status" => "success", "data" => $this->object->toArray()]);
-                } else {
-                    http_response_code(400);
-                }
-            } else {
-                echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Mise à jour d'une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin
-     *
-     * @return void
-     */
-    private function update() {
-        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
-            $this->object->loadFromId($_POST["id"]);
-            $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($this->files["add"]);
-            if ($check === [] && $checkFiles === []) {
-                $this->object->setFromArray($_POST);
-                $this->object->setFromArray($this->files["add"]);
-                $this->object->deleteFiles($this->files["del"]);
-                if ($this->object->update()) {
-                    $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];
-                    if ($_POST["table"] === "App\\User" && $_SESSION["id"] === (int)$_POST["id"]) {
-                        $this->object->updateSession();
-                        $response["session"] = $_SESSION;
-                    }
-                    echo json_encode($response);
-                } else {
-                    http_response_code(400);
-                }
-            } else {
-                echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Mise à jour d'un compte utilisteur
-     *
-     * @return void
-     */
-    private function updateUser() {
-        if ($this->isAdmin() && $_SESSION["id"] === (int)$_POST["id"]) {
-            $this->object = new User;
-            $this->object->loadFromId($_POST["id"]);
-            $data = ["nom" => $_POST["nom"], "prenom" => $_POST["prenom"], "email" => $_POST["email"]];
-            $check = $this->object->checkData($data);
-            if ($check === []) {
-                $this->object->setFromArray($data);
-                if ($this->object->update()) {
-                    $this->object->updateSession();
-                    echo json_encode(["status" => "success", "session" => $_SESSION]);
-                } else {
-                    http_response_code(400);
-                }
-            } else {
-                echo json_encode(["status" => "invalid", "data" => $check]);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Suprime une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin
-     *
-     * @return void
-     */
-    private function delete() {
-        if ($this->isAdmin() && $_POST["table"] !== "App\\User" || $this->isSuperAdmin()) {
-            if ($this->object->loadFromId($_POST["id"])) {
-                $this->object->delete();
-                http_response_code(200);
-            } else {
-                http_response_code(404);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
-     * Mise à jour ou création d'une ligne de la BDD si l'utilisateur est bien connecté avec un compte admin 
-     *
-     * @return void
-     */
-    private function upsert() {
-        if ($this->isAdmin()) {
-            $check = $this->object->checkData($_POST);
-            $checkFiles = $this->object->checkFiles($this->files["add"]);
-            if ($check === [] && $checkFiles === []) {
-                $this->object->setFromArray($_POST);
-                $this->object->setFromArray($this->files["add"]);
-                $this->object->deleteFiles($this->files["del"]);
-                if ($this->object->upsert()) {
-                    $response = ["status" => "success", "session" => null];
-                    echo json_encode($response);
-                } else {
-                    http_response_code(400);
-                }
-            } else {
-                echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-
-    /**
      * Se connecter si l'utilisateur est bien admin
      *
      * @return void
      */
     private function logIn() {
         try {
-            if (!(isset($_POST["action"]) && isset($_POST["email"]) && isset($_POST["password"]))) {
+            if (!(isset($_POST["email"], $_POST["password"]))) {
                 throw new \Exception("Une erreur est survenue");
             }
             $user = new User;
@@ -315,13 +385,24 @@ final class Api {
             if (!$this->isAdmin()) {
                 session_destroy();
                 throw new \Exception("Identifiants incorrect");
-            } else {
-                http_response_code(200);
-                echo json_encode($_SESSION);
             }
+            echo json_encode($_SESSION);
         } catch (\Exception $e) {
             http_response_code(401);
             echo json_encode(["warning" => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Vérifie que le lien de rénitialistion de mot passe est valide
+     *
+     * @return void
+     */
+    private function isValidRecoveryLink() {
+        if (isset($_POST["code"])) {
+            echo json_encode((new User)->isValidRecoveryLink($_POST["code"]));
+        } else {
+            echo json_encode(["isValid" => false, "msg" => "Url non valide"]);
         }
     }
 
@@ -332,7 +413,7 @@ final class Api {
      */
     private function forgotPass() {
         try {
-            if (!(isset($_POST["action"]) && isset($_POST["email"]))) {
+            if (!isset($_POST["email"])) {
                 throw new \Exception("Une erreur est survenue");
             }
             $user = new User;
@@ -354,21 +435,66 @@ final class Api {
     }
 
     /**
-     * Vérifie que le lien de rénitialistion de mot passe est valide
-     *
-     * @return void
-     */
-    private function isValidRecoveryLink() {
-        echo json_encode((new User)->isValidRecoveryLink($_GET["isValidRecoveryLink"]));
-    }
-
-    /**
      * Mise à jour du mot de passe depuis lien de récupération
      *
      * @return void
      */
     private function changePass() {
-        echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
+        if (isset($_POST["code"], $_POST["pass1"], $_POST["pass2"])) {
+            echo json_encode((new User)->changePass($_POST["code"], $_POST["pass1"], $_POST["pass2"]));
+        } else {
+            echo json_encode(["isValid" => false, "msg" => "Une erreur est survenue"]);
+        }
+    }
+
+    //--------------------------------------------------------------------------------------
+    // Method user
+    //--------------------------------------------------------------------------------------
+
+    /**
+     * Recherche la variable $_POST["action"] dans le tableau de l'attribut $methods["USER"]
+     *
+     * @return void
+     */
+    private function setUserMethod() {
+        $this->role = "admin";
+        foreach ($this->methods["USER"] as $method) {
+            if ($_POST["action"] === $method) {
+                $this->action = $_POST["action"];
+                $this->object = new User;
+                break;
+            }
+        }
+    }
+
+    /**
+     * Mise à jour d'un compte utilisteur
+     *
+     * @return void
+     */
+    private function updateUser() {
+        try {
+            if (!(isset($_POST["id"], $_POST["nom"], $_POST["prenom"], $_POST["email"]) && $_SESSION["id"] === (int)$_POST["id"])) {
+                throw new \Exception("Une erreur est survenue");
+            }
+            if (!$this->object->loadFromId($_POST["id"])) {
+                throw new \Exception("Une erreur est survenue");
+            }
+            $data = ["nom" => $_POST["nom"], "prenom" => $_POST["prenom"], "email" => $_POST["email"]];
+            $check = $this->object->checkData($data);
+            if ($check === []) {
+                $this->object->setFromArray($data);
+                if (!$this->object->update()) {
+                    throw new \Exception("Enregistrement échoué");
+                }
+                $this->object->updateSession();
+                echo json_encode(["status" => "success", "session" => $_SESSION]);
+            } else {
+                echo json_encode(["status" => "invalid", "data" => $check]);
+            }
+        } catch (\Exception $e) {
+            echo json_encode(["status" => "error", "msg" => $e->getMessage()]);
+        }
     }
 
     /**
@@ -377,20 +503,31 @@ final class Api {
      * @return void
      */
     private function updatePass() {
-        echo json_encode((new User)->updatePass($_POST["pass"], $_POST["newPass1"], $_POST["newPass2"]));
+        if (isset($_POST["pass"], $_POST["newPass1"], $_POST["newPass2"])) {
+            echo json_encode($this->object->updatePass($_POST["pass"], $_POST["newPass1"], $_POST["newPass2"]));
+        } else {
+            echo json_encode(["status" => "invalid", "warning" => "Une erreur est survenue"]);
+        }
     }
 
+    //--------------------------------------------------------------------------------------
+    // Method Cloud
+    //--------------------------------------------------------------------------------------
+
     /**
-     * Trie les fichiers à supprimer et à ajouter
+     * Recherche la variable $_POST["action"] dans le tableau de l'attribut $methods["CLOUD"]
      *
      * @return void
      */
-    private function sortFiles() {
-        foreach ($_FILES as $key => $file) {
-            if ($file["size"] !== 0) {
-                $this->files["add"][$key] = $file;
-            } else {
-                $this->files["del"][] = $key;
+    private function setCloudMethod() {
+        global $CLOUD;
+        if ($CLOUD) {
+            $this->role = "admin";
+            foreach ($this->methods["CLOUD"] as $method) {
+                if ($_POST["action"] === $method) {
+                    $this->action = $_POST["action"];
+                    break;
+                }
             }
         }
     }
@@ -401,16 +538,10 @@ final class Api {
      * @return void
      */
     private function getDir() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud($_POST["path"]);
-                $folderChain = $cloud->getDir();
-                echo json_encode($folderChain);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["path"])) {
+            $cloud = new Cloud($_POST["path"]);
+            $folderChain = $cloud->getDir();
+            echo json_encode($folderChain);
         }
     }
 
@@ -420,17 +551,11 @@ final class Api {
      * @return void
      */
     private function createFolder() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud($_POST["path"]);
-                if ($cloud->createFolder($_POST["name"])) {
-                    http_response_code(200);
-                }
-            } else {
-                http_response_code(400);
+        if (isset($_POST["path"], $_POST["name"])) {
+            $cloud = new Cloud($_POST["path"]);
+            if ($cloud->createFolder($_POST["name"])) {
+                http_response_code(200);
             }
-        } else {
-            http_response_code(401);
         }
     }
 
@@ -440,16 +565,10 @@ final class Api {
      * @return void
      */
     private function deleteFiles() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud($_POST["path"]);
-                $files = explode(",", $_POST["files"]);
-                $cloud->deleteFiles($files);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["path"], $_POST["files"])) {
+            $cloud = new Cloud($_POST["path"]);
+            $files = explode(",", $_POST["files"]);
+            $cloud->deleteFiles($files);
         }
     }
 
@@ -459,15 +578,9 @@ final class Api {
      * @return void
      */
     private function uploadFiles() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud($_POST["path"]);
-                $cloud->uploadFiles($_FILES["files"]);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["path"], $_FILES["files"])) {
+            $cloud = new Cloud($_POST["path"]);
+            $cloud->uploadFiles($_FILES["files"]);
         }
     }
 
@@ -477,15 +590,9 @@ final class Api {
      * @return void
      */
     private function moveFiles() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud;
-                $cloud->moveFiles($_POST["destination"], $_POST["files"]);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["destination"], $_POST["files"])) {
+            $cloud = new Cloud;
+            $cloud->moveFiles($_POST["destination"], $_POST["files"]);
         }
     }
 
@@ -495,15 +602,9 @@ final class Api {
      * @return void
      */
     private function downLoadFile() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud;
-                $cloud->downloadFile($_POST["file"]);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["file"])) {
+            $cloud = new Cloud;
+            $cloud->downloadFile($_POST["file"]);
         }
     }
 
@@ -513,15 +614,9 @@ final class Api {
      * @return void
      */
     private function renameFile() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud($_POST["path"]);
-                $cloud->renameFile($_POST["newName"], $_POST["oldName"]);
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
+        if (isset($_POST["path"], $_POST["newName"], $_POST["oldName"])) {
+            $cloud = new Cloud($_POST["path"]);
+            $cloud->renameFile($_POST["newName"], $_POST["oldName"]);
         }
     }
 
@@ -531,40 +626,9 @@ final class Api {
      * @return void
      */
     private function getThumbmail() {
-        if ($this->isAdmin()) {
-            if ($this->cloud) {
-                $cloud = new Cloud;
-                echo json_encode($cloud->getThumbmail($_POST["file"]));
-            } else {
-                http_response_code(400);
-            }
-        } else {
-            http_response_code(401);
-        }
-    }
-    
-    /**
-     * Télécharger un fichier correspondant au champ d'une class table
-     *
-     * @return void
-     */
-    private function download() {
-        if ($this->isAdmin()) {
-            //! conditions à faire
-            $this->object = new $_POST["table"];
-            $this->object->loadFromId($_POST["id"]);
-            $file = $this->object->get($_POST["field"]);
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($file));
-            readfile($file);
-            exit;
-        } else {
-            http_response_code(401);
+        if (isset($_POST["file"])) {
+            $cloud = new Cloud;
+            echo json_encode($cloud->getThumbmail($_POST["file"]));
         }
     }
 }

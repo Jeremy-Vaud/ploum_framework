@@ -18,8 +18,14 @@ export default function PageEditArea(props) {
     const [modalVisibility, setModalVisibility] = useState(false)
 
     useEffect(() => {
+        const formData = new FormData
+        formData.append("action", "getEditArea")
+        formData.append("edit_area", props.dataTable.className)
         setLoading(true)
-        fetch("/api" + '?edit_area=' + props.dataTable.className)
+        fetch("/api", {
+            method: 'POST',
+            body: formData
+        })
             .then((response) => {
                 setLoading(false)
                 if (response.status === 404) {

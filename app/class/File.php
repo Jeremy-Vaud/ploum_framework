@@ -57,7 +57,7 @@ class File extends Debug {
             }
             // Public
             if (isset($params["public"])) {
-                if(is_bool($params["public"])) {
+                if (is_bool($params["public"])) {
                     $this->public = $params["public"];
                 } else {
                     throw new \Exception("Le paramètre public n'est pas un booléen");
@@ -83,7 +83,7 @@ class File extends Debug {
      * @return string Chemin du fichier
      */
     public function get() {
-        $file = $this->path . str_replace("..", "",$this->name ?? "");
+        $file = $this->path . str_replace("..", "", $this->name ?? "");
         if (file_exists($file)) {
             return $file;
         }
@@ -115,7 +115,7 @@ class File extends Debug {
      * @return void
      */
     public function setPath(string $path) {
-        if($this->public) {
+        if ($this->public) {
             $this->path = "files/";
         } else {
             $this->path = __DIR__ . "/../files/";
@@ -245,10 +245,12 @@ class File extends Debug {
      * @return void
      */
     public function deleteFile() {
-        $name = str_replace("..", "", $this->name);
-        if (is_file($this->path . $name)) {
-            unlink($this->path . $name);
-            rmdir($this->path);
+        if ($this->name) {
+            $name = str_replace("..", "", $this->name);
+            if (is_file($this->path . $name)) {
+                unlink($this->path . $name);
+                rmdir($this->path);
+            }
         }
     }
 }

@@ -120,8 +120,14 @@ export default function Table(props) {
     }
 
     useEffect(() => {
+        const formData = new FormData
+        formData.append("action", "getTable")
+        formData.append("table", props.table)
         setLoading("")
-        fetch("/api" + '?table=' + props.table + '&id=all')
+        fetch("/api", {
+            method: 'POST',
+            body: formData
+        })
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {
@@ -144,8 +150,14 @@ export default function Table(props) {
     }, [])
 
     function loadSelect(table, name, key) {
+        const formData = new FormData
+        formData.append("action", "getTable")
+        formData.append("table", table)
         setLoading("")
-        fetch("/api" + '?table=' + table + '&id=all')
+        fetch("/api", {
+            method: 'POST',
+            body: formData
+        })
             .then((response) => {
                 setLoading("hidden")
                 if (response.status === 404) {

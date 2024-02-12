@@ -10,6 +10,7 @@ export default function PageAccount(props) {
         { name: "email", value: props.session.email, warning: "" }
     ])
     const [warning, setWarning] = useState("")
+    const [success, setSuccess] = useState(false)
     const [loading, setLoading] = useState(false)
 
     function handleChange(evt) {
@@ -42,6 +43,7 @@ export default function PageAccount(props) {
         let form = document.getElementById("formAccount")
         let formData = new FormData(form)
         formData.append("action", "updateUser")
+        formData.append("method", "user")
         setLoading(true)
         fetch("/api", {
             method: 'POST',
@@ -58,9 +60,13 @@ export default function PageAccount(props) {
             .then((result) => {
                 if ((result.status === "success")) {
                     props.setSession(result.session)
+                    setSuccess(true)
                     setWarning("Modifications enregistrées")
                 } else if (result.status === "invalid") {
                     setWarnings(result.data)
+                } else if (result.status === "error") {
+                    setSuccess(false)
+                    setWarning(result.msg)
                 }
             })
             .catch((e) => {
@@ -79,7 +85,7 @@ export default function PageAccount(props) {
                     )
                 })}
                 <div className="text-center">
-                    <p className="text-warning h-8">{warning}</p>
+                    <p className={success ? "text-success h-8" : "text-warning h-8"}>{warning}</p>
                     <button type="submit" className="btn-add">Enregistrer</button>
                 </div>
             </form>

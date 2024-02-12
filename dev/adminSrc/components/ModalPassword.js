@@ -26,6 +26,7 @@ export default function ModalPassword() {
         let form = document.getElementById("formPassword")
         let formData = new FormData(form)
         formData.append("action", "updatePass")
+        formData.append("method", "user")
         setLoading(true)
         fetch("/api", {
             method: 'POST',
@@ -76,7 +77,7 @@ export default function ModalPassword() {
                         <label htmlFor="newPass2">Confirmer le nouveau Mot de passe</label>
                         <input className="mb-3" type="password" name="newPass2" id="newPass2" />
                         <div className="text-center">
-                            <p className="text-warning h-8">{warning}</p>
+                            <p className="text-warning h-16">{warning}</p>
                             <button onClick={submit} className="btn-update mr-5">Modifier</button>
                             <button onClick={hide} className="btn-cancel">Annuler</button>
                         </div>

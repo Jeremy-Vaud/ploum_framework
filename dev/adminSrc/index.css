@@ -115,6 +115,9 @@
     .text-warning {
         @apply text-delete_light;
     }
+    .text-success {
+        @apply text-add_light;
+    }
     /*
      * Chargement
      */

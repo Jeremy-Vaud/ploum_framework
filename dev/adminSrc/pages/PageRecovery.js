@@ -10,8 +10,15 @@ export default function PageRecovery() {
 
     useEffect(() => {
         if (code) {
+            const formData = new FormData
+            formData.append("method", "session")
+            formData.append("action", "isValidRecoveryLink")
+            formData.append("code", code)
             setLoading(true)
-            fetch("/api" + `?isValidRecoveryLink=${code}`)
+            fetch("/api", {
+                method: "POST",
+                body: formData
+            })
                 .then((response) => {
                     setLoading(false)
                     if (response.status === 200) {
@@ -34,8 +41,9 @@ export default function PageRecovery() {
 
     function submit(e) {
         e.preventDefault()
-        let formData = new FormData(changePassForm)
+        const formData = new FormData(changePassForm)
         formData.set("action", "changePass")
+        formData.set("method", "session")
         if (checkForm(formData)) {
             setLoading(true)
             fetch("/api", {
@@ -52,9 +60,6 @@ export default function PageRecovery() {
                 .then((result) => {
                     setIsValidLink(result.isValid)
                     setMsg(result.msg)
-                })
-                .catch((e) => {
-                    console.log(e);
                 })
         }
     }

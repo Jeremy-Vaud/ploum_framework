@@ -34,7 +34,13 @@ export function App() {
     }
 
     function isLog() {
-        fetch("/api" + '?isLog=1')
+        const formData = new FormData
+        formData.append("method", "session")
+        formData.append("action", "isLog")
+        fetch("/api", {
+            method: "POST",
+            body: formData
+        })
             .then((response) => {
                 setLoading(false)
                 if (response.status === 200) {
@@ -54,16 +60,19 @@ export function App() {
     useEffect(isLog, [])
 
     function sendLogOut() {
+        const formData = new FormData
+        formData.append("method", "session")
+        formData.append("action", "logOut")
         setLoading(true)
-        fetch("/api" + '?logOut=1')
+        fetch("/api", {
+            method: "POST",
+            body: formData
+        })
             .then((response) => {
                 if (response.status === 200) {
                     setIsConnect(false);
                 }
                 setLoading(false)
-            })
-            .catch((e) => {
-                console.log(e.message)
             })
     }
 

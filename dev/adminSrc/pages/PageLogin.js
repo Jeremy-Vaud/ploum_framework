@@ -19,9 +19,10 @@ export default function PageLogin(props) {
 
     function submit(e) {
         e.preventDefault();
-        let formData = new FormData
+        const formData = new FormData
         let isLog = false
         formData.append("email", email)
+        formData.append("method", "session")
         if (forgotPass) {
             formData.append("action", "forgotPass")
         } else {         

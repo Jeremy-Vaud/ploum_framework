@@ -135,6 +135,7 @@ export default function PageCloud(props) {
         let data = new FormData
         data.append("action", "getDir")
         data.append("path", getPath())
+        data.append("method", "cloud")
         setLoading(true)
         fetch("/api", {
             method: 'POST',
@@ -154,6 +155,7 @@ export default function PageCloud(props) {
                 setFiles(result)   
             })
             .catch((e) => {
+                setLoading(false)
                 console.log(e)
             })
     }
@@ -206,6 +208,7 @@ export default function PageCloud(props) {
             let form = new FormData
             form.append("action", "downloadFile")
             form.append("file", data.state.selectedFiles[i].id)
+            form.append("method", "cloud")
             fetch("/api", {
                 method: 'POST',
                 body: form
@@ -227,6 +230,7 @@ export default function PageCloud(props) {
                     a.click();
                 })
                 .catch((e) => {
+                    setLoading(false)
                     console.log(e)
                 })
         }
@@ -271,6 +275,7 @@ export default function PageCloud(props) {
 
     function sendData(form) {
         form.append("path", getPath())
+        form.append("method", "cloud")
         setLoading(true)
         fetch("/api", {
             method: 'POST',
@@ -297,6 +302,7 @@ export default function PageCloud(props) {
         let form = new FormData
         form.append("action", "getThumbmail")
         form.append("file", file.id)
+        form.append("method", "cloud")
         let thumbmail = null
         await fetch("/api", {
             method: 'POST',
