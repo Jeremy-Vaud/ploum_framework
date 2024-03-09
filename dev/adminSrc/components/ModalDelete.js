@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import{ faTrashCan } from '@fortawesome/free-solid-svg-icons'
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import Modal from "./Modal"
 import Loading from "./Loading"
 
@@ -47,15 +47,15 @@ export default function ModalDelete(props) {
 
     return (
         <>
-            <button onClick={show}><FontAwesomeIcon icon={faTrashCan} className='w-[15px]'/></button>
+            <button onClick={show}><FontAwesomeIcon icon={faTrashCan} className='w-[15px]' /></button>
             <Modal visibility={visibility} hide={hide}>
-                <div className="text-center">               
+                <div className="text-center">
                     <p className="mb-3">Attention toute suppression est définitive</p>
                     <button onClick={deleteById} className="btn-delete mr-5">Supprimer</button>
                     <button onClick={hide} className="btn-cancel">Annuler</button>
                 </div>
             </Modal>
-            <Loading visibility={loading}/>
+            <Loading visibility={loading} />
         </>
     )
 }

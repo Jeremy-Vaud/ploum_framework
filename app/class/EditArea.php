@@ -73,6 +73,8 @@ abstract class EditArea extends Debug {
                     } else if (is_array($val)) {
                         $this->fields[$field]->save($val, false);
                     }
+                } else if (is_a($this->fields[$field], "App\MultipleForeignKeys")) {
+                    $this->fields[$field]->set($val);
                 } else if (!$this->fields[$field]->set($val, $verif)) {
                     throw new \Exception("La valeur du champs " . htmlentities($field) . " n'est pas valide");
                 }
@@ -118,7 +120,7 @@ abstract class EditArea extends Debug {
         $class = substr(get_called_class(), strrpos(get_called_class(), '\\') + 1);
         foreach ($this->fields as $name => $val) {
             if (is_a($val, "App\File")) {
-                $val->setPath("files/" . $class . "/" . $name . "/");
+                $val->setPath($class . "/" . $name . "/");
             }
         }
     }
@@ -138,7 +140,7 @@ abstract class EditArea extends Debug {
                 throw new \Exception("Erreur SQL ($sql)");
             }
             $result = BDD::Fetch();
-            if ($result) {
+            if ($result && $result["val"]) {
                 $decode = json_decode($result["val"]);
                 foreach ($decode as $field => $val) {
                     $this->set($field, $val, false);
@@ -150,7 +152,7 @@ abstract class EditArea extends Debug {
         }
         return true;
     }
-    
+
     /**
      * Mettre à jour ou insérer une ligne de la bdd
      *
@@ -169,21 +171,71 @@ abstract class EditArea extends Debug {
         }
         return true;
     }
-    
+
     /**
      * Renvoi toutes les valeurs des champs au format json
      *
      * @param  bool $filePath si true renvoi le chemin des fichier si false les noms
+     * @param  bool $dataSelect si true renvoi aussi toutes les valeurs possible pour les champs 'ForeignKey' et 'MultipleForeignKeys'
      * @return string
      */
-    public function valuesToJSON(bool $filePath = false) {
+    public function valuesToJSON(bool $filePath = false, bool $dataSelect = false) {
         $values = [];
+        $selectValues = [];
         foreach ($this->fields as $key => $field) {
-            if(!$filePath && is_a($field, "App\File")) {
-                $values[$key] = $field->getName();
-            } else {
-                $values[$key] = $field->get();
-            }     
+            $val = $field->get();
+            switch (get_class($field)) {
+                case 'App\File':
+                    if (!$filePath) {
+                        $values[$key] = $field->getName();
+                    } else {
+                        $values[$key] = $field->get();
+                    }
+                    break;
+                case 'App\Image':
+                    if (!$filePath) {
+                        $values[$key] = $field->getName();
+                    } else {
+                        $values[$key] = $field->get();
+                    }
+                    break;
+                case 'App\ForeignKey':
+                    $values[$key] = $field->get()->get("id");
+                    if ($dataSelect) {
+                        $name = $field->getAdminKey();
+                        $table = new ($field->getTable());
+                        $list = $table->listAll();
+                        foreach ($list as $elt) {
+                            $selectValues[$key][] = ["value" => $elt->get("id"), "name" => $elt->get($name)];
+                        }
+                    }
+                    break;
+                case 'App\MultipleForeignKeys':
+                    $values[$key] = [];
+                    foreach (array_keys($field->get()) as $id) {
+                        $values[$key][] = $id;
+                    }
+                    if ($dataSelect) {
+                        $name = $field->getKey();
+                        $table = new ($field->getForeignTable());
+                        $list = $table->listAll();
+                        foreach ($list as $elt) {
+                            $selectValues[$key][] = ["value" => $elt->get("id"), "name" => $elt->get($name)];
+                        }
+                    }
+                    break;
+                default:
+                    $values[$key] = $field->get();
+                    if($field->getType() === "select") {
+                        foreach ($field->getChoices() as $choice) {
+                            $selectValues[$key][] = ["value" => $choice, "name" => $choice];
+                        }
+                    }
+                    break;
+            }
+        }
+        if ($dataSelect) {
+            return json_encode(["data" => $values, "dataSelect" => $selectValues]);
         }
         return json_encode($values);
     }
@@ -253,7 +305,7 @@ abstract class EditArea extends Debug {
             $return["fields"] = [];
             $return["type"] = "edit_area";
             foreach ($this->fields as $key => $field) {
-                $return["fields"][$key] = $field->getAdmin();
+                $return["fields"][$key] = $field->getAdmin(false);
             }
             return $return;
         }

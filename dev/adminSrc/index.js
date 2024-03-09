@@ -4,7 +4,6 @@ import { App } from "./App";
 
 const app = document.getElementById("app");
 const root = createRoot(app);
-root.render(<React.StrictMode>
+root.render(
     <App tab="home" />
-</React.StrictMode>
 );

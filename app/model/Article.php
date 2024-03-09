@@ -18,10 +18,11 @@ class Article extends \App\Table {
             //"time" => new \App\Field(["type"=>"time", "admin" => ["columns","insert","update"]]),
             //"datetime" => new \App\Field(["type"=>"dateTime", "admin" => ["columns","insert","update"]]),
             //"nombre" => new \App\Field(["type"=>"int", "admin" => ["columns","insert","update"]]),
-            //"cle" => new \App\ForeignKey("Model\Tag", ["key" => "nom", "admin" => ["columns","insert","update"]]),
+            "cle" => new \App\ForeignKey("Model\Tag", ["key" => "nom", "admin" => ["columns", "insert", "update"]]),
             "tag" => new \App\MultipleForeignKeys("Model\Tag", ["key" => "nom", "admin" => ["insert", "update"]]),
-            //"checkbox" => new \App\Field(["type"=>"bool", "admin" => ["columns","insert","update"]]),
+            "checkbox" => new \App\Field(["type"=>"bool", "admin" => ["columns","insert","update"]]),
             "richText" => new \App\Field(["type" => "richText", "length" => 100, "admin" => ["insert", "update"]]),
+            "role" => new \App\Field(["type" => "select", "value" => "user", "choices" => ["user", "admin", "superAdmin"], "admin" => ["columns","insert","update"]])
         ];
         $this->adminPannel = [
             "title" => "Articles",

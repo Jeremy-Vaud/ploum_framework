@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import Modal from "../components/Modal"
-import FormCheckbox from "../components/FormCheckbox"
-import FormInput from "../components/FormInput"
-import FormTextarea from "../components/FormTextarea"
-import FormImage from "../components/FormImage"
-import FormSelect from "../components/FormSelect"
-import FormSelectMulti from "../components/FormSelectMulti"
 import Loading from "../components/Loading"
-import FormDateTime from "../components/FormDateTime"
-import FormRichText from "../components/FormRichText"
+import Form from "../components/Form"
 
 export default function PageEditArea(props) {
     const formId = useState(uuidv4())
     const [inputs, setInputs] = useState([])
+    const [dataSelect, setDataSelect] = useState({})
     const [loading, setLoading] = useState(false)
     const [modalVisibility, setModalVisibility] = useState(false)
 
@@ -40,12 +34,11 @@ export default function PageEditArea(props) {
             })
             .then((result) => {
                 let array = [];
-                {
-                    Object.entries(props.dataTable.fields).forEach(([name, obj]) => {
-                        array.push({ key: uuidv4(), name: name, type: obj.type, warning: "", value: result[name] })
-                    })
-                }
+                Object.entries(props.dataTable.fields).forEach(([name, obj]) => {
+                    array.push({ key: uuidv4(), name: name, type: obj.type, warning: "", value: result.data[name] })
+                })
                 setInputs(array)
+                setDataSelect(result.dataSelect)
             })
             .catch((e) => {
                 console.log(e.message)
@@ -123,51 +116,7 @@ export default function PageEditArea(props) {
     return (
         <>
             <h1>{props.dataTable.title}</h1>
-            <form id={formId} className="max-w-lg mx-auto">
-                {inputs.map(e => {
-                    if (e.type === "checkbox") {
-                        return (
-                            <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
-                        )
-                    } else if (e.type === "textarea") {
-                        return (
-                            <FormTextarea key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                        )
-                    } else if (e.type === "image") {
-                        return (
-                            <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                        )
-                    } else if (e.type === "select" && props.dataSelect[e.name]) {
-                        return (
-                            <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
-                        )
-                    } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
-                        let table;
-                        for (let i = 0; i < props.form.length; i++) {
-                            if (props.form[i].name === e.name) {
-                                table = props.form[i].table
-                                break
-                            }
-                        }
-                        let value = []
-                        return (
-                            <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} dataSelect={props.dataSelect[e.name]} table={table} />
-                        )
-                    } else if (e.type === "dateTime") {
-                        return (
-                            <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                        )
-                    } else if (e.type === "richText") {
-                        return (
-                            <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                        )
-                    } else {
-                        return (
-                            <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                        )
-                    }
-                })}
-            </form>
+            <Form formId={formId} editArea={props.dataTable.className} id={null} inputs={inputs} dataSelect={dataSelect} handleChange={handleChange} logOut={props.logOut} />
             <div className="text-center">
                 <button onClick={submit} className="btn-add mb-5">Enregistrer</button>
             </div>

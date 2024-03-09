@@ -93,10 +93,15 @@ class File extends Debug {
     /**
      * Retourne les paramètres du fichier pour le panneau d'administration
      *
+     * @param bool $table si true retourne aussi la valeur de l'attribut table
      * @return mixed Un tableau de paramètres
      */
-    public function getAdmin() {
-        return ["type" => "file", "table" => $this->admin];
+    public function getAdmin(bool $table = true) {
+        $return = ["type" => "file"];
+        if($table) {
+            $return["table"] = $this->admin;
+        }
+        return $return;
     }
 
     /**

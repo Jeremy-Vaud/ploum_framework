@@ -11,8 +11,7 @@ export default function Table(props) {
     const [sortState, setSortState] = useState([])
     const [hiddenRows, setHiddenRows] = useState({})
     const [loading, setLoading] = useState("hidden")
-    const [dataSelect, setDataSelect] = useState({})
-
+    const [dataSelect, setDataSelect] = useState([])
 
     function initSortState() {
         let array = []
@@ -141,66 +140,14 @@ export default function Table(props) {
                 return response.json()
             })
             .then((result) => {
-                setData(result)
+                setData(result.data)
+                setDataSelect(result.dataSelect)
                 initSortState()
             })
             .catch((e) => {
                 console.log(e.message)
             })
     }, [])
-
-    function loadSelect(table, name, key) {
-        const formData = new FormData
-        formData.append("action", "getTable")
-        formData.append("table", table)
-        setLoading("")
-        fetch("/api", {
-            method: 'POST',
-            body: formData
-        })
-            .then((response) => {
-                setLoading("hidden")
-                if (response.status === 404) {
-                    throw new Error('not found')
-                } else if (response.status === 401) {
-                    props.logOut()
-                    throw new Error('Connection requise')
-                } else if (!response.ok) {
-                    throw new Error('response not ok')
-                }
-                return response.json()
-            })
-            .then((response) => {
-                let copyDataSelect = dataSelect;
-                let value = [];
-                response.map((e) => {
-                    value.push({ value: e.id, name: e[key] })
-                })
-                copyDataSelect[name] = value
-                setDataSelect(copyDataSelect)
-
-            })
-            .catch((e) => {
-                console.log(e.message)
-            })
-    }
-
-    useEffect(() => {
-        props.form.map((e) => {
-            if (e.type === "select" || e.type === "selectMulti") {
-                if (typeof e.table !== 'undefined') {
-                    loadSelect(e.table, e.name, e.key)
-                } else if (typeof e.choices !== 'undefined') {
-                    let copyDataSelect = dataSelect
-                    copyDataSelect[e.name] = []
-                    e.choices.map((choice) => {
-                        copyDataSelect[e.name].push({ value: choice, name: choice })
-                    })
-                    setDataSelect(copyDataSelect)
-                }
-            }
-        })
-    }, [props.form])
 
     return (
         <>

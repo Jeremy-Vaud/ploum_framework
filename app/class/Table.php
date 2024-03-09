@@ -357,11 +357,65 @@ abstract class Table extends Debug {
      * @return string
      */
     public function listAllToJson() {
-        $return = [];
-        foreach ($this->listAll() as $elt) {
-            $return[] = $elt->toArray();
+        $class = strtolower(substr(get_called_class(), strrpos(get_called_class(), '\\') + 1));
+        $join = "";
+        $columns = "$class.id";
+        $data = [];
+        $dataSelect = [];
+        $requirePath = [];
+        $splits = [];
+        foreach ($this->fields as $field => $value) {
+            if (is_a($value, "App\ForeignKey")) {
+                $columns .= ", $class.$field";
+                $table = strtolower(explode("\\", $value->getTable())[1]);
+                $name = $value->getAdminKey();
+                if(BDD::Execute("SELECT id AS value, $name AS name FROM $table", [])) {
+                    $dataSelect[$field] = BDD::FetchAll();
+                }
+            } else if (is_a($value, "App\MultipleForeignKeys")) {
+                $foreignTable = strtolower(explode("\\", $value->getForeignTable())[1]);
+                $junctionTable = $value->getTableName();
+                $columns .= ", GROUP_CONCAT($foreignTable.id) as $field";
+                $join .= "LEFT JOIN $junctionTable ON $class.id = $junctionTable.$class LEFT JOIN $foreignTable ON $foreignTable.id = $junctionTable.$foreignTable";
+                $name = $value->getKey();
+                $splits[] = $field;
+                if(BDD::Execute("SELECT id AS value, $name AS name FROM $foreignTable", [])) {
+                    $dataSelect[$field] = BDD::FetchAll();
+                }
+            } else if (is_a($value, "App\File")) {
+                $columns .= ", $class.$field";
+                $requirePath[] = $field;
+            } else if (is_a($value, "App\Field")) {
+                if ($value->getType() === "select") {
+                    foreach ($value->getChoices() as $choice) {
+                        $dataSelect[$field][] = ["value" => $choice, "name" => $choice];
+                    }
+                }
+                if ($value->getType() !== "password") {
+                    $columns .= ", $class.$field";
+                }
+            }
         }
-        return json_encode($return);
+        if(BDD::Execute("SELECT $columns FROM $class $join GROUP BY $class.id", [])) {
+            $data = BDD::FetchAll();
+        }
+        foreach ($requirePath as $require) {
+            foreach ($data as $key => $val) {
+                $this->set("id", $val["id"]);
+                $this->set($require, $val[$require]);
+                $data[$key][$require] = $this->get($require);
+            }
+        }
+        foreach ($splits as $split) {
+            foreach ($data as $key => $val) {
+                if (isset($data[$key][$split])) {
+                    $data[$key][$split] = array_map("intval", explode(",", $data[$key][$split]));
+                } else {
+                    $data[$key][$split] = [];
+                }
+            }
+        }
+        return json_encode(["data" => $data, "dataSelect" => $dataSelect]);
     }
 
     /**
@@ -373,11 +427,11 @@ abstract class Table extends Debug {
         $array = ["id" => $this->id];
         foreach ($this->fields as $field => $value) {
             if (get_class($value) === "App\ForeignKey") {
-                $array[$field] = $value->get()->toArray();
+                $array[$field] = $value->getKey();
             } else if (is_a($value, "App\MultipleForeignKeys")) {
                 $array[$field] = [];
                 foreach ($value->get() as $object) {
-                    $array[$field][] = $object->toArray();
+                    $array[$field][] = $object->get("id");
                 }
             } else if (get_class($value) === "App\Field") {
                 if ($value->getType() !== "password") {

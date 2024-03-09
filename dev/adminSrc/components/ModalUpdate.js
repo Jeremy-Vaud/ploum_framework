@@ -3,16 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen } from '@fortawesome/free-solid-svg-icons'
 import Modal from "./Modal"
-import FormCheckbox from "./FormCheckbox"
-import FormInput from "./FormInput"
-import FormTextarea from "./FormTextarea"
-import FormImage from "./FormImage"
-import FormSelect from "./FormSelect"
-import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
-import FormDateTime from "./FormDateTime"
-import FormRichText from "./FormRichText"
-import FormFile from "./FormFile"
+import Form from "./Form"
 
 export default function ModalUpdate(props) {
     const [visibility, setVisibility] = useState(false)
@@ -66,6 +58,7 @@ export default function ModalUpdate(props) {
         let formData = new FormData(form)
         formData.append("table", props.table)
         formData.append("action", "update")
+        formData.append("id", props.data.id)
         setLoading(true)
         checkbox.forEach((input) => {
             if (!input.checked) {
@@ -107,62 +100,7 @@ export default function ModalUpdate(props) {
         <>
             <button onClick={show}><FontAwesomeIcon icon={faPen} className='w-[15px] mr-5' /></button>
             <Modal visibility={visibility} hide={hide}>
-                <form id={formId}>
-                    <input type="hidden" name="id" value={props.data.id} />
-                    {inputs.map(e => {
-                        if (e.type === "checkbox") {
-                            return (
-                                <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "textarea") {
-                            return (
-                                <FormTextarea key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "image") {
-                            return (
-                                <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "select" && props.dataSelect[e.name]) {
-                            let value
-                            if (typeof e.value === "string") {
-                                value = e.value
-                            } else {
-                                value = e.value.id
-                            }
-                            return (
-                                <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
-                            )
-                        } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
-                            let table;
-                            for (let i = 0; i < props.formUpdate.length; i++) {
-                                if (props.formUpdate[i].name === e.name) {
-                                    table = props.formUpdate[i].table
-                                    break
-                                }
-                            }
-                            return (
-                                <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} dataSelect={props.dataSelect[e.name]} table={table} />
-                            )
-                        } else if (e.type === "dateTime") {
-                            return (
-                                <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "richText") {
-                            return (
-                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "file") {
-                            return (
-                                <FormFile key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} table={props.table} id={props.data.id} logOut={props.logOut}/>
-                            )
-                        } else {
-                            return (
-                                <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        }
-                    })
-                    }
-                </form>
+                <Form formId={formId} table={props.table} id={props.data.id} inputs={inputs} dataSelect={props.dataSelect} handleChange={handleChange} logOut={props.logOut} />
                 <div className="text-center">
                     <button onClick={submit} className="btn-update mr-5">Enregistrer les modifications</button>
                     <button onClick={hide} className="btn-cancel">Annuler</button>

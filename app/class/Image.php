@@ -60,10 +60,15 @@ final class Image extends File {
     /**
      * Retourne les paramètres de l'image pour le panneau d'administration
      *
+     * @param bool $table si true retourne aussi la valeur de l'attribut table
      * @return mixed Un tableau de paramètres
      */
-    public function getAdmin() {
-        return ["type" => "image", "table" => $this->admin];
+    public function getAdmin(bool $table = true) {
+        $return = ["type" => "image"];
+        if($table) {
+            $return["table"] = $this->admin;
+        }
+        return $return;
     }
 
     /**

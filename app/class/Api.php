@@ -16,11 +16,12 @@ final class Api {
             "insert",
             "update",
             "delete",
-            "download"
+            "downloadTable"
         ],
         "EDIT_AREA" => [
             "getEditArea",
-            "upsert"
+            "upsert",
+            "downloadEditArea"
         ],
         "SESSION" => [
             "isLog",
@@ -253,7 +254,7 @@ final class Api {
      *
      * @return void
      */
-    private function download() {
+    private function downloadTable() {
         if (isset($_POST["id"]) && isset($_POST["field"])) {
             $this->object->loadFromId($_POST["id"]);
             $file = $this->object->get($_POST["field"]);
@@ -300,7 +301,7 @@ final class Api {
      */
     private function getEditArea() {
         $this->object->load();
-        echo $this->object->valuesToJSON(true);
+        echo $this->object->valuesToJSON(true, true);
     }
 
     /**
@@ -323,6 +324,28 @@ final class Api {
             }
         } else {
             echo json_encode(["status" => "invalid", "data" => array_merge($check, $checkFiles)]);
+        }
+    }
+
+    /**
+     * Télécharger un fichier correspondant au champ d'une class EditArea
+     *
+     * @return void
+     */
+    private function downloadEditArea() {
+        if (isset($_POST["field"])) {
+            $file = $this->object->get($_POST["field"]);
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+            exit;
+        } else {
+            http_response_code(400);
         }
     }
 

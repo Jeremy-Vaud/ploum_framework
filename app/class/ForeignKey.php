@@ -8,13 +8,13 @@ namespace App;
  * @author  Jérémy Vaud
  * @final
  */
-final class ForeignKey extends Debug{
+final class ForeignKey extends Debug {
     // Attributs
     protected $table;
     protected $key = 0;
     protected $value = null;
     protected $admin = ["key" => "id", "admin" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
-    
+
     /**
      * Constructeur
      *
@@ -27,13 +27,13 @@ final class ForeignKey extends Debug{
         // Vérifie que la class exist avant de construire
         try {
             if (!class_exists($table)) {
-                throw new \Exception("La class " .  htmlentities($table) ." n'existe pas");
+                throw new \Exception("La class " .  htmlentities($table) . " n'existe pas");
             }
-            if($admin !== []) {
-                if(isset($admin["key"])) {
+            if ($admin !== []) {
+                if (isset($admin["key"])) {
                     $this->admin["key"] = $admin["key"];
                 }
-                if(isset($admin["admin"])) {
+                if (isset($admin["admin"])) {
                     $this->admin["admin"] = $admin["admin"];
                 }
             }
@@ -42,7 +42,7 @@ final class ForeignKey extends Debug{
             $this->alertDebug($e);
         }
     }
-    
+
     /**
      * Retourne la Valeur de la clée
      *
@@ -51,7 +51,7 @@ final class ForeignKey extends Debug{
     public function getKey() {
         return $this->key;
     }
-    
+
     /**
      * Retourne l'objet vers lequel pointe la clée étrangère
      *
@@ -59,13 +59,17 @@ final class ForeignKey extends Debug{
      */
     public function get() {
         // Renvoye value
-        if($this->value === null) {        
+        if ($this->value === null) {
             $this->value = new $this->table();
             $this->value->loadFromId($this->key);
         }
         return $this->value;
     }
-    
+
+    public function getTable() {
+        return $this->table;
+    }
+
     /**
      * Retourne le type de colone pour la structure de la BDD
      *
@@ -74,7 +78,7 @@ final class ForeignKey extends Debug{
     public function getTypeForSql() {
         return "int NOT NULL";
     }
-    
+
     /**
      * Attribuer une valeur à la clée étrangère
      *
@@ -93,12 +97,18 @@ final class ForeignKey extends Debug{
     /**
      * Retourne les paramètres du champ pour le panneau d'administration
      *
+     * @param bool $table si true retourne aussi la valeur de l'attribut table
      * @return mixed Un tableau de paramètres ou false 
      */
-    public function getAdmin() {
-        if($this->admin["admin"] !== []) {
-            return ["type" => "select", "table" => $this->admin["admin"],"foreignTable" => $this->table,"key" => $this->admin["key"]];
+    public function getAdmin(bool $table = true) {
+        $return = ["type" => "select", "foreignTable" => $this->table, "key" => $this->admin["key"]];
+        if ($table) {
+            $return["table"] = $this->admin["admin"];
         }
-        return "false";
+        return $return;
+    }
+
+    public function getAdminKey() {
+        return $this->admin["key"];
     }
 }

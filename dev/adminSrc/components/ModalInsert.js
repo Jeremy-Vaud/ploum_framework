@@ -1,19 +1,8 @@
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from 'uuid'
 import Modal from "./Modal"
-import FormCheckbox from "./FormCheckbox"
-import FormInput from "./FormInput"
-import FormTextarea from "./FormTextarea"
-import FormImage from "./FormImage"
-import FormSelect from "./FormSelect"
-import FormSelectMulti from "./FormSelectMulti"
 import Loading from "./Loading"
-import FormDateTime from "./FormDateTime"
-import FormRichText from "./FormRichText"
-import FormFile from "./FormFile"
-
-
-
+import Form from "./Form"
 
 export default function ModalInsert(props) {
     const [visibility, setVisibility] = useState(false)
@@ -107,56 +96,7 @@ export default function ModalInsert(props) {
         <>
             <button onClick={show} className="btn-add">Ajouter</button>
             <Modal visibility={visibility} hide={hide}>
-                <form id={formId}>
-                    {inputs.map(e => {
-                        if (e.type === "checkbox") {
-                            return (
-                                <FormCheckbox key={e.key} name={e.name} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "textarea") {
-                            return (
-                                <FormTextarea key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "image") {
-                            return (
-                                <FormImage key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "select" && props.dataSelect[e.name]) {
-                            return (
-                                <FormSelect key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} dataSelect={props.dataSelect[e.name]} />
-                            )
-                        } else if (e.type === "selectMulti" && props.dataSelect[e.name]) {
-                            let table;
-                            for (let i = 0; i < props.form.length; i++) {
-                                if (props.form[i].name === e.name) {
-                                    table = props.form[i].table
-                                    break
-                                }
-                            }
-                            let value = []
-                            return (
-                                <FormSelectMulti key={e.key} name={e.name} type={e.type} warning={e.warning} value={value} dataSelect={props.dataSelect[e.name]} table={table} />
-                            )
-                        } else if (e.type === "dateTime") {
-                            return (
-                                <FormDateTime key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "richText") {
-                            return (
-                                <FormRichText key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        } else if (e.type === "file") {
-                            return (
-                                <FormFile key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} table={props.table}/>
-                            )
-                        } else {
-                            return (
-                                <FormInput key={e.key} name={e.name} type={e.type} warning={e.warning} value={e.value} handleChange={handleChange} />
-                            )
-                        }
-                    })
-                    }
-                </form>
+                <Form formId={formId} table={props.table} id={null} inputs={inputs} dataSelect={props.dataSelect} handleChange={handleChange} logOut={props.logOut} />
                 <div className="text-center">
                     <button onClick={submit} className="btn-add mr-5">Ajouter</button>
                     <button onClick={hide} className="btn-cancel">Annuler</button>

@@ -27,10 +27,17 @@ export default function FormFile(props) {
     function download(e) {
         e.preventDefault()
         let formData = new FormData
-        formData.append("table", props.table)
-        formData.append("action", "download")
+        if (props.table) {
+            formData.append("table", props.table)
+            formData.append("action", "downloadTable")
+        } else if (props.editArea) {
+            formData.append("edit_area", props.editArea)
+            formData.append("action", "downloadEditArea")
+        }
+        if (props.id) {
+            formData.append("id", props.id)
+        }
         formData.append("field", props.name)
-        formData.append("id", props.id)
         fetch("/api", {
             method: 'POST',
             body: formData
@@ -47,9 +54,9 @@ export default function FormFile(props) {
             })
             .then((result) => {
                 let a = document.createElement("a");
-                    a.href = window.URL.createObjectURL(result);
-                    a.download = props.value.split("/").slice(-1);
-                    a.click();
+                a.href = window.URL.createObjectURL(result);
+                a.download = props.value.split("/").slice(-1);
+                a.click();
             })
             .catch((e) => {
                 console.log(e);
@@ -64,7 +71,7 @@ export default function FormFile(props) {
             </label>
             {!hasFile ?
                 <>
-                    <input type={props.type} name={props.name} id={id} onChange={handleChange} className={hasTmp ? "hidden file:btn-add" : "file:btn-add"} />
+                    <input type="file" name={props.name} id={id} onChange={handleChange} className={hasTmp ? "hidden file:btn-add" : "file:btn-add"} />
                     {hasTmp ?
                         <>
                             <button onClick={deleteTmp} className='mr-5'><FontAwesomeIcon icon={faTrashCan} className='w-[15px]' /></button>

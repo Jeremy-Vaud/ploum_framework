@@ -111,7 +111,7 @@ final class Field extends Debug {
     public function get() {
         return $this->value;
     }
-    
+
     /**
      * Retourne la valeur de l'attribut value convertit en entités HTML
      *
@@ -148,22 +148,29 @@ final class Field extends Debug {
     /**
      * Retourne les paramètres du champ pour le panneau d'administration
      *
+     * @param bool $table si true retourne aussi la valeur de l'attribut table
      * @return mixed Un tableau de paramètres
      */
-    public function getAdmin() {
-            if ($this->type === "int") {
-                return ["type" => "number", "table" => $this->admin];
-            } else if ($this->type === "char") {
-                return ["type" => "text", "table" => $this->admin];
-            } else if ($this->type === "bool") {
-                return ["type" => "checkbox", "table" => $this->admin];
-            } else if ($this->type === "text") {
-                return ["type" => "textarea", "table" => $this->admin];
-            } else if ($this->type === "select") {
-                return ["type" => "select", "table" => $this->admin, "choices" => $this->choices];
-            } else {
-                return ["type" => $this->type, "table" => $this->admin];
-            }
+    public function getAdmin(bool $table = true) {
+        $return = [];
+        if($table) {
+            $return["table"] = $this->admin;
+        }
+        if ($this->type === "int") {
+            $return["type"] = "number";
+        } else if ($this->type === "char") {
+            $return["type"] = "text";
+        } else if ($this->type === "bool") {
+            $return["type"] = "checkbox";
+        } else if ($this->type === "text") {
+            $return["type"] = "textarea";
+        } else if ($this->type === "select") {
+            $return["type"] = "select";
+            $return["choices"] = $this->choices;
+        } else {
+            $return["type"] = $this->type;
+        }
+        return $return;
     }
 
     /**

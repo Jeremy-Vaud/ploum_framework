@@ -14,7 +14,7 @@ final class MultipleForeignKeys extends Debug {
     protected $table;
     protected $foreignTable;
     protected $tableName;
-    protected $value = null;
+    protected $value = [];
     protected $admin = ["key" => "id", "admin" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
 
     /**
@@ -43,7 +43,7 @@ final class MultipleForeignKeys extends Debug {
             $this->alertDebug($e);
         }
     }
-    
+
     /**
      * Retourne la valeur de l'attribut value
      *
@@ -52,7 +52,7 @@ final class MultipleForeignKeys extends Debug {
     public function get() {
         return $this->value;
     }
-    
+
     /**
      * Retourne la valeur de l'attribut foreignTable
      *
@@ -62,6 +62,10 @@ final class MultipleForeignKeys extends Debug {
         return $this->foreignTable;
     }
     
+    public function getTableName() {
+        return $this->tableName;
+    }
+
     /**
      * Attribuer une valeur à l'attribut $id
      *
@@ -71,7 +75,7 @@ final class MultipleForeignKeys extends Debug {
     public function setId(int $id) {
         $this->id = $id;
     }
-    
+
     /**
      * Attribut les noms des attributs table et foreignTable
      *
@@ -90,7 +94,7 @@ final class MultipleForeignKeys extends Debug {
             $this->alertDebug($e);
         }
     }
-    
+
     /**
      * Attribuer des valeurs à l'attribut $value depuis un tableau ou une chaine de charactères
      *
@@ -99,20 +103,20 @@ final class MultipleForeignKeys extends Debug {
      */
     public function set(array | string $list) {
         $this->value = [];
-        if(is_array($list)) {
+        if (is_array($list)) {
             foreach ($list as $elt) {
                 $this->value[$elt] = null;
             }
         } else {
             $explode = explode(",", $list);
             foreach ($explode as $elt) {
-                if(ctype_digit($elt)) {
+                if (ctype_digit($elt)) {
                     $this->value[$elt] = null;
-                }             
+                }
             }
         }
     }
-    
+
     /**
      * Charges les données depuis la BDD
      *
@@ -141,7 +145,6 @@ final class MultipleForeignKeys extends Debug {
         }
     }
 
-    
     /**
      * Insère les données dans la BDD
      *
@@ -171,7 +174,7 @@ final class MultipleForeignKeys extends Debug {
         }
         return true;
     }
-    
+
     /**
      * Suprime toutes les données de la BDD
      *
@@ -190,7 +193,7 @@ final class MultipleForeignKeys extends Debug {
         }
         return true;
     }
-    
+
     /**
      * Mise à jour des données de la BDD
      *
@@ -215,12 +218,18 @@ final class MultipleForeignKeys extends Debug {
     /**
      * Retourne les paramètres du champ pour le panneau d'administration
      *
+     * @param bool $table si true retourne aussi la valeur de l'attribut table
      * @return mixed Un tableau de paramètres ou false 
      */
-    public function getAdmin() {
-        if ($this->admin["admin"] !== []) {
-            return ["type" => "selectMulti", "table" => $this->admin["admin"], "foreignTable" => $this->foreignTable, "key" => $this->admin["key"]];
+    public function getAdmin(bool $table = true) {
+        $return = ["type" => "selectMulti", "foreignTable" => $this->foreignTable, "key" => $this->admin["key"]];
+        if ($table) {
+            $return["table"] = $this->admin["admin"];
         }
-        return false;
+        return $return;
+    }
+
+    public function getKey() {
+        return $this->admin["key"];
     }
 }
