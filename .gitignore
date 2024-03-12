@@ -10,7 +10,6 @@ app/.env
 app/files/
 
 # Dev
-dev/adminSrc/data.json
 dev/adminSrc/icons.js
 dev/migrations/
 
