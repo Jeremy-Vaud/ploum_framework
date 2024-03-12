@@ -10,7 +10,7 @@ namespace App;
  */
 final class AdminPannel {
     // Attributs
-    protected $data = []; // Données du fichier 'adminSrc/data.json'
+    protected array $data = []; // Données de la structure du panneau d'administration
 
     /**
      * Initialistion
@@ -52,7 +52,7 @@ final class AdminPannel {
             return $a['order'] - $b['order'];
         });
     }
-    
+
     /**
      * Retourne l'attribut "data"
      *

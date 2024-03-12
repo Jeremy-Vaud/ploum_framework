@@ -9,7 +9,7 @@
         "downloadFonts": "php dev/manage.php download-fonts",
         "devBuildAdmin": "npx parcel watch dev/adminSrc/index.html --dist-dir public/admin --public-url /admin",
         "buildAdmin": "npx parcel build dev/adminSrc/index.html --dist-dir public/admin --public-url /admin",
-        "importIcons": "node --experimental-json-modules dev/adminSrc/importIcons.mjs",
+        "importIcons": "php dev/manage.php import-icons",
         "watchCss": "npx tailwindcss -c dev/tailwind.config.js -i dev/src/style.css -o public/assets/css/style.css --watch --minify",
         "watchJs": "npx parcel watch dev/src/*.js dev/src/*.ts --dist-dir public/assets/js",
         "buildJs": "npx parcel build dev/src/*.js dev/src/*.ts --dist-dir public/assets/js",

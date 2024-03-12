@@ -2,8 +2,8 @@
 /*
  * CLI
  */
-require __DIR__ ."/../app/vendor/autoload.php";
-require __DIR__ ."/../app/settings/global.php";
+require __DIR__ . "/../app/vendor/autoload.php";
+require __DIR__ . "/../app/settings/global.php";
 
 App\DotEnv::load();
 
@@ -16,6 +16,7 @@ if (isset($argv[1])) {
             echo "export-DB : Expote la Base de données\n";
             echo "create-superAdmin : Créer un compte superAdmin\n";
             echo "download-fonts : Télécharge des polices depuis Google Fonts\n";
+            echo "import-icons : Crée le fichier adminSrc/icons.js\n";
             break;
 
         case 'migrate':
@@ -57,6 +58,10 @@ if (isset($argv[1])) {
         case 'download-fonts':
             $gfd = new GFontsDownloader\GFontsDownloader\GFontsDownloader($FONTS, "public/assets/fonts");
             $gfd->download();
+            break;
+
+        case 'import-icons':
+            Dev\Icons::importIcons();
             break;
 
         default:
