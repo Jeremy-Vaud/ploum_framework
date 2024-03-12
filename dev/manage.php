@@ -15,7 +15,6 @@ if (isset($argv[1])) {
             echo "migrate : Génére ou modifie les tables de la BDD\n";
             echo "export-DB : Expote la Base de données\n";
             echo "create-superAdmin : Créer un compte superAdmin\n";
-            echo "create-admin-pannel : Génére un fichier JSON pour la construction du panneau d'administration\n";
             echo "download-fonts : Télécharge des polices depuis Google Fonts\n";
             break;
 
@@ -53,11 +52,6 @@ if (isset($argv[1])) {
             } else {
                 echo "Une erreur est survenue";
             }
-            break;
-
-        case 'create-admin-pannel':
-            $adminPannel = new Dev\AdminPannel;
-            $adminPannel->generate();
             break;
 
         case 'download-fonts':

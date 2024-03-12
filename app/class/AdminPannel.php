@@ -1,9 +1,9 @@
 <?php
 
-namespace Dev;
+namespace App;
 
 /**
- * Class permetant de générer le fichier 'adminSrc/data.json' qui sert à la génération du panneau d'administration
+ * Class permetant de générer la structure du panneau d'administration
  * 
  * @author  Jérémy Vaud
  * @final
@@ -48,22 +48,17 @@ final class AdminPannel {
                 }
             }
         }
+        usort($this->data["pages"], function ($a, $b) {
+            return $a['order'] - $b['order'];
+        });
     }
-
+    
     /**
-     * générer le fichier 'adminSrc/data.json'
+     * Retourne l'attribut "data"
      *
-     * @return void
+     * @return array
      */
-    public function generate() {
-        if ($file = fopen(__DIR__ . "/../adminSrc/data.json", "w")) {
-            if (fwrite($file, json_encode($this->data))) {
-                echo "Le fichier adminSrc/data.json a été modifié";
-            } else {
-                echo "Une erreur est survenue lors de l'écriture dans le fichier adminSrc/data.json";
-            }
-        } else {
-            echo "Une erreur est survenue lors de l'ouverture du fichier adminSrc/data.json";
-        }
+    public function get() {
+        return $this->data;
     }
 }

@@ -29,7 +29,8 @@ final class Api {
             "logOut",
             "isValidRecoveryLink",
             "forgotPass",
-            "changePass"
+            "changePass",
+            "getNavigation"
         ],
         "USER" => [
             "updateUser",
@@ -468,6 +469,16 @@ final class Api {
         } else {
             echo json_encode(["isValid" => false, "msg" => "Une erreur est survenue"]);
         }
+    }
+
+    /**
+     * Charge la structure du panneau d'administration
+     *
+     * @return void
+     */
+    public function getNavigation() {
+        $data = new AdminPannel;
+        echo json_encode($data->get());
     }
 
     //--------------------------------------------------------------------------------------

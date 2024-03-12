@@ -166,7 +166,6 @@ final class Field extends Debug {
             $return["type"] = "textarea";
         } else if ($this->type === "select") {
             $return["type"] = "select";
-            $return["choices"] = $this->choices;
         } else {
             $return["type"] = $this->type;
         }

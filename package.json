@@ -6,7 +6,6 @@
         "migrate": "php dev/manage.php migrate",
         "exportDB": "php dev/manage.php export-DB",
         "createSuperAdmin": "php dev/manage.php create-superAdmin",
-        "createAdminPannel": "php dev/manage.php create-admin-pannel",
         "downloadFonts": "php dev/manage.php download-fonts",
         "devBuildAdmin": "npx parcel watch dev/adminSrc/index.html --dist-dir public/admin --public-url /admin",
         "buildAdmin": "npx parcel build dev/adminSrc/index.html --dist-dir public/admin --public-url /admin",

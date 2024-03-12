@@ -101,7 +101,7 @@ final class ForeignKey extends Debug {
      * @return mixed Un tableau de paramètres ou false 
      */
     public function getAdmin(bool $table = true) {
-        $return = ["type" => "select", "foreignTable" => $this->table, "key" => $this->admin["key"]];
+        $return = ["type" => "select"];
         if ($table) {
             $return["table"] = $this->admin["admin"];
         }

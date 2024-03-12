@@ -9,7 +9,6 @@ import PageTable from './pages/pageTable'
 import PageEditArea from './pages/PageEditArea'
 import PageAccount from './pages/PageAccount'
 import PageRecovery from './pages/PageRecovery'
-import data from './data.json'
 import Loading from './components/Loading'
 import { lazy, Suspense } from 'react'
 const LazyCloud = lazy(() => import("./pages/PageCloud"))
@@ -18,10 +17,9 @@ export function App() {
     const [loading, setLoading] = useState(true)
     const [isConnect, setIsConnect] = useState(false)
     const [session, setSession] = useState(null)
-    const navigation = [...data.pages].sort((a, b) => {
-        return a.order - b.order
-    })
-    const cloud = true
+    const [navigation, setNavigation] = useState(null)
+
+
 
     function logIn(session) {
         setIsConnect(true)
@@ -57,7 +55,33 @@ export function App() {
             })
     }
 
-    useEffect(isLog, [])
+    function getNavigation() {
+        const formData = new FormData
+        formData.append("method", "session")
+        formData.append("action", "getNavigation")
+        fetch("/api", {
+            method: "POST",
+            body: formData
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json()
+                } else {
+                    throw new Error("Navigation non chargée")
+                }
+            })
+            .then((result) => {
+                setNavigation(result)
+            })
+            .catch((e) => {
+                console.log(e.message)
+            })
+    }
+
+    useEffect(() => {
+        isLog()
+        getNavigation()
+    }, [])
 
     function sendLogOut() {
         const formData = new FormData
@@ -76,14 +100,14 @@ export function App() {
             })
     }
 
-    if (!loading) {
+    if (!loading && navigation) {
         return (
             <BrowserRouter>
-                <Navbar sendLogOut={sendLogOut} navigation={navigation} isConnect={isConnect} session={session} cloud={data.cloud}>
+                <Navbar sendLogOut={sendLogOut} navigation={navigation.pages} isConnect={isConnect} session={session} cloud={navigation.cloud}>
                     <Routes>
-                        <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation} session={session} cloud={data.cloud} /> : <PageLogin logIn={logIn} />} />
+                        <Route path='/admin' key={uuidv4()} element={isConnect ? <PageHome logOut={logOut} navigation={navigation.pages} session={session} cloud={navigation.cloud} /> : <PageLogin logIn={logIn} />} />
                         <Route path='/admin/account' key={uuidv4()} element={isConnect ? <PageAccount logOut={logOut} session={session} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
-                        {session ? (navigation.map(e => {
+                        {session ? (navigation.pages.map(e => {
                             if (e.className !== "App\\User" || session.role === "superAdmin") {
                                 if (e.type === "table") {
                                     return (
@@ -96,7 +120,7 @@ export function App() {
                                 }
                             }
                         })) : null}
-                        {data.cloud ?
+                        {navigation.cloud ?
                             <Route path='/admin/cloud' key={uuidv4()} element={isConnect ? <PageCloud logOut={logOut} key={uuidv4()} setSession={setSession} /> : <PageLogin logIn={logIn} />} />
                             : null}
                         <Route path='/admin/recovery' element={<PageRecovery />} />
@@ -107,7 +131,7 @@ export function App() {
         )
     } else {
         return (
-            <Loading loading="" />
+            <Loading visibility={true} />
         )
     }
 }

@@ -222,7 +222,7 @@ final class MultipleForeignKeys extends Debug {
      * @return mixed Un tableau de paramètres ou false 
      */
     public function getAdmin(bool $table = true) {
-        $return = ["type" => "selectMulti", "foreignTable" => $this->foreignTable, "key" => $this->admin["key"]];
+        $return = ["type" => "selectMulti"];
         if ($table) {
             $return["table"] = $this->admin["admin"];
         }
