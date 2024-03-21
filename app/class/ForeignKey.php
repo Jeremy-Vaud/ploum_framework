@@ -9,34 +9,43 @@ namespace App;
  * @final
  */
 final class ForeignKey extends Debug {
+    // Traits
+    use FieldTrait;
+    use ForeignTrait;
     // Attributs
-    protected $table;
-    protected $key = 0;
-    protected $value = null;
-    protected $admin = ["key" => "id", "admin" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
-
+    protected ?string $table = null; // Nom de la table de la clée étrangère
+    protected int $key = 0; // Id de l'objet
+    protected ?object $value = null; // Objet
     /**
      * Constructeur
      *
      * @param  string $table Nom de la table de la clée étrangère
-     * @param  array $admin Liste des paramètres pour le panneau d'administration ("columns","insert","update")
+     * @param  array $params [column : string, admin : array]
      * @throws Exeption si la table n'existe pas
      * @return void
      */
-    public function __construct(string $table, array $admin = []) {
+    public function __construct(string $table, array $params = []) {
         // Vérifie que la class exist avant de construire
         try {
+            // Input
+            $this->input = "select";
             if (!class_exists($table)) {
                 throw new \Exception("La class " .  htmlentities($table) . " n'existe pas");
             }
-            if ($admin !== []) {
-                if (isset($admin["key"])) {
-                    $this->admin["key"] = $admin["key"];
+            // Column
+            if (isset($params["column"])) {
+                if (!is_string($params["column"])) {
+                    throw new \Exception("Paramètre 'column' invalides");
                 }
-                if (isset($admin["admin"])) {
-                    $this->admin["admin"] = $admin["admin"];
+                $this->column = $params["column"];
+            }
+            // Admin
+            if (isset($params["admin"])) {
+                if (!$this->setAdmin($params["admin"])) {
+                    throw new \Exception("Paramètres 'admin' invalides");
                 }
             }
+            // Table
             $this->table = $table;
         } catch (\Exception $e) {
             $this->alertDebug($e);
@@ -48,7 +57,7 @@ final class ForeignKey extends Debug {
      *
      * @return int la Valeur de la clée
      */
-    public function getKey() {
+    public function getKey(): int {
         return $this->key;
     }
 
@@ -57,7 +66,7 @@ final class ForeignKey extends Debug {
      *
      * @return object
      */
-    public function get() {
+    public function get(): object {
         // Renvoye value
         if ($this->value === null) {
             $this->value = new $this->table();
@@ -75,7 +84,7 @@ final class ForeignKey extends Debug {
      *
      * @return string type
      */
-    public function getTypeForSql() {
+    public function getTypeForSql(): string {
         return "int NOT NULL";
     }
 
@@ -85,30 +94,12 @@ final class ForeignKey extends Debug {
      * @param  int $key Valeur de la clée
      * @return bool
      */
-    public function set(int $key) {
+    public function set(int $key): bool {
         // Change value
         if ($key > 0) {
             $this->key = $key;
             return true;
         }
         return false;
-    }
-
-    /**
-     * Retourne les paramètres du champ pour le panneau d'administration
-     *
-     * @param bool $table si true retourne aussi la valeur de l'attribut table
-     * @return mixed Un tableau de paramètres ou false 
-     */
-    public function getAdmin(bool $table = true) {
-        $return = ["type" => "select"];
-        if ($table) {
-            $return["table"] = $this->admin["admin"];
-        }
-        return $return;
-    }
-
-    public function getAdminKey() {
-        return $this->admin["key"];
     }
 }

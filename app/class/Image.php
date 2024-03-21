@@ -11,7 +11,7 @@ namespace App;
  * @final
  */
 final class Image extends File {
-    protected $width = null;
+    protected null|int $width = null; // Largeur de l'image
 
     /**
      * Constructeur
@@ -22,8 +22,10 @@ final class Image extends File {
     public function __construct(array $params) {
         // Constructeur
         try {
-            // Type
-            $this->type = ["jpg", "png", "jpeg", "webp"];
+            // Input
+            $this->input = "image";
+            // Accept
+            $this->accept = ["jpg", "png", "jpeg", "webp"];
             // Max size
             if (isset($params["maxSize"])) {
                 if (!is_int($params["maxSize"]) || $params["maxSize"] < 1) {
@@ -33,12 +35,8 @@ final class Image extends File {
             }
             // Admin
             if (isset($params["admin"])) {
-                foreach ($params["admin"] as $param) {
-                    if ($param === "columns" || $param === "insert" || $param === "update") {
-                        $this->admin[] = $param;
-                    } else {
-                        throw new \Exception("Paramètres admin invalides");
-                    }
+                if (!$this->setAdmin($params["admin"])) {
+                    throw new \Exception("Paramètres 'admin' invalides");
                 }
             }
             // Width
@@ -58,27 +56,13 @@ final class Image extends File {
     }
 
     /**
-     * Retourne les paramètres de l'image pour le panneau d'administration
-     *
-     * @param bool $table si true retourne aussi la valeur de l'attribut table
-     * @return mixed Un tableau de paramètres
-     */
-    public function getAdmin(bool $table = true) {
-        $return = ["type" => "image"];
-        if($table) {
-            $return["table"] = $this->admin;
-        }
-        return $return;
-    }
-
-    /**
      * Sauvegarde le fichier après vérification
      *
      * @param  array $file Le fichier à passer depuis $_FILES
      * @param  bool $check Si true vérifie le fichier avant l'enregistrement
      * @return void
      */
-    public function save(array $file, bool $check = true) {
+    public function save(array $file, bool $check = true): void {
         // Sauvegarder le fichier 
         try {
             if (!$check) {
@@ -86,7 +70,7 @@ final class Image extends File {
                     throw new \Exception("Une erreur est survenue");
                 }
                 $fileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
-                if (!$this->checkType($fileType)) {
+                if (!$this->isAccept($fileType)) {
                     throw new \Exception("Type de fichier non pris en charge");
                 }
                 if (!$this->checkSize($file["size"])) {

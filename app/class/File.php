@@ -8,32 +8,35 @@ namespace App;
  * @author  Jérémy Vaud
  */
 class File extends Debug {
+    // Trait
+    use FieldTrait;
     // Attributs
-    protected $name; // Nom du fichier
-    protected $path; // Chemin du fichier
-    protected $type; // Tableau des extention de fichier possible (exemple: 'pdf')
-    protected $maxSize = null; // Taille maximum du fichier
-    protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
-    protected $default = null; // Chemin du fichier par défaut
-    protected $public = true; // Fichier public ou privé
+    protected ?string $name = null; // Nom du fichier
+    protected ?string $path = null; // Chemin du fichier
+    protected ?int $maxSize = null; // Taille maximum du fichier
+    protected ?string $default = null; // Chemin du fichier par défaut
+    protected bool $public = true; // Fichier public ou privé
+    protected array $accept = []; // Tableau des extention de fichier possible (exemple: 'pdf')
 
     /**
      * Constructeur
      *
-     * @param  array $params Tableau de paramètres : type, maxSize, admin, default, public
+     * @param  array $params Tableau de paramètres : accept, maxSize, admin, default, public
      * @return void
      */
     public function __construct(array $params) {
         // Constructeur
         try {
-            // Type
-            if (!isset($params["type"])) {
+            // Input
+            $this->input = "file";
+            // Accept
+            if (!isset($params["accept"])) {
                 throw new \Exception("Le fichier n'as pas de format définit");
             }
-            if ($params["type"] === [] || !is_array($params["type"]) || !array_is_list($params["type"])) {
-                throw new \Exception("Le paramètre type n'est pas valide");
+            if ($params["accept"] === [] || !is_array($params["accept"]) || !array_is_list($params["accept"])) {
+                throw new \Exception("Le paramètre accept n'est pas valide");
             }
-            $this->type = $params["type"];
+            $this->accept = $params["accept"];
             // Max size
             if (isset($params["maxSize"])) {
                 if (!is_int($params["maxSize"]) || $params["maxSize"] < 1) {
@@ -43,17 +46,13 @@ class File extends Debug {
             }
             // Admin
             if (isset($params["admin"])) {
-                foreach ($params["admin"] as $param) {
-                    if ($param === "columns" || $param === "insert" || $param === "update") {
-                        $this->admin[] = $param;
-                    } else {
-                        throw new \Exception("Paramètres admin invalides");
-                    }
+                if (!$this->setAdmin($params["admin"])) {
+                    throw new \Exception("Paramètres 'admin' invalides");
                 }
             }
             // Default
             if (isset($params["default"])) {
-                $this->default = $param["default"];
+                $this->default = $params["default"];
             }
             // Public
             if (isset($params["public"])) {
@@ -71,18 +70,18 @@ class File extends Debug {
     /**
      * Retourne le nom du fichier
      *
-     * @return string Nom du fichier
+     * @return ?string Nom du fichier
      */
-    public function getName() {
+    public function getName(): ?string {
         return $this->name;
     }
 
     /**
      * Retourne le chemin du fichier
      *
-     * @return string Chemin du fichier
+     * @return ?string Chemin du fichier
      */
-    public function get() {
+    public function get(): ?string {
         $file = $this->path . str_replace("..", "", $this->name ?? "");
         if (file_exists($file)) {
             return $file;
@@ -91,25 +90,11 @@ class File extends Debug {
     }
 
     /**
-     * Retourne les paramètres du fichier pour le panneau d'administration
-     *
-     * @param bool $table si true retourne aussi la valeur de l'attribut table
-     * @return mixed Un tableau de paramètres
-     */
-    public function getAdmin(bool $table = true) {
-        $return = ["type" => "file"];
-        if($table) {
-            $return["table"] = $this->admin;
-        }
-        return $return;
-    }
-
-    /**
      * Retourne le type de colone pour la structure de la BDD
      *
      * @return string
      */
-    public function getTypeForSql() {
+    public function getTypeForSql(): string {
         return "text";
     }
 
@@ -119,7 +104,7 @@ class File extends Debug {
      * @param  string $path Chemin du fichier
      * @return void
      */
-    public function setPath(string $path) {
+    public function setPath(string $path): void {
         if ($this->public) {
             $this->path = "files/";
         } else {
@@ -134,7 +119,7 @@ class File extends Debug {
      * @param  string $name Nom du fichier
      * @return void
      */
-    public function set(string $name) {
+    public function set(string $name): void {
         $this->name = str_replace("..", "", $name);
     }
 
@@ -145,7 +130,7 @@ class File extends Debug {
      * @param  bool $check Si true vérifie le fichier avant l'enregistrement
      * @return void
      */
-    public function save(array $file, bool $check = true) {
+    public function save(array $file, bool $check = true): void {
         // Sauvegarder le fichier
         $target_file = $this->path . $file["name"];
         $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -154,7 +139,7 @@ class File extends Debug {
                 if ($file['error'] !== 0) {
                     throw new \Exception("Une erreur est survenue");
                 }
-                if (!$this->checkType($fileType)) {
+                if (!$this->isAccept($fileType)) {
                     throw new \Exception("Type de fichier non pris en charge");
                 }
                 if (!$this->checkSize($file["size"])) {
@@ -178,16 +163,16 @@ class File extends Debug {
      * Vérifie qu'un fichier est conforme aux paramètre
      *
      * @param  array $file (ex: $_FILES)
-     * @return mixed True si pas d'erreur sinon un message d'erreur (string)
+     * @return bool|string True si pas d'erreur sinon un message d'erreur (string)
      */
-    public function checkFile(array $file) {
+    public function checkFile(array $file): bool|string {
         $target_file = $this->path . $file["name"];
         $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         try {
             if ($file['error'] !== 0) {
                 throw new \Exception("Une erreur est survenue");
             }
-            if (!$this->checkType($fileType)) {
+            if (!$this->isAccept($fileType)) {
                 throw new \Exception("Type de fichier non pris en charge");
             }
             if (!$this->checkSize($file["size"])) {
@@ -204,7 +189,7 @@ class File extends Debug {
      *
      * @return bool
      */
-    protected function createDirectory() {
+    protected function createDirectory(): bool {
         if (!is_dir($this->path)) {
             if (!mkdir($this->path, 0777, true)) {
                 return false;
@@ -219,10 +204,10 @@ class File extends Debug {
      * @param  string $fileType fichier à vérifier
      * @return bool
      */
-    protected function checkType(string $fileType) {
+    protected function isAccept(string $fileType): bool {
         // Vérifie l'extention
         $ok = false;
-        foreach ($this->type as $type) {
+        foreach ($this->accept as $type) {
             if ($type === $fileType) {
                 $ok = true;
             }
@@ -236,7 +221,7 @@ class File extends Debug {
      * @param  int $fileSize taille du fichier
      * @return bool
      */
-    protected function checkSize(int $fileSize) {
+    protected function checkSize(int $fileSize): bool {
         // Vérifie la taille du fichier
         if ($this->maxSize >= $fileSize) {
             return true;
@@ -249,7 +234,7 @@ class File extends Debug {
      *
      * @return void
      */
-    public function deleteFile() {
+    public function deleteFile(): void {
         if ($this->name) {
             $name = str_replace("..", "", $this->name);
             if (is_file($this->path . $name)) {

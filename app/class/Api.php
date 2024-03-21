@@ -190,10 +190,10 @@ final class Api {
         $check = $this->object->checkData($_POST);
         $checkFiles = $this->object->checkFiles($this->files["add"]);
         if ($check === [] && $checkFiles === []) {
-            $this->object->setFromArray($_POST);
+            $this->object->setFromArray($_POST, "insert");
             if ($this->object->insert()) {
                 if ($_FILES !== []) {
-                    $this->object->setFromArray($this->files["add"]);
+                    $this->object->setFromArray($this->files["add"], "insert");
                     $this->object->update();
                 }
                 echo json_encode(["status" => "success", "data" => $this->object->toArray()]);
@@ -215,8 +215,8 @@ final class Api {
             $check = $this->object->checkData($_POST);
             $checkFiles = $this->object->checkFiles($this->files["add"]);
             if ($check === [] && $checkFiles === []) {
-                $this->object->setFromArray($_POST);
-                $this->object->setFromArray($this->files["add"]);
+                $this->object->setFromArray($_POST, "update");
+                $this->object->setFromArray($this->files["add"], "update");
                 $this->object->deleteFiles($this->files["del"]);
                 if ($this->object->update()) {
                     $response = ["status" => "success", "data" => $this->object->toArray(), "session" => null];

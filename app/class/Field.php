@@ -10,15 +10,16 @@ namespace App;
  * @final
  */
 final class Field extends Debug {
+    // Traits
+    use FieldTrait;
     // Attributs
-    protected $type; // Type de champ
-    protected $length = null; // Taille maximum pour les chaine de caractères
-    protected $minLength = null; // Taille minimum pour les chaine de caractères
-    protected $value = null; // Valeur du champ
-    protected $unique = false; // Doit avoir une valeur unique (ex: email pour les utilisateur)
-    protected $admin = []; // Parmètres du panneau d'administration ("columns","insert","update")
-    protected $null = false; // True si valeur null possible
-    protected $choices = []; // Choix select
+    protected ?string $type = null; // Type de champ
+    protected ?int $length = null; // Taille maximum pour les chaine de caractères
+    protected ?int $minLength = null; // Taille minimum pour les chaine de caractères
+    protected mixed $value = null; // Valeur du champ
+    protected bool $unique = false; // Doit avoir une valeur unique (ex: email pour les utilisateur)
+    protected bool $null = false; // True si valeur null possible
+    protected array $choices = []; // Choix select
 
     /**
      * Vérifie les paramètres avant de construire
@@ -82,12 +83,8 @@ final class Field extends Debug {
             }
             // Admin
             if (isset($params["admin"])) {
-                foreach ($params["admin"] as $param) {
-                    if ($param === "columns" || $param === "insert" || $param === "update") {
-                        $this->admin[] = $param;
-                    } else {
-                        throw new \Exception("Paramètres 'admin' invalides");
-                    }
+                if (!$this->setAdmin($params["admin"])) {
+                    throw new \Exception("Paramètres 'admin' invalides");
                 }
             }
             // Null
@@ -108,7 +105,7 @@ final class Field extends Debug {
      *
      * @return mixed
      */
-    public function get() {
+    public function get(): mixed {
         return $this->value;
     }
 
@@ -117,7 +114,7 @@ final class Field extends Debug {
      *
      * @return string
      */
-    public function html() {
+    public function html(): string {
         if ($this->type === "richText") {
             $config = \HTMLPurifier_Config::createDefault();
             $purifier = new \HTMLPurifier($config);
@@ -132,7 +129,7 @@ final class Field extends Debug {
      *
      * @return string
      */
-    public function getType() {
+    public function getType(): string {
         return $this->type;
     }
 
@@ -141,35 +138,27 @@ final class Field extends Debug {
      *
      * @return array
      */
-    public function getChoices() {
+    public function getChoices(): array {
         return $this->choices;
     }
 
     /**
-     * Retourne les paramètres du champ pour le panneau d'administration
+     * Attribut une valeur à l'attribut input en fonction de l'attribut type
      *
-     * @param bool $table si true retourne aussi la valeur de l'attribut table
-     * @return mixed Un tableau de paramètres
+     * @return void
      */
-    public function getAdmin(bool $table = true) {
-        $return = [];
-        if($table) {
-            $return["table"] = $this->admin;
-        }
+    public function setInput() {
         if ($this->type === "int") {
-            $return["type"] = "number";
+            $this->input = "number";
         } else if ($this->type === "char") {
-            $return["type"] = "text";
+            $this->input = "text";
         } else if ($this->type === "bool") {
-            $return["type"] = "checkbox";
+            $this->input = "checkbox";
         } else if ($this->type === "text") {
-            $return["type"] = "textarea";
-        } else if ($this->type === "select") {
-            $return["type"] = "select";
+            $this->input = "textarea";
         } else {
-            $return["type"] = $this->type;
+            $this->input = $this->type;
         }
-        return $return;
     }
 
     /**
@@ -177,7 +166,7 @@ final class Field extends Debug {
      *
      * @return string type
      */
-    public function getTypeForSql() {
+    public function getTypeForSql(): string {
         $null = " NOT NULL";
         if ($this->null) {
             $null = "";
@@ -217,7 +206,7 @@ final class Field extends Debug {
      *
      * @return bool
      */
-    public function isUnique() {
+    public function isUnique(): bool {
         return $this->unique;
     }
 
@@ -228,7 +217,7 @@ final class Field extends Debug {
      * @param  bool $verif Si true vérifie la conformité du paramètre $val
      * @return bool Retourne false si $val n'est pas conforme
      */
-    public function set($val, bool $verif = true) {
+    public function set($val, bool $verif = true): bool {
         // Change value
         if (!is_int($val) && ($this->type === "int")) {
             $val = (int)$val;
@@ -257,9 +246,9 @@ final class Field extends Debug {
      *
      * @param  mixed $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * 
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    public function isValid($val, bool $returnMessage = false) {
+    public function isValid($val, bool $returnMessage = false): bool|string {
         if ($this->null && is_null($val)) {
             return true;
         }
@@ -272,9 +261,9 @@ final class Field extends Debug {
      *
      * @param  mixed $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidChar($val, bool $returnMessage = false) {
+    private function isValidChar($val, bool $returnMessage = false): bool|string {
         try {
             if (!is_string($val)) {
                 throw new \Exception("La valeur du champ n'est pas une chaîne de caractères");
@@ -301,9 +290,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidEmail(string $val, bool $returnMessage = false) {
+    private function isValidEmail(string $val, bool $returnMessage = false): bool|string {
         try {
             if (isset($this->length) && strlen($val) > $this->length) {
                 throw new \Exception("La chaîne de caractères est trop longue");
@@ -327,9 +316,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidText(string $val, bool $returnMessage = false) {
+    private function isValidText(string $val, bool $returnMessage = false): bool|string {
         try {
             if (isset($this->length) && strlen($val) > $this->length) {
                 throw new \Exception("La chaîne de caractères est trop longue");
@@ -353,9 +342,9 @@ final class Field extends Debug {
      *
      * @param  mixed $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidInt($val, bool $returnMessage = false) {
+    private function isValidInt($val, bool $returnMessage = false): bool|string {
         try {
             if (!(is_int($val) || ctype_digit($val))) {
                 throw new \Exception("La valeur du champ n'est pas un entier");
@@ -376,9 +365,9 @@ final class Field extends Debug {
      *
      * @param  mixed $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidBool($val, bool $returnMessage = false) {
+    private function isValidBool($val, bool $returnMessage = false): bool|string {
         try {
             if (!($val == 1 || $val == 0 || $val === true || $val === false || $val === "on")) {
                 throw new \Exception("La valeur du champ n'est pas un booléen");
@@ -399,9 +388,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidPassword(string $val, bool $returnMessage = false) {
+    private function isValidPassword(string $val, bool $returnMessage = false): bool|string {
         try {
             if (isset($this->length) && strlen($val) > $this->length) {
                 throw new \Exception("Le mot de passe est trop long");
@@ -425,9 +414,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidDateTime(string $val, bool $returnMessage = false) {
+    private function isValidDateTime(string $val, bool $returnMessage = false): bool|string {
         try {
             if (!preg_match("/^((((19|[2-9]\d)\d{2})\-(0[13578]|1[02])\-(0[1-9]|[12]\d|3[01]))|(((19|[2-9]\d)\d{2})\-(0[13456789]|1[012])\-(0[1-9]|[12]\d|30))|(((19|[2-9]\d)\d{2})\-02\-(0[1-9]|1\d|2[0-8]))|(((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))\-02\-29)) (([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)$/", $val)) {
                 throw new \Exception("DateTime non valide");
@@ -448,9 +437,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidDate(string $val, bool $returnMessage = false) {
+    private function isValidDate(string $val, bool $returnMessage = false): bool|string {
         try {
             if (!preg_match("/^((((19|[2-9]\d)\d{2})\-(0[13578]|1[02])\-(0[1-9]|[12]\d|3[01]))|(((19|[2-9]\d)\d{2})\-(0[13456789]|1[012])\-(0[1-9]|[12]\d|30))|(((19|[2-9]\d)\d{2})\-02\-(0[1-9]|1\d|2[0-8]))|(((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))\-02\-29))$/", $val)) {
                 throw new \Exception("Date non valide");
@@ -471,9 +460,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidTime(string $val, bool $returnMessage = false) {
+    private function isValidTime(string $val, bool $returnMessage = false): bool|string {
         try {
             if (!preg_match("/^(([0-1][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?)$/", $val)) {
                 throw new \Exception("Heure non valide");
@@ -494,9 +483,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidUrl(string $val, bool $returnMessage = false) {
+    private function isValidUrl(string $val, bool $returnMessage = false): bool|string {
         try {
             if (!preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i", $val)) {
                 throw new \Exception("Url non valide");
@@ -512,7 +501,14 @@ final class Field extends Debug {
         return true;
     }
 
-    private function isValidSelect(string $val, bool $returnMessage = false) {
+    /**
+     * Validtions de la valeur du champs de type select
+     *
+     * @param  string $val Valeur à vérifier
+     * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
+     * @return bool|string True $val correct et $returnMessage = false
+     */
+    private function isValidSelect(string $val, bool $returnMessage = false): bool|string {
         try {
             $valExist = false;
             foreach ($this->choices as $choice) {
@@ -540,9 +536,9 @@ final class Field extends Debug {
      *
      * @param  string $val Valeur à vérifier
      * @param  bool $returnMessage Si true retourne un message d'erreur si $val n'est pas conforme
-     * @return bool True $val correct et $returnMessage = false
+     * @return bool|string True $val correct et $returnMessage = false
      */
-    private function isValidRichText(string $val, bool $returnMessage = false) {
+    private function isValidRichText(string $val, bool $returnMessage = false): bool|string {
         try {
             if (isset($this->length)) {
                 $config = \HTMLPurifier_Config::createDefault();

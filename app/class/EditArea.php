@@ -202,7 +202,7 @@ abstract class EditArea extends Debug {
                 case 'App\ForeignKey':
                     $values[$key] = $field->get()->get("id");
                     if ($dataSelect) {
-                        $name = $field->getAdminKey();
+                        $name = $field->getColumn();
                         $table = new ($field->getTable());
                         $list = $table->listAll();
                         foreach ($list as $elt) {
@@ -216,7 +216,7 @@ abstract class EditArea extends Debug {
                         $values[$key][] = $id;
                     }
                     if ($dataSelect) {
-                        $name = $field->getKey();
+                        $name = $field->getColumn();
                         $table = new ($field->getForeignTable());
                         $list = $table->listAll();
                         foreach ($list as $elt) {

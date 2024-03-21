@@ -92,11 +92,14 @@ abstract class Table extends Debug {
      * Attribuer des valeurs à des champs de la table depuis un tableau
      *
      * @param  array $array [ Nom => Valeur ]
+     * @param  string $for "insert" ou "update"
      * @return void
      */
-    public function setFromArray(array $array) {
+    public function setFromArray(array $array, string|null $for = null) {
         foreach ($array as $key => $val) {
-            $this->set($key, $val);
+            if (is_null($for) || isset($this->fields[$key]) && ($for === "insert" && $this->fields[$key]->canInsert() || $for === "update" && $this->fields[$key]->canUpdate())) {
+                $this->set($key, $val);
+            }
         }
     }
 
@@ -368,8 +371,8 @@ abstract class Table extends Debug {
             if (is_a($value, "App\ForeignKey")) {
                 $columns .= ", $class.$field";
                 $table = strtolower(explode("\\", $value->getTable())[1]);
-                $name = $value->getAdminKey();
-                if(BDD::Execute("SELECT id AS value, $name AS name FROM $table", [])) {
+                $name = $value->getColumn();
+                if (BDD::Execute("SELECT id AS value, $name AS name FROM $table", [])) {
                     $dataSelect[$field] = BDD::FetchAll();
                 }
             } else if (is_a($value, "App\MultipleForeignKeys")) {
@@ -377,9 +380,9 @@ abstract class Table extends Debug {
                 $junctionTable = $value->getTableName();
                 $columns .= ", GROUP_CONCAT($foreignTable.id) as $field";
                 $join .= "LEFT JOIN $junctionTable ON $class.id = $junctionTable.$class LEFT JOIN $foreignTable ON $foreignTable.id = $junctionTable.$foreignTable";
-                $name = $value->getKey();
+                $name = $value->getColumn();
                 $splits[] = $field;
-                if(BDD::Execute("SELECT id AS value, $name AS name FROM $foreignTable", [])) {
+                if (BDD::Execute("SELECT id AS value, $name AS name FROM $foreignTable", [])) {
                     $dataSelect[$field] = BDD::FetchAll();
                 }
             } else if (is_a($value, "App\File")) {
@@ -396,7 +399,7 @@ abstract class Table extends Debug {
                 }
             }
         }
-        if(BDD::Execute("SELECT $columns FROM $class $join GROUP BY $class.id", [])) {
+        if (BDD::Execute("SELECT $columns FROM $class $join GROUP BY $class.id", [])) {
             $data = BDD::FetchAll();
         }
         foreach ($requirePath as $require) {

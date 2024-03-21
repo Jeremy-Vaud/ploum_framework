@@ -9,35 +9,45 @@ namespace App;
  * @final
  */
 final class MultipleForeignKeys extends Debug {
+    // Traits
+    use FieldTrait;
+    use ForeignTrait;
     // Attributs
-    protected $id = 0;
-    protected $table;
-    protected $foreignTable;
-    protected $tableName;
-    protected $value = [];
-    protected $admin = ["key" => "id", "admin" => []]; // Parmètres du panneau d'administration ("columns","insert","update")
+    protected int $id = 0; // Id de l'objet auxquelle le champ appartiens
+    protected ?string $table = null; // Nom de la classe a laquelle appartiens le champ
+    protected ?string $foreignTable = null; // Nom de la classe étrangère
+    protected ?string $tableName = null; // Nom de la table
+    protected array $value = [];
 
     /**
      * Constructeur
      *
-     * @param  string $foreignTable Nom de la table des clées étrangères
-     * @param  array $admin Liste des paramètres pour le panneau d'administration ("columns","insert","update")
+     * @param  string $foreignTable Nom de la classe étrangère
+     * @param  array $params [column : string, admin : array]
      * @throws Exeption si la table n'existe pas
      * @return void
      */
-    public function __construct(string $foreignTable, array $admin = []) {
+    public function __construct(string $foreignTable, array $params = []) {
         try {
+            // Input
+            $this->input = "selectMulti";
             if (!class_exists($foreignTable)) {
                 throw new \Exception("La class " .  htmlentities($foreignTable) . " n'existe pas");
             }
-            if ($admin !== []) {
-                if (isset($admin["key"])) {
-                    $this->admin["key"] = $admin["key"];
+            // Column
+            if (isset($params["column"])) {
+                if (!is_string($params["column"])) {
+                    throw new \Exception("Paramètre 'column' invalides");
                 }
-                if (isset($admin["admin"])) {
-                    $this->admin["admin"] = $admin["admin"];
+                $this->column = $params["column"];
+            }
+            // Admin
+            if (isset($params["admin"])) {
+                if (!$this->setAdmin($params["admin"])) {
+                    throw new \Exception("Paramètres 'admin' invalides");
                 }
             }
+            // ForeignTable
             $this->foreignTable = $foreignTable;
         } catch (\Exception $e) {
             $this->alertDebug($e);
@@ -49,7 +59,7 @@ final class MultipleForeignKeys extends Debug {
      *
      * @return array value
      */
-    public function get() {
+    public function get(): array {
         return $this->value;
     }
 
@@ -58,11 +68,16 @@ final class MultipleForeignKeys extends Debug {
      *
      * @return string
      */
-    public function getForeignTable() {
+    public function getForeignTable(): string {
         return $this->foreignTable;
     }
-    
-    public function getTableName() {
+
+    /**
+     * Retourne la valeur de l'attribut tableName
+     *
+     * @return string
+     */
+    public function getTableName(): string {
         return $this->tableName;
     }
 
@@ -72,7 +87,7 @@ final class MultipleForeignKeys extends Debug {
      * @param  int $id
      * @return void
      */
-    public function setId(int $id) {
+    public function setId(int $id): void {
         $this->id = $id;
     }
 
@@ -83,7 +98,7 @@ final class MultipleForeignKeys extends Debug {
      * @throws Exeption si table n'existe pas
      * @return void
      */
-    public function setTable(string $table) {
+    public function setTable(string $table): void {
         try {
             if (!class_exists($table)) {
                 throw new \Exception("La class " .  htmlentities($table) . " n'existe pas");
@@ -101,7 +116,7 @@ final class MultipleForeignKeys extends Debug {
      * @param  mixed $list (array : [1,6,9], string : '1,6,9')
      * @return void
      */
-    public function set(array | string $list) {
+    public function set(array | string $list): void {
         $this->value = [];
         if (is_array($list)) {
             foreach ($list as $elt) {
@@ -123,7 +138,7 @@ final class MultipleForeignKeys extends Debug {
      * @throws Excepton Erreur sql 
      * @return void
      */
-    public function load() {
+    public function load(): void {
         $table = $this->tableName;
         $explode = explode("_", $table);
         $firstTable = $explode[0];
@@ -149,9 +164,9 @@ final class MultipleForeignKeys extends Debug {
      * Insère les données dans la BDD
      *
      * @throws Excepton Erreur sql 
-     * @return void
+     * @return bool
      */
-    public function insert() {
+    public function insert(): bool {
         if ($this->value && $this->value !== []) {
             $explode = explode("_", $this->tableName);
             $sql = "INSERT INTO `" . $this->tableName . "` (`" . $explode[0] . "`,`" . $explode[1] . "`) VALUE ";
@@ -178,9 +193,9 @@ final class MultipleForeignKeys extends Debug {
     /**
      * Suprime toutes les données de la BDD
      *
-     * @return void
+     * @return bool
      */
-    public function delete() {
+    public function delete(): bool {
         $sql = "DELETE FROM `" . $this->tableName . "` WHERE `" . explode("\\", $this->table)[1] . "` = :id";
         $param = [":id" => $this->id];
         try {
@@ -197,9 +212,9 @@ final class MultipleForeignKeys extends Debug {
     /**
      * Mise à jour des données de la BDD
      *
-     * @return void
+     * @return bool
      */
-    public function update() {
+    public function update(): bool {
         try {
             if (!$this->delete()) {
                 throw new \Exception("Erreur de supréssion ");
@@ -212,24 +227,5 @@ final class MultipleForeignKeys extends Debug {
             return false;
         }
         return true;
-    }
-
-
-    /**
-     * Retourne les paramètres du champ pour le panneau d'administration
-     *
-     * @param bool $table si true retourne aussi la valeur de l'attribut table
-     * @return mixed Un tableau de paramètres ou false 
-     */
-    public function getAdmin(bool $table = true) {
-        $return = ["type" => "selectMulti"];
-        if ($table) {
-            $return["table"] = $this->admin["admin"];
-        }
-        return $return;
-    }
-
-    public function getKey() {
-        return $this->admin["key"];
     }
 }
